@@ -8,7 +8,8 @@
     "dev": "vite",
     "format": "bun x sort-package-json && prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tc": "tsc --watch --noEmit"
   },
   "prettier": {
     "bracketSpacing": true,
