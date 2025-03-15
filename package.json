@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
-    "dev": "vite",
+    "backend": "bun --hot ./src/backend/backend.ts",
+    "backend:build": "bun frontend:build",
     "format": "bun x sort-package-json && prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
+    "frontend": "vite",
+    "frontend:build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "tc": "tsc --watch --noEmit"
@@ -23,25 +25,23 @@
     "trailingComma": "es5"
   },
   "dependencies": {
+    "@trpc/client": "^11.0.0-rc.833",
+    "@trpc/server": "^11.0.0-rc.833",
     "@types/bun": "^1.2.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.14",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
-    "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "tailwindcss": "^4.0.14",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.2"
+    "typescript": "^5.8.2"
   }
 }
