@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from '../app/frontend.tsx';
-import '../frontend/frontend.css';
 
 const root = document.getElementById('root');
 

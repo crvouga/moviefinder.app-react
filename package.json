@@ -1,16 +1,12 @@
 {
-  "name": "vite-project",
+  "name": "moviefinder.app",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "backend": "bun --hot ./src/backend/backend.ts",
-    "backend:build": "bun frontend:build",
+    "start": "bun --hot ./src/backend/backend.ts",
     "format": "bun x sort-package-json && prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
-    "frontend": "vite",
-    "frontend:build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
     "tc": "tsc --watch --noEmit"
   },
   "prettier": {
@@ -35,13 +31,6 @@
   "devDependencies": {
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
-    "eslint": "^9.22.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "^5.8.2"
   }
 }
