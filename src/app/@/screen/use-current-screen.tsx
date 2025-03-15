@@ -1,5 +1,5 @@
-import { useQueryParam } from '~/@/use-query-param';
-import { Screen } from './screen';
+import { useQueryParam } from '~/@/use-query-param'
+import { Screen } from './screen'
 
 export const useCurrentScreen = () => {
   const queryParam = useQueryParam({
@@ -8,7 +8,7 @@ export const useCurrentScreen = () => {
     defaultValue: {
       type: 'home',
     },
-  });
+  })
 
-  return queryParam;
-};
+  return queryParam
+}

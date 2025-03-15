@@ -1,12 +1,12 @@
-import { CurrentScreen } from './frontend/current-screen';
+import { CurrentScreen } from './frontend/current-screen'
 
 export const App = () => {
   return (
     <AppRoot>
       <CurrentScreen />
     </AppRoot>
-  );
-};
+  )
+}
 
 const AppRoot = (props: { children: React.ReactNode }) => {
   return (
@@ -15,5 +15,5 @@ const AppRoot = (props: { children: React.ReactNode }) => {
         {props.children}
       </div>
     </div>
-  );
-};
+  )
+}

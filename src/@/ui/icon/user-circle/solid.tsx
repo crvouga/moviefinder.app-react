@@ -1,4 +1,4 @@
-import { Icon } from '../@/props';
+import { Icon } from '../@/props'
 
 export const IconUserCircleSolid: Icon = (props) => {
   return (
@@ -14,5 +14,5 @@ export const IconUserCircleSolid: Icon = (props) => {
         clipRule="evenodd"
       />
     </svg>
-  );
-};
+  )
+}

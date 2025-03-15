@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "bun --hot ./src/backend/backend.ts",
+    "dev": "bun start",
     "format": "bun x sort-package-json && prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "start": "bun --hot ./src/backend/backend.ts",
     "tc": "tsc --watch --noEmit"
   },
   "prettier": {
@@ -15,7 +16,7 @@
       "prettier-plugin-tailwindcss"
     ],
     "printWidth": 100,
-    "semi": true,
+    "semi": false,
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "es5"
@@ -23,14 +24,16 @@
   "dependencies": {
     "@trpc/client": "^11.0.0-rc.833",
     "@trpc/server": "^11.0.0-rc.833",
-    "@types/bun": "^1.2.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/bun": "^1.2.5",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
     "typescript": "^5.8.2"
   }
 }

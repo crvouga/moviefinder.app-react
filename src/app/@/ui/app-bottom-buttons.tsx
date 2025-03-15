@@ -1,10 +1,10 @@
-import { BottomButtons } from '~/@/ui/bottom-buttons';
-import { IconHomeSolid } from '~/@/ui/icon/home/solid';
-import { IconUserCircleSolid } from '~/@/ui/icon/user-circle/solid';
-import { useCurrentScreen } from '../screen/use-current-screen';
+import { BottomButtons } from '~/@/ui/bottom-buttons'
+import { IconHomeSolid } from '~/@/ui/icon/home/solid'
+import { IconUserCircleSolid } from '~/@/ui/icon/user-circle/solid'
+import { useCurrentScreen } from '../screen/use-current-screen'
 
 export const AppBottomButtons = () => {
-  const currentScreen = useCurrentScreen();
+  const currentScreen = useCurrentScreen()
   return (
     <BottomButtons
       buttons={[
@@ -22,8 +22,8 @@ export const AppBottomButtons = () => {
         },
       ]}
     />
-  );
-};
+  )
+}
 
 export const AppBottomButtonsLayout = (props: { children: React.ReactNode }) => {
   return (
@@ -31,5 +31,5 @@ export const AppBottomButtonsLayout = (props: { children: React.ReactNode }) => 
       <div className="w-full flex-1 flex-col items-center justify-center">{props.children}</div>
       <AppBottomButtons />
     </div>
-  );
-};
+  )
+}

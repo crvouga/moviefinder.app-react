@@ -1,3 +1,3 @@
-import { FC } from 'react';
+import { FC } from 'react'
 
-export type Icon = FC<{ className: string }>;
+export type Icon = FC<{ className: string }>
