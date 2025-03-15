@@ -1,8 +1,12 @@
 export const App = () => {
+  return <AppRoot>hello world</AppRoot>;
+};
+
+const AppRoot = (props: { children: React.ReactNode }) => {
   return (
-    <div className="w-screen h-[100vh] bg-black text-white flex justify-center items-center">
-      <div className="w-full h-full flex flex-col border rounded max-w-[600px] max-h-[900px]">
-        Hello world!
+    <div className="flex h-[100vh] w-screen items-center justify-center bg-black text-white">
+      <div className="flex h-full max-h-[900px] w-full max-w-[600px] flex-col items-center justify-center rounded border">
+        {props.children}
       </div>
     </div>
   );
