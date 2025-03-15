@@ -17,6 +17,7 @@ export const useQueryParam = <T>(config: {
     push: (value: T) => {
       searchParams.set(param, codec.encode(value))
       window.history.pushState({}, '', window.location.pathname + '?' + searchParams.toString())
+      window.dispatchEvent(new Event('pushstate'))
     },
   }
 }

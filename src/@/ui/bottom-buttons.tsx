@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { cn } from './cn'
 
 export type BottomButton = {
   label: string
@@ -25,9 +26,10 @@ const BottomButton = ({ button }: { button: BottomButton }) => {
   return (
     <button
       onClick={button.onClick}
-      className={`flex flex-col items-center p-2 ${
-        button.selected ? 'text-blue-500' : 'text-gray-500'
-      }`}
+      className={cn(
+        'flex h-16 flex-1 cursor-pointer flex-col items-center justify-center',
+        button.selected ? 'text-blue-500' : 'text-neutral-200'
+      )}
     >
       <span className="text-2xl">{button.icon({ className: 'size-6' })}</span>
       <span className="text-xs">{button.label}</span>
