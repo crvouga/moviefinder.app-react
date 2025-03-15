@@ -1,7 +1,12 @@
 @import 'tailwindcss';
 
 @layer base {
-  .border {
-    @apply border-neutral-600;
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-neutral-600, currentColor);
   }
 }

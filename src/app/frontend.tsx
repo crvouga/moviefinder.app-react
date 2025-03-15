@@ -1,5 +1,11 @@
+import { CurrentScreen } from './frontend/current-screen';
+
 export const App = () => {
-  return <AppRoot>hello world</AppRoot>;
+  return (
+    <AppRoot>
+      <CurrentScreen />
+    </AppRoot>
+  );
 };
 
 const AppRoot = (props: { children: React.ReactNode }) => {
