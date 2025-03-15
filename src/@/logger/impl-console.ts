@@ -2,24 +2,23 @@ import type { ILogger } from './interface'
 
 export const LoggerConsole = (): ILogger => {
   return {
-    info(msg) {
-      console.log(`[inf]`, msg)
+    info(...args) {
+      console.log(`[inf]`, ...args)
     },
-    warn(msg) {
-      console.warn(`[wrn]`, msg)
+    warn(...args) {
+      console.warn(`[wrn]`, ...args)
     },
-    error(msg) {
-      console.error(`[err]`, msg)
+    error(...args) {
+      console.error(`[err]`, ...args)
     },
-    debug(msg) {
-      console.debug(`[dbg]`, msg)
+    debug(...args) {
+      console.debug(`[dbg]`, ...args)
     },
-    trace(msg) {
-      console.trace(`[trc]`, msg)
+    trace(...args) {
+      console.trace(`[trc]`, ...args)
     },
-    fatal(msg) {
-      console.error(`[ftl]`, msg)
+    fatal(...args) {
+      console.error(`[ftl]`, ...args)
     },
-    noop() {},
   }
 }
