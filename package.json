@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "echo 'build'",
     "dev": "bun start",
     "format": "bun x sort-package-json && prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
+    "kp": "bun x kill-port 3000",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "start": "bun --hot ./src/backend/backend.ts",
-    "build": "echo 'build'",
     "tc": "tsc --watch --noEmit"
   },
   "prettier": {
