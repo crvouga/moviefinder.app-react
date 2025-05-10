@@ -27,8 +27,10 @@ export const AppBottomButtons = () => {
 
 export const AppBottomButtonsLayout = (props: { children: React.ReactNode }) => {
   return (
-    <div className="flex w-full flex-1 flex-col items-center justify-center">
-      <div className="w-full flex-1 flex-col items-center justify-center">{props.children}</div>
+    <div className="flex w-full flex-1 flex-col items-center justify-center overflow-hidden">
+      <div className="w-full flex-1 flex-col items-center justify-center overflow-hidden">
+        {props.children}
+      </div>
       <AppBottomButtons />
     </div>
   )

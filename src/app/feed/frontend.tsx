@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Loading, NotAsked, Remote } from '~/@/result'
+import { Swiper } from '~/@/ui/swiper'
 import { AppBottomButtonsLayout } from '~/app/@/ui/app-bottom-buttons'
 import { useCtx } from '../ctx/frontend'
 import { MediaDbQueryOutput } from '../media/media-db/query-output'
@@ -29,11 +30,11 @@ const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) =
   switch (props.media.t) {
     case 'ok': {
       return (
-        <div>
+        <Swiper.Container slidesPerView={1} className="h-full w-full" direction="vertical">
           {props.media.value.media.items.map((item) => (
-            <div key={item.id}>{item.title}</div>
+            <Swiper.Slide key={item.id}>{item.title}</Swiper.Slide>
           ))}
-        </div>
+        </Swiper.Container>
       )
     }
     case 'not-asked': {
