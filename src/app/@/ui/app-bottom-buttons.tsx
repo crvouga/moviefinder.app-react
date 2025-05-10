@@ -10,9 +10,9 @@ export const AppBottomButtons = () => {
       buttons={[
         {
           icon: (props) => <IconHomeSolid {...props} />,
-          label: 'Home',
-          selected: currentScreen.value.type === 'home',
-          onClick: () => currentScreen.push({ type: 'home' }),
+          label: 'Feed',
+          selected: currentScreen.value.type === 'feed',
+          onClick: () => currentScreen.push({ type: 'feed' }),
         },
         {
           icon: (props) => <IconUserCircleSolid {...props} />,

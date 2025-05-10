@@ -3,7 +3,7 @@ import { Codec } from '~/@/codec'
 
 const parser = z.discriminatedUnion('type', [
   z.object({
-    type: z.literal('home'),
+    type: z.literal('feed'),
   }),
   z.object({
     type: z.literal('account'),

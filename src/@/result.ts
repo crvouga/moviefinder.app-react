@@ -35,3 +35,21 @@ export const Result = {
   parser,
   mapErr,
 }
+
+export type Loading = {
+  t: 'loading'
+}
+
+export const Loading: Loading = {
+  t: 'loading',
+}
+
+export type NotAsked = {
+  t: 'not-asked'
+}
+
+export const NotAsked: NotAsked = {
+  t: 'not-asked',
+}
+
+export type Remote = Loading | NotAsked
