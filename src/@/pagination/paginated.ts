@@ -1,6 +1,6 @@
 export type Paginated<T> = {
   items: T[]
   total: number
-  page: number
+  offset: number
   limit: number
 }

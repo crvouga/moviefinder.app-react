@@ -14,3 +14,5 @@ export const TmdbClient = (config: TmdbClientConfig) => {
     person: PersonClient(config),
   }
 }
+
+export type TmdbClient = ReturnType<typeof TmdbClient>
