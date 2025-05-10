@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ApiKey } from '../@/api-key'
+import { TmdbApiKey } from '../@/api-key'
 import { ErrResponse } from '../@/error-response'
 import { HttpClientGet } from '../@/http-client-get'
 import { Language } from '../@/language'
@@ -9,7 +9,7 @@ import { TmdbClientConfig } from '../@/tmdb-client-config'
 // https://developers.themoviedb.org/3/search/multi-search
 
 export const TmdbSearchMultiQueryParams = z.object({
-  api_key: ApiKey.optional(),
+  api_key: TmdbApiKey.optional(),
   language: Language.optional(),
   query: z.string().min(0).optional(),
   page: z.number().int().min(1).max(1000).default(1).optional(),

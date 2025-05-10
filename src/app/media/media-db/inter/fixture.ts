@@ -1,4 +1,4 @@
-import { TmdbClientFixture } from '~/app/@/tmdb-client/@/fixture'
+import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
 import { MediaDb } from '../impl-tmdb-client/impl-tmdb-client'
 
 export const Fixture = async () => {

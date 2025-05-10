@@ -5,7 +5,7 @@ import { TMDB_BASE_URL } from './base-url'
 
 export type TmdbClientConfig = {
   apiKey: string
-  baseUrl: string
+  baseUrl?: string
 }
 
 const init = (input: { apiKey: string; baseUrl?: string }): TmdbClientConfig => {

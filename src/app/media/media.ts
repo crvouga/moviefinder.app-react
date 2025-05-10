@@ -10,5 +10,5 @@ const parser = z.object({
 export type Media = z.infer<typeof parser>
 
 export const Media = {
-  ...parser,
+  parser,
 }

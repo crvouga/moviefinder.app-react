@@ -2,6 +2,7 @@ import { ZodSchema } from 'zod'
 import { Err, Ok, Result } from '~/@/result'
 import { objectToStringMap } from './object-to-string-map'
 import { TmdbClientConfig } from './tmdb-client-config'
+import { TMDB_BASE_URL } from './base-url'
 
 export const HttpClientGet =
   <
@@ -19,7 +20,9 @@ export const HttpClientGet =
     queryParams: QueryParams
   }): Promise<Result<ResponseBody, Error>> => {
     try {
-      const url = new URL(`${config.config.baseUrl}${config.endpoint(input.pathParams)}`)
+      const url = new URL(
+        `${config.config.baseUrl ?? TMDB_BASE_URL}${config.endpoint(input.pathParams)}`
+      )
       const searchParams = new URLSearchParams(objectToStringMap(input.queryParams))
       const headers = new Headers()
 
@@ -42,6 +45,7 @@ export const HttpClientGet =
 
       return Ok(parsed.data)
     } catch (error) {
+      console.error(error)
       if (error instanceof Error) {
         return Err(error)
       }

@@ -1,10 +1,11 @@
-import { Err, isErr, Ok } from '~/@/result'
-import { TmdbClient } from '~/app/@/tmdb-client'
-import { IMediaDb } from '../inter'
+import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
+import { Paginated } from '~/@/pagination/paginated'
+import { Err, isErr, mapErr, Ok } from '~/@/result'
+import { AppErr } from '~/app/@/error'
+import { TmdbClient } from '~/@/tmdb-client'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
-import { Paginated } from '~/@/pagination/paginated'
-import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
+import { IMediaDb } from '../inter'
 
 export type Config = {
   t: 'tmdb-client'
@@ -21,8 +22,9 @@ export const MediaDb = (config: Config): IMediaDb => {
         },
       })
 
-      if (isErr(got)) return got
-      if (got.value.status !== 200) return Err(new Error('Failed to fetch movies'))
+      if (isErr(got)) return mapErr(got, AppErr.from)
+
+      if (got.value.status !== 200) return Err(AppErr.from(got.value.body))
 
       const media: Paginated<Media> = {
         total: got.value.body.total_results ?? 0,
