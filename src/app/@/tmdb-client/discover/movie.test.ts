@@ -18,4 +18,17 @@ describe('Tmdb Discover Movie', () => {
 
     expect(isOk(result)).toBe(true)
   })
+
+  it('should paginate correctly', async () => {
+    const f = Fixture()
+
+    const result = await f.tmdbClient.discover.movie.get({
+      pathParams: {},
+      queryParams: {
+        page: 1,
+      },
+    })
+
+    expect(isOk(result)).toBe(true)
+  })
 })

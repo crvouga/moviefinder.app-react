@@ -20,14 +20,17 @@ export const HttpClientGet =
   }): Promise<Result<ResponseBody, Error>> => {
     try {
       const url = new URL(`${config.config.baseUrl}${config.endpoint(input.pathParams)}`)
-
       const searchParams = new URLSearchParams(objectToStringMap(input.queryParams))
+      const headers = new Headers()
 
-      searchParams.set('api_key', config.config.apiKey)
+      headers.set('Authorization', `Bearer ${config.config.apiKey}`)
 
       url.search = searchParams.toString()
+      const urlString = url.toString()
 
-      const fetched = await fetch(url.toString())
+      const fetched = await fetch(urlString, {
+        headers,
+      })
 
       const body = await fetched.json()
 

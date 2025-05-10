@@ -1,4 +1,4 @@
-import { TmdbClient } from '..'
+import { TmdbClient } from '../tmdb-client'
 import { ApiKey } from './api-key'
 import { TMDB_BASE_URL } from './base-url'
 
