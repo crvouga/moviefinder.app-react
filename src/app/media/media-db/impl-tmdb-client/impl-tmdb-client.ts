@@ -4,6 +4,7 @@ import { IMediaDb } from '../inter'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { Paginated } from '~/@/pagination/paginated'
+import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
 
 export type Config = {
   t: 'tmdb-client'
@@ -15,7 +16,9 @@ export const MediaDb = (config: Config): IMediaDb => {
     async query(query) {
       const got = await config.tmdbClient.discover.movie.get({
         pathParams: {},
-        queryParams: {},
+        queryParams: {
+          page: PageBasedPagination.fromPagination(query).page,
+        },
       })
 
       if (isErr(got)) return got

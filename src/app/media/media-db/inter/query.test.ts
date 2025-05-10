@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { isOk } from '~/@/result'
 import { Fixture } from './fixture'
 
-describe('query', () => {
+describe('MediaDb Query', () => {
   it('should work', async () => {
     const f = await Fixture()
 

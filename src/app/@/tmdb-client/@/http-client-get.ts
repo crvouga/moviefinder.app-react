@@ -36,7 +36,9 @@ export const HttpClientGet =
 
       const parsed = await config.response.safeParseAsync({ status: fetched.status, body })
 
-      if (!parsed.success) return Err(new Error('Failed to parse response'))
+      if (!parsed.success) {
+        return Err(parsed.error)
+      }
 
       return Ok(parsed.data)
     } catch (error) {
