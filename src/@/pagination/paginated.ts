@@ -11,6 +11,16 @@ const parser = <T>(t: z.ZodType<T>) => {
 
 export type Paginated<T> = z.infer<ReturnType<typeof parser<T>>>
 
+const empty = <T>(): Paginated<T> => {
+  return {
+    items: [],
+    total: 0,
+    offset: 0,
+    limit: 0,
+  }
+}
+
 export const Paginated = {
   parser,
+  empty,
 }

@@ -1,3 +1,4 @@
+import { distinct } from '~/@/distinct'
 import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
 import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
@@ -7,7 +8,6 @@ import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { IMediaDb } from '../interface/interface'
-import { distinct } from '~/@/distinct'
 
 export type Config = {
   t: 'tmdb-client'
@@ -15,7 +15,16 @@ export type Config = {
 }
 
 export const MediaDb = (config: Config): IMediaDb => {
+  const upserted = new Map<MediaId, Media>()
+
   return {
+    async upsert(input) {
+      for (const media of input.media) {
+        upserted.set(media.id, media)
+      }
+
+      return Ok(null)
+    },
     async query(query) {
       const got = await config.tmdbClient.discover.movie.get({
         pathParams: {},

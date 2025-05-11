@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { z } from 'zod'
 
 const parser = z.object({
@@ -31,8 +32,15 @@ const isEmpty = (imageSet: ImageSet): boolean => {
   return imageSet.lowestToHighestRes.length === 0
 }
 
+const random = (): ImageSet => {
+  return {
+    lowestToHighestRes: [faker.image.url(), faker.image.url(), faker.image.url()],
+  }
+}
+
 export const ImageSet = {
   parser,
+  random,
   init,
   empty,
   toHighestRes,

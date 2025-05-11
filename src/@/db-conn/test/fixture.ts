@@ -18,3 +18,10 @@ export const Fixtures = () => {
 
   return configs.map(Fixture)
 }
+
+export const DbConnFixture = () => {
+  const pglite = new PGlite()
+  const dbConn = DbConn({ t: 'pglite', pglite })
+
+  return { dbConn }
+}

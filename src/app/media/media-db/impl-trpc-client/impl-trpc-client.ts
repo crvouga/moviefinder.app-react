@@ -12,5 +12,9 @@ export const MediaDb = (config: Config): IMediaDb => {
       const queried = await config.trpcClient.mediaDb.query.query(query)
       return queried
     },
+    async upsert(input) {
+      const upserted = await config.trpcClient.mediaDb.upsert.mutate(input)
+      return upserted
+    },
   }
 }

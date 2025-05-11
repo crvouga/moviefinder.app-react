@@ -1,20 +1,42 @@
+import { DbConnFixture } from '~/@/db-conn/test/fixture'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
-import { MediaDb } from '../impl-tmdb-client/impl-tmdb-client'
-import { Config } from '../impl/backend'
+import { Config, MediaDbBackend } from '../impl/backend'
 
 const Fixture = async (config: Config) => {
-  const mediaDb = MediaDb(config)
+  const mediaDb = MediaDbBackend(config)
 
-  return { mediaDb }
+  return {
+    mediaDb,
+  }
 }
 
-export const Fixtures = async () => {
+export const ReadOnlyFixtures = async () => {
   const configs: Config[] = []
 
   const { tmdbClient } = TmdbClientFixture()
   configs.push({
     t: 'tmdb-client',
     tmdbClient,
+  })
+
+  const { dbConn } = DbConnFixture()
+  configs.push({
+    t: 'db-conn',
+    dbConn,
+    shouldCreateTable: true,
+  })
+
+  return await Promise.all(configs.map(Fixture))
+}
+
+export const Fixtures = async () => {
+  const configs: Config[] = []
+
+  const { dbConn } = DbConnFixture()
+  configs.push({
+    t: 'db-conn',
+    dbConn,
+    shouldCreateTable: true,
   })
 
   return await Promise.all(configs.map(Fixture))

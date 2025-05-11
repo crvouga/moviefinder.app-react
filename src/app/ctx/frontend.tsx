@@ -29,7 +29,7 @@ const init = (): Ctx => {
 
   const mediaDb = MediaDbFrontend({
     t: 'sync-reads',
-    local: MediaDbFrontend({ t: 'db-conn', dbConn }),
+    local: MediaDbFrontend({ t: 'db-conn', dbConn, shouldCreateTable: true }),
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
   })
 

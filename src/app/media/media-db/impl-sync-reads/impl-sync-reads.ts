@@ -11,5 +11,8 @@ export const MediaDb = (config: Config): IMediaDb => {
     async query(query) {
       return config.remote.query(query)
     },
+    async upsert(input) {
+      return config.local.upsert(input)
+    },
   }
 }

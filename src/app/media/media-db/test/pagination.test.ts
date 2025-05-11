@@ -2,11 +2,11 @@ import { describe, expect, it } from 'bun:test'
 import { intersectionWith } from '~/@/intersection-with'
 import { Pagination } from '~/@/pagination/pagination'
 import { unwrap } from '~/@/result'
-import { Fixtures } from './fixture'
+import { ReadOnlyFixtures } from './fixture'
 
 describe('MediaDb Pagination', () => {
   it.todo('should work', async () => {
-    for (const f of await Fixtures()) {
+    for (const f of await ReadOnlyFixtures()) {
       const page1 = unwrap(await f.mediaDb.query({ limit: 20, offset: 0 }))
       const page2 = unwrap(await f.mediaDb.query(Pagination.nextPage(page1.media)))
 

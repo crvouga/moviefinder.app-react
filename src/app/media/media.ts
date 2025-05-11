@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { z } from 'zod'
 import { ImageSet } from '~/@/image-set'
 import { MediaId } from './media-id'
@@ -12,6 +13,17 @@ const parser = z.object({
 
 export type Media = z.infer<typeof parser>
 
+const random = (): Media => {
+  return {
+    id: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
+    title: faker.lorem.words(3),
+    description: faker.lorem.paragraph(),
+    poster: ImageSet.random(),
+    backdrop: ImageSet.random(),
+  }
+}
+
 export const Media = {
   parser,
+  random,
 }
