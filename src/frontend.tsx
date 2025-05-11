@@ -9,7 +9,7 @@ if (!root) throw new Error('Root element not found')
 
 const reactRoot = ReactDOM.createRoot(root)
 
-const ctx = Ctx.init()
+const ctx = await Ctx.init()
 
 // @ts-ignore
 window.ctx = ctx

@@ -16,5 +16,5 @@ export type IDbConn = {
     parser: z.ZodType<TRow>
     sql: string
     params?: Param[]
-  }) => Sub<Result<TRow, Error>>
+  }) => Sub<Result<{ rows: TRow[] }, Error>>
 }

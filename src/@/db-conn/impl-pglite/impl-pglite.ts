@@ -31,8 +31,6 @@ export const DbConn = (config: Config): IDbConn => {
         return Err(error instanceof Error ? error : new Error(String(error)))
       }
     },
-    liveQuery(_input) {
-      throw new Error('Not implemented')
-    },
+    liveQuery(_input) {},
   }
 }

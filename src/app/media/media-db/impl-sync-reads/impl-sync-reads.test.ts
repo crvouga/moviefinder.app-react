@@ -3,8 +3,8 @@ import { DbConnFixture } from '~/@/db-conn/test/fixture'
 import { MediaDbBackend } from '../impl/backend'
 
 const Fixture = async () => {
-  const dbConnLocal = DbConnFixture()
-  const dbConnRemote = DbConnFixture()
+  const dbConnLocal = await DbConnFixture()
+  const dbConnRemote = await DbConnFixture()
   const local = MediaDbBackend({
     t: 'db-conn',
     dbConn: dbConnLocal.dbConn,

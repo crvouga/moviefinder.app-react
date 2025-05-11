@@ -1,8 +1,8 @@
-import { PGlite } from '@electric-sql/pglite'
 import { createContext, useContext } from 'react'
 import { DbConn } from '~/@/db-conn/impl'
 import { IDbConn } from '~/@/db-conn/interface'
 import { ILogger, Logger } from '~/@/logger'
+import { createPglite } from '~/@/pglite/pglite'
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
@@ -14,12 +14,12 @@ export type Ctx = {
   logger: ILogger
 }
 
-const init = (): Ctx => {
+const init = async (): Promise<Ctx> => {
   const isProd = process.env.NODE_ENV === 'production'
 
   const logger = Logger.prefix('app', Logger({ type: 'console' }))
 
-  const pglite = new PGlite()
+  const pglite = await createPglite()
 
   const dbConn = DbConn({ t: 'pglite', pglite })
 
@@ -41,14 +41,16 @@ const init = (): Ctx => {
   }
 }
 
-const Context = createContext<Ctx>(init())
+const Context = createContext<Ctx | null>(null)
 
 const Provider = (props: { children: React.ReactNode; ctx: Ctx }) => {
   return <Context.Provider value={props.ctx}>{props.children}</Context.Provider>
 }
 
-export const useCtx = () => {
-  return useContext(Context)
+export const useCtx = (): Ctx => {
+  const ctx = useContext(Context)
+  if (!ctx) throw new Error('Ctx not found')
+  return ctx
 }
 
 export const Ctx = {

@@ -5,7 +5,7 @@ import { ILogger, Logger } from './@/logger'
 import { ServeSinglePageApp } from './@/serve-single-page-app'
 import { RequestId } from './app/@/request-id'
 
-const ctx = Ctx.init()
+const ctx = await Ctx.init()
 
 const app = App({ ctx })
 

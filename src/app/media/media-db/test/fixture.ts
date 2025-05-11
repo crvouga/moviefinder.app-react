@@ -19,7 +19,7 @@ export const ReadOnlyFixtures = async () => {
     tmdbClient,
   })
 
-  const { dbConn } = DbConnFixture()
+  const { dbConn } = await DbConnFixture()
   configs.push({
     t: 'db-conn',
     dbConn,
@@ -32,7 +32,7 @@ export const ReadOnlyFixtures = async () => {
 export const Fixtures = async () => {
   const configs: Config[] = []
 
-  const { dbConn } = DbConnFixture()
+  const { dbConn } = await DbConnFixture()
   configs.push({
     t: 'db-conn',
     dbConn,
