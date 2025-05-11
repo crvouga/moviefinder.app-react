@@ -13,14 +13,14 @@ export const Fixtures = async () => {
 
   configs.push({
     t: 'pglite',
-    pglite: await createPglite(),
+    pglite: await createPglite({ t: 'in-memory' }),
   })
 
   return configs.map(Fixture)
 }
 
 export const DbConnFixture = async () => {
-  const pglite = await createPglite()
+  const pglite = await createPglite({ t: 'in-memory' })
   const dbConn = DbConn({ t: 'pglite', pglite })
 
   return { dbConn }

@@ -54,6 +54,7 @@ export const DbConn = (config: Config): IDbConn => {
       })
 
       return {
+        ...sub,
         subscribe(callback) {
           const unsubscribe = sub.subscribe(callback)
           return () => {

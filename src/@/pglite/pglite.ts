@@ -1,11 +1,29 @@
-import { PGlite } from '@electric-sql/pglite'
+import { IdbFs, MemoryFS, PGlite } from '@electric-sql/pglite'
 import { live } from '@electric-sql/pglite/live'
 
-export const createPglite = async () => {
+export type PgliteConfig =
+  | {
+      t: 'in-memory'
+    }
+  | {
+      t: 'indexed-db'
+      databaseName: string
+    }
+
+const configToFs = (config: PgliteConfig) => {
+  switch (config.t) {
+    case 'in-memory':
+      return new MemoryFS()
+    case 'indexed-db':
+      return new IdbFs(config.databaseName)
+  }
+}
+export const createPglite = async (config: PgliteConfig) => {
   const pglite = await PGlite.create({
     extensions: {
       live,
     },
+    fs: configToFs(config),
   })
 
   return pglite

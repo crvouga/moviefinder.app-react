@@ -25,7 +25,7 @@ const init = async (): Promise<Ctx> => {
 
   const isProd = process.env.NODE_ENV === 'production'
 
-  const pglite = await createPglite()
+  const pglite = await createPglite({ t: 'in-memory' })
 
   const dbConn = DbConn({ t: 'pglite', pglite })
 

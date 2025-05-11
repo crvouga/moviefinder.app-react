@@ -4,6 +4,8 @@ import { isErr, mapErr, Ok } from '~/@/result'
 import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
 import { IMediaDb } from '../interface/interface'
+import { MediaDbQueryInput } from '../interface/query-input'
+import { MediaDbQueryOutput } from '../interface/query-output'
 import { Row } from './row'
 
 export type Config = {
@@ -31,19 +33,7 @@ export const MediaDb = (config: Config): IMediaDb => {
 
   return {
     async query(query) {
-      const sql = `
-      SELECT
-        id,
-        title,
-        description,
-        poster_urls,
-        backdrop_urls
-      FROM media
-      LIMIT $1 
-      OFFSET $2
-      `
-
-      const params = [query.limit, query.offset]
+      const { sql, params } = toSqlQuery(query)
 
       const queried = await config.dbConn.query({
         sql,
@@ -53,22 +43,15 @@ export const MediaDb = (config: Config): IMediaDb => {
 
       if (isErr(queried)) return mapErr(queried, AppErr.from)
 
-      const media = queried.value.rows.map((row): Media => {
-        const media = Row.toMedia(row)
-        return media
-      })
-
-      return Ok({
-        media: {
-          items: media,
-          total: media.length,
-          limit: query.limit,
-          offset: query.offset,
-        },
-      })
+      return toQueryOutput({ rows: queried.value.rows, query })
     },
-    liveQuery(_query) {
-      throw new Error('Not implemented')
+    liveQuery(query) {
+      const { sql, params } = toSqlQuery(query)
+
+      return config.dbConn.liveQuery({ sql, params, parser: Row.parser }).map((m) => {
+        if (isErr(m)) return mapErr(m, AppErr.from)
+        return toQueryOutput({ rows: m.value.rows, query })
+      })
     },
     async upsert(input) {
       const paramsNested = input.media.map((media) => [
@@ -111,5 +94,42 @@ export const MediaDb = (config: Config): IMediaDb => {
 
       return Ok(null)
     },
+  }
+}
+
+const toQueryOutput = (input: { rows: Row[]; query: MediaDbQueryInput }): MediaDbQueryOutput => {
+  const media = input.rows.map((row): Media => {
+    const media = Row.toMedia(row)
+    return media
+  })
+
+  return Ok({
+    media: {
+      items: media,
+      total: media.length,
+      limit: input.query.limit,
+      offset: input.query.offset,
+    },
+  })
+}
+
+const toSqlQuery = (query: MediaDbQueryInput) => {
+  const sql = `
+  SELECT
+    id,
+    title,
+    description,
+    poster_urls,
+    backdrop_urls
+  FROM media
+  LIMIT $1 
+  OFFSET $2
+  `
+
+  const params = [query.limit, query.offset]
+
+  return {
+    sql,
+    params,
   }
 }

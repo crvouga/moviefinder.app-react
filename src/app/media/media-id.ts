@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const parser = z.string().brand('MediaId')
+const parser = z.string()
 
 export type MediaId = z.infer<typeof parser>
 

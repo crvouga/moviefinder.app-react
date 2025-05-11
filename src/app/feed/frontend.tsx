@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react'
 import { ImageSet } from '~/@/image-set'
-import { Loading, NotAsked, Remote } from '~/@/result'
+import { useLatest } from '~/@/pub-sub'
+import { NotAsked, Remote } from '~/@/result'
 import { Swiper } from '~/@/ui/swiper'
 import { AppBottomButtonsLayout } from '~/app/@/ui/app-bottom-buttons'
 import { useCtx } from '../ctx/frontend'
 import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
+import { useCallback } from 'react'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
-  const [media, setMedia] = useState<Remote | MediaDbQueryOutput>(NotAsked)
-  useEffect(() => {
-    setMedia(Loading)
-    ctx.mediaDb.query({ limit: 20, offset: 0 }).then(setMedia)
-  }, [])
+
+  const liveQuery = useCallback(() => ctx.mediaDb.liveQuery({ limit: 20, offset: 0 }), [ctx])
+
+  const queried = useLatest<Remote | MediaDbQueryOutput>(liveQuery, NotAsked)
 
   return (
     <AppBottomButtonsLayout>
-      <ViewMediaDbQueryOutput media={media} />
+      <ViewMediaDbQueryOutput media={queried} />
     </AppBottomButtonsLayout>
   )
 }

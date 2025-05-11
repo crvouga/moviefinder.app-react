@@ -6,6 +6,7 @@ import { createPglite } from '~/@/pglite/pglite'
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
+import { PubSub } from '~/@/pub-sub'
 
 export type Ctx = {
   isProd: boolean
@@ -19,7 +20,7 @@ const init = async (): Promise<Ctx> => {
 
   const logger = Logger.prefix('app', Logger({ type: 'console' }))
 
-  const pglite = await createPglite()
+  const pglite = await createPglite({ t: 'indexed-db', databaseName: 'db' })
 
   const dbConn = DbConn({ t: 'pglite', pglite })
 
@@ -28,9 +29,11 @@ const init = async (): Promise<Ctx> => {
   const trpcClient = TrpcClient({ backendUrl })
 
   const mediaDb = MediaDbFrontend({
-    t: 'sync-reads',
+    t: 'one-way-sync-remote-to-local',
     local: MediaDbFrontend({ t: 'db-conn', dbConn, shouldCreateTable: true }),
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
+    logger,
+    pubSub: PubSub(),
   })
 
   return {
