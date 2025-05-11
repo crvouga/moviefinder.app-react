@@ -24,6 +24,7 @@
     "trailingComma": "es5"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.3.0",
     "@trpc/client": "^11.0.0-rc.833",
     "@trpc/server": "^11.0.0-rc.833",
     "react": "^19.0.0",

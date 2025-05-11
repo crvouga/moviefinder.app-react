@@ -1,3 +1,4 @@
+import { PGlite } from '@electric-sql/pglite'
 import { createContext, useContext } from 'react'
 import { FrontendMediaDb } from '../media/media-db/frontend'
 import { IMediaDb } from '../media/media-db/interface'
@@ -5,6 +6,10 @@ import { IMediaDb } from '../media/media-db/interface'
 export type Ctx = {
   mediaDb: IMediaDb
 }
+
+// const db = new PGlite()
+// @ts-ignore
+window.PGlite = PGlite
 
 const init = (): Ctx => {
   const mediaDb = FrontendMediaDb({
