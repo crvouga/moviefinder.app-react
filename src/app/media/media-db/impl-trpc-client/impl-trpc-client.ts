@@ -1,14 +1,15 @@
-import { trpcClient } from '~/app/trpc/frontend/trpc-client'
+import { TrpcClient } from '~/app/trpc/frontend/trpc-client'
 import { IMediaDb } from '../interface'
 
 export type Config = {
   t: 'trpc-client'
+  trpcClient: TrpcClient
 }
 
-export const MediaDb = (_config: Config): IMediaDb => {
+export const MediaDb = (config: Config): IMediaDb => {
   return {
     async query(query) {
-      const queried = await trpcClient.mediaDb.query.query(query)
+      const queried = await config.trpcClient.mediaDb.query.query(query)
       return queried
     },
   }

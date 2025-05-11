@@ -3,7 +3,7 @@ import { IMediaDb } from './interface'
 
 export type Config = ImplTmdbClient.Config
 
-export const BackendMediaDb = (config: Config): IMediaDb => {
+export const MediaDbBackend = (config: Config): IMediaDb => {
   switch (config.t) {
     case 'tmdb-client': {
       return ImplTmdbClient.MediaDb(config)

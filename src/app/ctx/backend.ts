@@ -1,7 +1,7 @@
 import { ILogger, Logger } from '~/@/logger'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbApiKey } from '~/@/tmdb-client/@/api-key'
-import { BackendMediaDb } from '../media/media-db/backend'
+import { MediaDbBackend } from '../media/media-db/backend'
 import { IMediaDb } from '../media/media-db/interface'
 import { IDbConn } from '~/@/db-conn/interface'
 import { PGlite } from '@electric-sql/pglite'
@@ -21,7 +21,7 @@ const init = (): Ctx => {
 
   const tmdbClient = TmdbClient({ readAccessToken: TMDB_API_READ_ACCESS_TOKEN })
 
-  const mediaDb = BackendMediaDb({ t: 'tmdb-client', tmdbClient })
+  const mediaDb = MediaDbBackend({ t: 'tmdb-client', tmdbClient })
 
   const isProd = process.env.NODE_ENV === 'production'
 

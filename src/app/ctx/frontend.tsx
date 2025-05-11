@@ -2,9 +2,10 @@ import { PGlite } from '@electric-sql/pglite'
 import { createContext, useContext } from 'react'
 import { DbConn } from '~/@/db-conn/impl'
 import { IDbConn } from '~/@/db-conn/interface'
-import { FrontendMediaDb } from '../media/media-db/frontend'
-import { IMediaDb } from '../media/media-db/interface'
 import { ILogger, Logger } from '~/@/logger'
+import { MediaDbFrontend } from '../media/media-db/frontend'
+import { IMediaDb } from '../media/media-db/interface'
+import { TrpcClient } from '../trpc/frontend/trpc-client'
 
 export type Ctx = {
   isProd: boolean
@@ -14,15 +15,20 @@ export type Ctx = {
 }
 
 const init = (): Ctx => {
-  const mediaDb = FrontendMediaDb({ t: 'trpc-client' })
+  const logger = Logger.prefix('app', Logger({ type: 'console' }))
 
   const pglite = new PGlite()
 
   const dbConn = DbConn({ t: 'pglite', pglite })
 
-  const isProd = process.env.NODE_ENV === 'production'
+  const trpcClient = TrpcClient()
 
-  const logger = Logger.prefix('app', Logger({ type: 'console' }))
+  const mediaDb = MediaDbFrontend({
+    t: 'trpc-client',
+    trpcClient,
+  })
+
+  const isProd = process.env.NODE_ENV === 'production'
 
   return {
     mediaDb,
