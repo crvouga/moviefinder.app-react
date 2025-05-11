@@ -3,8 +3,8 @@ import { createContext, useContext } from 'react'
 import { DbConn } from '~/@/db-conn/impl'
 import { IDbConn } from '~/@/db-conn/interface'
 import { ILogger, Logger } from '~/@/logger'
-import { MediaDbFrontend } from '../media/media-db/frontend'
-import { IMediaDb } from '../media/media-db/interface'
+import { MediaDbFrontend } from '../media/media-db/impl/frontend'
+import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
 
 export type Ctx = {

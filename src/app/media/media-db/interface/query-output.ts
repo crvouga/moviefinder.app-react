@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { Paginated } from '~/@/pagination/paginated'
 import { Result } from '~/@/result'
 import { AppErr } from '~/app/@/error'
-import { Media } from '../media'
+import { Media } from '../../media'
 
 const parser = Result.parser(
   z.object({

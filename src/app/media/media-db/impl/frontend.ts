@@ -1,7 +1,7 @@
-import { ImplDbConn } from './impl-db-conn'
-import { ImplSyncReads } from './impl-sync-reads'
-import { ImplTrpcClient } from './impl-trpc-client'
-import { IMediaDb } from './interface'
+import { ImplDbConn } from '../impl-db-conn'
+import { ImplSyncReads } from '../impl-sync-reads'
+import { ImplTrpcClient } from '../impl-trpc-client'
+import { IMediaDb } from '../interface/interface'
 
 export type Config = ImplTrpcClient.Config | ImplDbConn.Config | ImplSyncReads.Config
 

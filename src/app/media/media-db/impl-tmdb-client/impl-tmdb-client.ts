@@ -6,7 +6,7 @@ import { Configuration } from '~/@/tmdb-client/configuration/configuration'
 import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
-import { IMediaDb } from '../interface'
+import { IMediaDb } from '../interface/interface'
 import { distinct } from '~/@/distinct'
 
 export type Config = {

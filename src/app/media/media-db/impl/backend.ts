@@ -1,5 +1,5 @@
-import { ImplTmdbClient } from './impl-tmdb-client'
-import { IMediaDb } from './interface'
+import { ImplTmdbClient } from '../impl-tmdb-client'
+import { IMediaDb } from '../interface/interface'
 
 export type Config = ImplTmdbClient.Config
 

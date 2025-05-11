@@ -4,7 +4,7 @@ import { Loading, NotAsked, Remote } from '~/@/result'
 import { Swiper } from '~/@/ui/swiper'
 import { AppBottomButtonsLayout } from '~/app/@/ui/app-bottom-buttons'
 import { useCtx } from '../ctx/frontend'
-import { MediaDbQueryOutput } from '../media/media-db/query-output'
+import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
 
 export const FeedScreen = () => {
   const ctx = useCtx()

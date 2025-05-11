@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { IDbConn } from '~/@/db-conn/interface'
-import { IMediaDb } from '../interface'
+import { IMediaDb } from '../interface/interface'
 
 export type Config = {
   t: 'db-conn'

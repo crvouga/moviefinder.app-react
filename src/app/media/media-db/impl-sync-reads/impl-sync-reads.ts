@@ -1,4 +1,4 @@
-import { IMediaDb } from '../interface'
+import { IMediaDb } from '../interface/interface'
 
 export type Config = {
   t: 'sync-reads'

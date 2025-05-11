@@ -1,6 +1,6 @@
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
 import { MediaDb } from '../impl-tmdb-client/impl-tmdb-client'
-import { Config } from '../backend'
+import { Config } from '../impl/backend'
 
 const Fixture = async (config: Config) => {
   const mediaDb = MediaDb(config)

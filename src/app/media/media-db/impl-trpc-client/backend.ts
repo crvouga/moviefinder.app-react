@@ -1,7 +1,7 @@
 import { Ctx } from '~/app/ctx/backend'
 import { publicProcedure } from '~/app/trpc/backend/trpc'
-import { MediaDbQueryInput } from '../query-input'
-import { MediaDbQueryOutput } from '../query-output'
+import { MediaDbQueryInput } from '../interface/query-input'
+import { MediaDbQueryOutput } from '../interface/query-output'
 
 export const MediaDbRouter = (config: { ctx: Ctx }) => {
   return {
