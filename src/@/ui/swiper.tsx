@@ -1,5 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useRef } from 'react'
+import { register } from 'swiper/element/bundle'
+register()
 
 declare global {
   namespace JSX {
