@@ -8,7 +8,6 @@ import { MediaDbQueryOutput } from '../media/media-db/query-output'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
-  // const media
   const [media, setMedia] = useState<Remote | MediaDbQueryOutput>(NotAsked)
   useEffect(() => {
     setMedia(Loading)

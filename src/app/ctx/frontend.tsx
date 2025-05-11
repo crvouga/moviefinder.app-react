@@ -1,12 +1,16 @@
 import { PGlite } from '@electric-sql/pglite'
 import { createContext, useContext } from 'react'
+import { DbConn } from '~/@/db-conn/impl'
+import { IDbConn } from '~/@/db-conn/interface'
 import { FrontendMediaDb } from '../media/media-db/frontend'
 import { IMediaDb } from '../media/media-db/interface'
+import { ILogger, Logger } from '~/@/logger'
 
 export type Ctx = {
-  mediaDb: IMediaDb
   isProd: boolean
-  pglite: PGlite
+  mediaDb: IMediaDb
+  dbConn: IDbConn
+  logger: ILogger
 }
 
 const init = (): Ctx => {
@@ -14,12 +18,17 @@ const init = (): Ctx => {
 
   const pglite = new PGlite()
 
+  const dbConn = DbConn({ t: 'pglite', pglite })
+
   const isProd = process.env.NODE_ENV === 'production'
+
+  const logger = Logger.prefix('app', Logger({ type: 'console' }))
 
   return {
     mediaDb,
     isProd,
-    pglite,
+    dbConn,
+    logger,
   }
 }
 

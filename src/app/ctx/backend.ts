@@ -3,11 +3,15 @@ import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbApiKey } from '~/@/tmdb-client/@/api-key'
 import { BackendMediaDb } from '../media/media-db/backend'
 import { IMediaDb } from '../media/media-db/interface'
+import { IDbConn } from '~/@/db-conn/interface'
+import { PGlite } from '@electric-sql/pglite'
+import { DbConn } from '~/@/db-conn/impl'
 
 export type Ctx = {
   mediaDb: IMediaDb
   logger: ILogger
   isProd: boolean
+  dbConn: IDbConn
 }
 
 const init = (): Ctx => {
@@ -21,10 +25,15 @@ const init = (): Ctx => {
 
   const isProd = process.env.NODE_ENV === 'production'
 
+  const pglite = new PGlite()
+
+  const dbConn = DbConn({ t: 'pglite', pglite })
+
   return {
     mediaDb,
     logger,
     isProd,
+    dbConn,
   }
 }
 
