@@ -67,7 +67,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         },
       })
     },
-    async liveQuery(_query) {
+    liveQuery(_query) {
       throw new Error('Not implemented')
     },
     async upsert(input) {

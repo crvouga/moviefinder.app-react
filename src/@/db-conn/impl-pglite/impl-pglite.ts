@@ -1,11 +1,12 @@
-import { PGlite } from '@electric-sql/pglite'
-import { Err, Ok } from '~/@/result'
-import { IDbConn } from '../interface'
+import { Err, Ok, Result } from '~/@/result'
+import { DbConnParam, IDbConn } from '../interface'
 import { z } from 'zod'
+import { Pglite } from '~/@/pglite/pglite'
+import { PubSub, Sub } from '~/@/pub-sub'
 
 export type Config = {
   t: 'pglite'
-  pglite: PGlite
+  pglite: Pglite
 }
 
 export const DbConn = (config: Config): IDbConn => {
@@ -31,6 +32,36 @@ export const DbConn = (config: Config): IDbConn => {
         return Err(error instanceof Error ? error : new Error(String(error)))
       }
     },
-    liveQuery(_input) {},
+    liveQuery<TRow>(input: {
+      parser: z.ZodType<TRow>
+      sql: string
+      params?: DbConnParam[]
+      limit?: number
+      offset?: number
+    }): Sub<Result<{ rows: TRow[] }, Error>> {
+      const sub = PubSub<Result<{ rows: TRow[] }, Error>>()
+
+      const ret = config.pglite.live.query({
+        query: input.sql,
+        params: input.params,
+        limit: input.limit,
+        offset: input.offset,
+        callback: (pgResult) => {
+          const parsedRows = pgResult.rows.map((row) => input.parser.parse(row))
+          const result = Ok({ rows: parsedRows })
+          return sub.publish(result)
+        },
+      })
+
+      return {
+        subscribe(callback) {
+          const unsubscribe = sub.subscribe(callback)
+          return () => {
+            unsubscribe()
+            ret.then((r) => r.unsubscribe())
+          }
+        },
+      }
+    },
   }
 }

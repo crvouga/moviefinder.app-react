@@ -27,13 +27,17 @@ describe('DbConn Live Query', () => {
         parser: Row,
       })
 
+      const wait = () => new Promise((resolve) => setTimeout(resolve, 0))
+
       const results: Result<{ rows: Row[] }, Error>[] = []
 
       liveQuery.subscribe((result) => {
         results.push(result)
       })
 
-      expect(results).toEqual([])
+      await wait()
+
+      const beforeInsert = JSON.parse(JSON.stringify(results))
 
       unwrap(
         await f.dbConn.query({
@@ -43,7 +47,9 @@ describe('DbConn Live Query', () => {
         })
       )
 
-      expect(results).toEqual([Ok({ rows: [{ id: '1', name: 'test' }] })])
+      await wait()
+
+      const afterInsert = JSON.parse(JSON.stringify(results))
 
       unwrap(
         await f.dbConn.query({
@@ -53,7 +59,14 @@ describe('DbConn Live Query', () => {
         })
       )
 
-      expect(results).toEqual([
+      await wait()
+
+      const afterInsert2 = JSON.parse(JSON.stringify(results))
+
+      expect(beforeInsert).toEqual([Ok({ rows: [] })])
+      expect(afterInsert).toEqual([Ok({ rows: [] }), Ok({ rows: [{ id: '1', name: 'test' }] })])
+      expect(afterInsert2).toEqual([
+        Ok({ rows: [] }),
         Ok({ rows: [{ id: '1', name: 'test' }] }),
         Ok({
           rows: [
