@@ -5,19 +5,21 @@ import { IMediaDb } from '../media/media-db/interface'
 
 export type Ctx = {
   mediaDb: IMediaDb
+  isProd: boolean
+  pglite: PGlite
 }
 
-// const db = new PGlite()
-// @ts-ignore
-window.PGlite = PGlite
-
 const init = (): Ctx => {
-  const mediaDb = FrontendMediaDb({
-    t: 'trpc-client',
-  })
+  const mediaDb = FrontendMediaDb({ t: 'trpc-client' })
+
+  const pglite = new PGlite()
+
+  const isProd = process.env.NODE_ENV === 'production'
 
   return {
     mediaDb,
+    isProd,
+    pglite,
   }
 }
 
