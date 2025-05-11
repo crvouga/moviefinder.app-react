@@ -25,6 +25,9 @@ export const MediaDb = (config: Config): IMediaDb => {
 
       return Ok(null)
     },
+    async liveQuery(_query) {
+      throw new Error('Not implemented')
+    },
     async query(query) {
       const got = await config.tmdbClient.discover.movie.get({
         pathParams: {},

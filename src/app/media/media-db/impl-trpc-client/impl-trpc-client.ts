@@ -16,5 +16,8 @@ export const MediaDb = (config: Config): IMediaDb => {
       const upserted = await config.trpcClient.mediaDb.upsert.mutate(input)
       return upserted
     },
+    async liveQuery(_query) {
+      throw new Error('Not implemented')
+    },
   }
 }

@@ -67,6 +67,9 @@ export const MediaDb = (config: Config): IMediaDb => {
         },
       })
     },
+    async liveQuery(_query) {
+      throw new Error('Not implemented')
+    },
     async upsert(input) {
       const paramsNested = input.media.map((media) => [
         media.id,
@@ -96,10 +99,10 @@ export const MediaDb = (config: Config): IMediaDb => {
       )
       VALUES ${variables}
       ON CONFLICT (id) DO UPDATE SET
-      title = EXCLUDED.title,
-      description = EXCLUDED.description,
-      poster_urls = EXCLUDED.poster_urls,
-      backdrop_urls = EXCLUDED.backdrop_urls
+        title = EXCLUDED.title,
+        description = EXCLUDED.description,
+        poster_urls = EXCLUDED.poster_urls,
+        backdrop_urls = EXCLUDED.backdrop_urls
       `
 
       const queried = await config.dbConn.query({ sql, params, parser: z.unknown() })

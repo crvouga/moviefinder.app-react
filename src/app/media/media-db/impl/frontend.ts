@@ -7,14 +7,11 @@ export type Config = ImplTrpcClient.Config | ImplDbConn.Config | ImplSyncReads.C
 
 export const MediaDbFrontend = (config: Config): IMediaDb => {
   switch (config.t) {
-    case 'trpc-client': {
+    case 'trpc-client':
       return ImplTrpcClient.MediaDb(config)
-    }
-    case 'db-conn': {
+    case 'db-conn':
       return ImplDbConn.MediaDb(config)
-    }
-    case 'sync-reads': {
+    case 'sync-reads':
       return ImplSyncReads.MediaDb(config)
-    }
   }
 }
