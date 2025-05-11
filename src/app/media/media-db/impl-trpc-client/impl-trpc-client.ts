@@ -1,5 +1,5 @@
 import { trpcClient } from '~/app/trpc/frontend/trpc-client'
-import { IMediaDb } from '../inter'
+import { IMediaDb } from '../interface'
 
 export type Config = {
   t: 'trpc-client'

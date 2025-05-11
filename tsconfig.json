@@ -19,6 +19,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
 
     /* Types */
     "types": ["@types/bun"],
@@ -29,5 +31,5 @@
       "~/*": ["src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src"]
 }

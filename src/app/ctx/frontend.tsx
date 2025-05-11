@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 import { FrontendMediaDb } from '../media/media-db/frontend'
-import { IMediaDb } from '../media/media-db/inter'
+import { IMediaDb } from '../media/media-db/interface'
 
 export type Ctx = {
   mediaDb: IMediaDb

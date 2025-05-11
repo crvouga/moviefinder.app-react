@@ -1,5 +1,5 @@
 import { ImplTrpcClient } from './impl-trpc-client'
-import { IMediaDb } from './inter'
+import { IMediaDb } from './interface'
 
 export type Config = ImplTrpcClient.Config
 

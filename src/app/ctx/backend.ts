@@ -2,7 +2,7 @@ import { ILogger, Logger } from '~/@/logger'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbApiKey } from '~/@/tmdb-client/@/api-key'
 import { BackendMediaDb } from '../media/media-db/backend'
-import { IMediaDb } from '../media/media-db/inter'
+import { IMediaDb } from '../media/media-db/interface'
 
 export type Ctx = {
   mediaDb: IMediaDb
