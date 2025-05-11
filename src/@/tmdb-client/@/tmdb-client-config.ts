@@ -4,13 +4,13 @@
 import { TMDB_BASE_URL } from './base-url'
 
 export type TmdbClientConfig = {
-  apiKey: string
+  readAccessToken: string
   baseUrl?: string
 }
 
-const init = (input: { apiKey: string; baseUrl?: string }): TmdbClientConfig => {
+const init = (input: Partial<TmdbClientConfig>): TmdbClientConfig => {
   return {
-    apiKey: input.apiKey,
+    readAccessToken: input.readAccessToken ?? '',
     baseUrl: input.baseUrl ?? TMDB_BASE_URL,
   }
 }

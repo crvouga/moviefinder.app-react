@@ -6,7 +6,7 @@ export const TmdbClientFixture = () => {
   const TMDB_API_READ_ACCESS_TOKEN = TmdbApiKey.parse(process.env.TMDB_API_READ_ACCESS_TOKEN)
 
   const tmdbClient = TmdbClient({
-    apiKey: TMDB_API_READ_ACCESS_TOKEN,
+    readAccessToken: TMDB_API_READ_ACCESS_TOKEN,
     baseUrl: TMDB_BASE_URL,
   })
 

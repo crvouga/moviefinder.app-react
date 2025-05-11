@@ -7,6 +7,7 @@ import { IMediaDb } from '../media/media-db/interface'
 export type Ctx = {
   mediaDb: IMediaDb
   logger: ILogger
+  isProd: boolean
 }
 
 const init = (): Ctx => {
@@ -14,18 +15,16 @@ const init = (): Ctx => {
 
   const TMDB_API_READ_ACCESS_TOKEN = TmdbApiKey.parse(process.env.TMDB_API_READ_ACCESS_TOKEN)
 
-  const tmdbClient = TmdbClient({
-    apiKey: TMDB_API_READ_ACCESS_TOKEN,
-  })
+  const tmdbClient = TmdbClient({ readAccessToken: TMDB_API_READ_ACCESS_TOKEN })
 
-  const mediaDb = BackendMediaDb({
-    t: 'tmdb-client',
-    tmdbClient,
-  })
+  const mediaDb = BackendMediaDb({ t: 'tmdb-client', tmdbClient })
+
+  const isProd = process.env.NODE_ENV === 'production'
 
   return {
     mediaDb,
     logger,
+    isProd,
   }
 }
 

@@ -26,7 +26,7 @@ export const HttpClientGet =
       const searchParams = new URLSearchParams(objectToStringMap(input.queryParams))
       const headers = new Headers()
 
-      headers.set('Authorization', `Bearer ${config.config.apiKey}`)
+      headers.set('Authorization', `Bearer ${config.config.readAccessToken}`)
 
       url.search = searchParams.toString()
       const urlString = url.toString()

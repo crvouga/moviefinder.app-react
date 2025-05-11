@@ -5,7 +5,7 @@ import { AppRouter } from '../backend/app-router'
 export const trpcClient = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: '/trpc',
+      url: 'http://localhost:8888/trpc',
     }),
   ],
 })
