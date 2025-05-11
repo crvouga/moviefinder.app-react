@@ -11,7 +11,8 @@
     "kp": "bun x kill-port 3000",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "start": "bun --hot ./src/backend.ts",
-    "tc": "tsc --watch --noEmit"
+    "tc": "tsc --watch --noEmit",
+    "preview": "bun install && bun run build && bun start"
   },
   "prettier": {
     "bracketSpacing": true,

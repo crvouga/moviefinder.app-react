@@ -24,8 +24,9 @@ const init = (): Ctx => {
   const trpcClient = TrpcClient()
 
   const mediaDb = MediaDbFrontend({
-    t: 'trpc-client',
-    trpcClient,
+    t: 'sync-reads',
+    local: MediaDbFrontend({ t: 'db-conn', dbConn }),
+    remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
   })
 
   const isProd = process.env.NODE_ENV === 'production'

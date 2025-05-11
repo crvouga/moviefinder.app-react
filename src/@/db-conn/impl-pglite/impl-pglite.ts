@@ -1,6 +1,7 @@
 import { PGlite } from '@electric-sql/pglite'
 import { Err, Ok } from '~/@/result'
 import { IDbConn } from '../interface'
+import { z } from 'zod'
 
 export type Config = {
   t: 'pglite'
@@ -21,7 +22,9 @@ export const DbConn = (config: Config): IDbConn => {
           rows.splice(0, input.offset)
         }
 
-        const parsedRows = rows.map((row) => input.parser.parse(row))
+        const parser = input.parser ?? z.unknown()
+
+        const parsedRows = rows.map((row) => parser.parse(row))
 
         return Ok({ rows: parsedRows })
       } catch (error) {
