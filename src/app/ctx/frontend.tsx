@@ -15,21 +15,23 @@ export type Ctx = {
 }
 
 const init = (): Ctx => {
+  const isProd = process.env.NODE_ENV === 'production'
+
   const logger = Logger.prefix('app', Logger({ type: 'console' }))
 
   const pglite = new PGlite()
 
   const dbConn = DbConn({ t: 'pglite', pglite })
 
-  const trpcClient = TrpcClient()
+  const backendUrl = isProd ? '' : 'http://localhost:8888'
+
+  const trpcClient = TrpcClient({ backendUrl })
 
   const mediaDb = MediaDbFrontend({
     t: 'sync-reads',
     local: MediaDbFrontend({ t: 'db-conn', dbConn }),
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
   })
-
-  const isProd = process.env.NODE_ENV === 'production'
 
   return {
     mediaDb,
