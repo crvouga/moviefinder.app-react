@@ -8,6 +8,7 @@ import { IMediaDb } from '../interface/interface'
 import { MediaDbQueryInput } from '../interface/query-input'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { Row } from './row'
+import { exhaustive } from '~/@/exhaustive-check'
 
 export type Config = {
   t: 'db-conn'
@@ -137,6 +138,7 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     popularity,
     release_date
   FROM media
+  ${toSqlQueryWhere(query)}
   ${toSqlQueryOrderBy(query)}
   LIMIT $1 
   OFFSET $2
@@ -145,6 +147,18 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
   return {
     sql,
     params,
+  }
+}
+
+const toSqlQueryWhere = (query: MediaDbQueryInput) => {
+  if (!query.where) return ''
+  switch (query.where.op) {
+    case '=': {
+      return `WHERE ${query.where.column} = '${query.where.value}'`
+    }
+    default: {
+      return exhaustive(query.where.op)
+    }
   }
 }
 

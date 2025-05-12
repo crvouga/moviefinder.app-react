@@ -15,7 +15,7 @@ const parser = z.object({
 
 export type Media = z.infer<typeof parser>
 
-const random = (): Media => {
+const random = (override?: Partial<Media>): Media => {
   return {
     id: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
     title: faker.lorem.words(3),
@@ -24,6 +24,7 @@ const random = (): Media => {
     backdrop: ImageSet.random(),
     popularity: Number((Math.random() * 100).toFixed(2)),
     releaseDate: faker.date.past().toISOString(),
+    ...override,
   }
 }
 
