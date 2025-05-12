@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Pagination } from './pagination'
 
 const parser = <T>(t: z.ZodType<T>) => {
   return z.object({
@@ -11,12 +12,12 @@ const parser = <T>(t: z.ZodType<T>) => {
 
 export type Paginated<T> = z.infer<ReturnType<typeof parser<T>>>
 
-const empty = <T>(): Paginated<T> => {
+const empty = <T>(pagination?: Partial<Pagination>): Paginated<T> => {
   return {
     items: [],
     total: 0,
-    offset: 0,
-    limit: 0,
+    offset: pagination?.offset ?? 0,
+    limit: pagination?.limit ?? 0,
   }
 }
 

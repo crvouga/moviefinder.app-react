@@ -8,6 +8,8 @@ export const attachTools = (ctx: Ctx) => {
   // @ts-ignore
   window.q = async (sql: string) => {
     const result = await ctx.dbConn.query({ parser: z.unknown(), sql })
-    console.log(unwrap(result))
+
+    const { rows } = unwrap(result)
+    console.table(rows)
   }
 }

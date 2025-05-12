@@ -1,11 +1,14 @@
 import { z } from 'zod'
-import { IDbConn } from '~/@/db-conn/interface'
+import { DbConnParam, IDbConn } from '~/@/db-conn/interface'
 import { ILogger } from '~/@/logger'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
-import { isErr, Ok } from '~/@/result'
+import { OrderBy } from '~/@/query/order-by'
+import { Where } from '~/@/query/where'
+import { isErr, Ok, Result } from '~/@/result'
+import { toBulkInsertSql } from '~/@/sql/bulk-insert'
 import { ClientSessionId } from '~/app/@/client-session-id/client-session-id'
 import { Feed } from '../../feed'
-import { IFeedDb } from '../interface'
+import { FeedColumn, FeedDbQueryInput, FeedDbQueryOutput, IFeedDb } from '../interface'
 
 export type Config = {
   t: 'db-conn'
@@ -43,30 +46,45 @@ const rowToFeed = (row: Row): Feed => {
   }
 }
 
+const feedColumnToSqlColumn = (column: FeedColumn): string => {
+  switch (column) {
+    case 'id': {
+      return 'id'
+    }
+    case 'client-session-id': {
+      return 'client_session_id'
+    }
+    default: {
+      throw new Error('Unreachable')
+    }
+  }
+}
+
 export const FeedDb = (config: Config): IFeedDb => {
   const run = config.migrationPolicy.run({ dbConn: config.dbConn, up, down })
 
   return {
-    async get(feedId) {
+    async query(input) {
       await run
-      const result = await config.dbConn.query({
-        sql: `
-          SELECT id, client_session_id, active_index 
-          FROM feed 
-          WHERE id = $1
-        `,
-        params: [feedId],
+      const { sql, params } = toDbConnInput(input)
+      const queried = await config.dbConn.query({
+        sql,
+        params,
         parser: Row,
       })
-
-      if (isErr(result)) return result
-      const row = result.value.rows[0]
-      if (!row) return Ok(null)
-      const feed = rowToFeed(row)
-      return Ok(feed)
+      return fromDbConnOutput({ queried, query: input })
     },
-    async put(feed) {
+    liveQuery(query) {
+      const { sql, params } = toDbConnInput(query)
+      return config.dbConn.liveQuery({ sql, params, parser: Row }).map((queried) => {
+        return fromDbConnOutput({ queried, query })
+      })
+    },
+    async upsert(feed) {
       await run
+      const { params, variables } = toBulkInsertSql({
+        params: feed.map((feed) => [feed.id, feed.clientSessionId, feed.activeIndex, Date.now()]),
+      })
       const result = await config.dbConn.query({
         sql: `
           INSERT INTO feed (
@@ -74,22 +92,49 @@ export const FeedDb = (config: Config): IFeedDb => {
             client_session_id,
             active_index,
             created_at_posix
-          ) VALUES (
-            $1,
-            $2,
-            $3,
-            $4
-          ) ON CONFLICT (id) DO UPDATE SET
-            client_session_id = $2,
-            active_index = $3,
-            updated_at_posix = $4
+          ) VALUES ${variables}
+          ON CONFLICT (id) DO UPDATE SET
+            client_session_id = EXCLUDED.client_session_id,
+            active_index = EXCLUDED.active_index,
+            updated_at_posix = EXCLUDED.updated_at_posix
         `,
-        params: [feed.id, feed.clientSessionId, feed.activeIndex, Date.now()],
+        params,
         parser: z.unknown(),
       })
 
       if (isErr(result)) return result
       return Ok(null)
     },
+  }
+}
+
+const fromDbConnOutput = (input: {
+  queried: Result<{ rows: Row[] }, Error>
+  query: FeedDbQueryInput
+}): FeedDbQueryOutput => {
+  if (isErr(input.queried)) return input.queried
+  return Ok({
+    items: input.queried.value.rows.map(rowToFeed),
+    total: input.queried.value.rows.length,
+    offset: input.query.offset,
+    limit: input.query.limit,
+  })
+}
+
+const toDbConnInput = (input: FeedDbQueryInput) => {
+  const whereStr = input.where ? Where.toSql(input.where, feedColumnToSqlColumn) : ''
+  const orderByStr = input.orderBy ? OrderBy.toSql(input.orderBy, feedColumnToSqlColumn) : ''
+  const sql = `
+    SELECT id, client_session_id, active_index 
+    FROM feed 
+    ${whereStr}
+    ${orderByStr}
+    LIMIT $1
+    OFFSET $2
+  `
+  const params: DbConnParam[] = [input.limit, input.offset]
+  return {
+    sql,
+    params,
   }
 }

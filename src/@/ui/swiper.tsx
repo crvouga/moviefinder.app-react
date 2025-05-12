@@ -34,6 +34,7 @@ interface SwiperProps {
   cssMode?: boolean
   grabCursor?: boolean
   effect?: 'slide' | 'fade' | 'cube' | 'coverflow' | 'flip'
+  onSlideChange?: () => void
 }
 
 const Container = (props: SwiperProps) => {

@@ -1,12 +1,14 @@
 import { z } from 'zod'
 import { DbConnParam, IDbConn } from '~/@/db-conn/interface'
-import { exhaustive } from '~/@/exhaustive-check'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
+import { OrderBy } from '~/@/query/order-by'
+import { Where } from '~/@/query/where'
 import { isErr, mapErr, Ok, Result } from '~/@/result'
+import { toBulkInsertSql } from '~/@/sql/bulk-insert'
 import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
 import { IMediaDb } from '../interface/interface'
-import { MediaDbQueryInput } from '../interface/query-input'
+import { MediaColumn, MediaDbQueryInput } from '../interface/query-input'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { Row } from './row'
 
@@ -57,25 +59,17 @@ export const MediaDb = (config: Config): IMediaDb => {
     },
     async upsert(input) {
       await run
-      const paramsNested = input.media.map((media) => [
-        media.id,
-        media.title,
-        media.description,
-        media.poster.lowestToHighestRes,
-        media.backdrop.lowestToHighestRes,
-        media.popularity,
-        media.releaseDate,
-      ])
-
-      const variables = paramsNested
-        .map((params, i) => {
-          const offset = i * params.length
-          const paramsStr = params.map((_param, i) => `$${offset + i + 1}`).join(',')
-          return `(${paramsStr})`
-        })
-        .join(',')
-
-      const params = paramsNested.flat()
+      const { params, variables } = toBulkInsertSql({
+        params: input.media.map((media) => [
+          media.id,
+          media.title,
+          media.description,
+          media.poster.lowestToHighestRes,
+          media.backdrop.lowestToHighestRes,
+          media.popularity,
+          media.releaseDate,
+        ]),
+      })
 
       const sql = `
       INSERT INTO media (
@@ -126,6 +120,21 @@ const toQueryOutput = (input: {
     },
   })
 }
+
+const mediaColumnToSqlColumn = (column: MediaColumn): string => {
+  switch (column) {
+    case 'id': {
+      return 'id'
+    }
+    case 'popularity': {
+      return 'popularity'
+    }
+    default: {
+      throw new Error('Unreachable')
+    }
+  }
+}
+
 const toSqlQuery = (query: MediaDbQueryInput) => {
   const params: DbConnParam[] = [query.limit, query.offset]
 
@@ -139,8 +148,8 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     popularity,
     release_date
   FROM media
-  ${toSqlQueryWhere(query, params)}
-  ${toSqlQueryOrderBy(query)}
+  ${query.where ? Where.toSql(query.where, mediaColumnToSqlColumn) : ''}
+  ${query.orderBy ? OrderBy.toSql(query.orderBy, mediaColumnToSqlColumn) : ''}
   LIMIT $1 
   OFFSET $2
   `
@@ -149,33 +158,4 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     sql,
     params,
   }
-}
-
-const toSqlQueryWhere = (query: MediaDbQueryInput, _params: DbConnParam[]) => {
-  if (!query.where) return ''
-  switch (query.where.op) {
-    case '=': {
-      return `WHERE ${query.where.column} = '${query.where.value}'`
-      // params.push(query.where.value)
-      // return `WHERE ${query.where.column} = $${params.length}`
-    }
-    case 'in': {
-      return `WHERE ${query.where.column} IN (${query.where.value.map((v) => `'${v}'`).join(',')})`
-    }
-    default: {
-      return exhaustive(query.where)
-    }
-  }
-}
-
-const toSqlQueryOrderBy = (query: MediaDbQueryInput) => {
-  if (!query.orderBy) return ''
-  if (query.orderBy.length === 0) return ''
-  const validColumns = ['popularity', 'release_date', 'title']
-  const validDirections = ['asc', 'desc']
-
-  return `ORDER BY ${query.orderBy
-    .filter((o) => validColumns.includes(o.column) && validDirections.includes(o.direction))
-    .map((o) => `${o.column} ${o.direction}`)
-    .join(', ')}`
 }

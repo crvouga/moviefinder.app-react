@@ -58,3 +58,5 @@ export const NotAsked: NotAsked = {
 }
 
 export type Remote = Loading | NotAsked
+
+export type RemoteResult<TOk, TErr> = Remote | Ok<TOk> | Err<TErr>
