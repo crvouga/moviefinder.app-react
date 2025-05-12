@@ -56,7 +56,7 @@ export const DbConn = (config: Config): IDbConn => {
         let ret: Promise<LiveQuery<{ [key: string]: any }>> | undefined
 
         config.pglite.then(async (pglite) => {
-          await input.waitFor
+          await (input.waitFor ?? Promise.resolve())
           ret = pglite.live.query({
             query: input.sql,
             params: input.params,

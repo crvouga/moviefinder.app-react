@@ -8,15 +8,17 @@ describe('DbConn Crud', () => {
     for (const f of await Fixtures()) {
       unwrap(
         await f.dbConn.query({
-          sql: 'CREATE TABLE IF NOT EXISTS test (id TEXT PRIMARY KEY, name TEXT)',
+          sql: 'CREATE TABLE IF NOT EXISTS test_crud (id TEXT PRIMARY KEY, name TEXT)',
           params: [],
           parser: z.unknown(),
         })
       )
 
+      const key = crypto.randomUUID()
+
       const before = unwrap(
         await f.dbConn.query({
-          sql: 'SELECT id, name FROM test',
+          sql: 'SELECT id, name FROM test_crud',
           params: [],
           parser: z.unknown(),
         })
@@ -24,15 +26,15 @@ describe('DbConn Crud', () => {
 
       unwrap(
         await f.dbConn.query({
-          sql: 'INSERT INTO test (id, name) VALUES ($1, $2)',
-          params: ['1', 'test'],
+          sql: 'INSERT INTO test_crud (id, name) VALUES ($1, $2)',
+          params: [key, 'test'],
           parser: z.unknown(),
         })
       )
 
       const after = unwrap(
         await f.dbConn.query({
-          sql: 'SELECT id, name FROM test',
+          sql: 'SELECT id, name FROM test_crud',
           params: [],
           parser: z.object({
             id: z.string(),
@@ -42,7 +44,7 @@ describe('DbConn Crud', () => {
       )
 
       expect(before).toEqual({ rows: [] })
-      expect(after).toEqual({ rows: [{ id: '1', name: 'test' }] })
+      expect(after).toEqual({ rows: [{ id: key, name: 'test' }] })
     }
   })
 })

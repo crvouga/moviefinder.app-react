@@ -6,10 +6,10 @@ import { Fixtures } from './fixture'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { clone } from '~/@/clone'
 
-const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
-
 describe('MediaDb Query By Id', () => {
   it('should work', async () => {
+    const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
+
     for (const f of await Fixtures()) {
       const expected = await Media.random({
         id: FIGHT_CLUB_ID,
@@ -39,8 +39,9 @@ describe('MediaDb Query By Id', () => {
   })
 
   it('should work for live query', async () => {
+    const SOME_MOVIE_ID = MediaId.fromTmdbId(551)
     for (const f of await Fixtures()) {
-      const expected = await Media.random({ id: FIGHT_CLUB_ID })
+      const expected = await Media.random({ id: SOME_MOVIE_ID })
 
       for (let i = 0; i < 10; i++) {
         unwrap(await f.mediaDb.upsert({ media: [await Media.random()] }))
@@ -50,7 +51,7 @@ describe('MediaDb Query By Id', () => {
 
       f.mediaDb
         .liveQuery({
-          where: { op: '=', column: 'id', value: FIGHT_CLUB_ID },
+          where: { op: '=', column: 'id', value: SOME_MOVIE_ID },
           limit: 1,
           offset: 0,
         })
@@ -61,7 +62,7 @@ describe('MediaDb Query By Id', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
       const before = clone(results)
 
-      unwrap(await f.mediaDb.upsert({ media: [await Media.random()] }))
+      unwrap(await f.mediaDb.upsert({ media: [expected] }))
 
       await new Promise((resolve) => setTimeout(resolve, 10))
       const after = clone(results)
