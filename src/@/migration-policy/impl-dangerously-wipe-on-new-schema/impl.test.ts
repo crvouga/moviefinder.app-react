@@ -11,7 +11,7 @@ const Fixture = async () => {
   const migrationPolicy = MigrationPolicy({
     t: 'dangerously-wipe-on-new-schema',
     keyValueDb,
-    logger: Logger({ type: 'console' }),
+    logger: Logger({ t: 'console' }),
   })
   return {
     dbConn,

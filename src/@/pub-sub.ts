@@ -12,7 +12,7 @@ export type Pub<T> = {
   publish: (value: T) => void
 }
 
-export type PubSub<T> = Sub<T> & Pub<T>
+export type PubSub<T> = Pub<T> & Sub<T>
 
 export const PubSub = <T>(): PubSub<T> => {
   const subscribers = new Set<(value: T) => void>()
@@ -31,9 +31,10 @@ export const PubSub = <T>(): PubSub<T> => {
     },
     next(filter) {
       return new Promise((resolve) => {
-        this.subscribe((value) => {
+        const unsubscribe = this.subscribe((value) => {
           if (filter(value)) {
             resolve(value)
+            unsubscribe()
           }
         })
       })
@@ -50,20 +51,15 @@ export const PubSub = <T>(): PubSub<T> => {
   }
 }
 
-export const useLatestValue = <T, U>(
-  initial: U,
-  createSub: () => Sub<T>,
-  deps: unknown[]
-): T | U => {
+export const useSubscription = <T>(createSub: () => Sub<T>, deps: unknown[]): T | null => {
   const subCallback = useCallback(() => createSub(), deps)
-
-  const [value, setValue] = useState<T | U>(initial)
-
+  const [value, setValue] = useState<T | null>(null)
   useEffect(() => {
     const sub = subCallback()
     return sub.subscribe((value) => {
       setValue(value)
     })
   }, [subCallback])
+
   return value
 }

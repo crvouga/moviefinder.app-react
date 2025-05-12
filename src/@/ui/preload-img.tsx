@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export const ImagePreload = (props: { image?: string }) => {
+export const PreloadImg = (props: { image?: string }) => {
   useEffect(() => {
     if (!props.image) {
       return

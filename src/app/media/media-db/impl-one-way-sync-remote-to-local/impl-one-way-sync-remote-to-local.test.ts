@@ -2,8 +2,8 @@ import { describe, expect, it } from 'bun:test'
 import { DbConnFixture } from '~/@/db-conn/test/fixture'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
-import { PubSub } from '~/@/pub-sub'
 import { unwrap } from '~/@/result'
+import { PubSub } from '~/@/pub-sub'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
 import { MediaDbBackend } from '../impl/backend'
 import { OneWaySyncRemoteToLocalMsg } from './impl-one-way-sync-remote-to-local'
@@ -14,7 +14,7 @@ const Fixture = async () => {
   const local = MediaDbBackend({
     t: 'db-conn',
     dbConn,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ type: 'console' }) }),
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'console' }) }),
   })
   const remote = MediaDbBackend({
     t: 'tmdb-client',
@@ -25,7 +25,7 @@ const Fixture = async () => {
     t: 'one-way-sync-remote-to-local',
     local,
     remote,
-    logger: Logger({ type: 'console' }),
+    logger: Logger({ t: 'console' }),
     pubSub,
   })
   return {

@@ -1,9 +1,9 @@
-import { Err, Ok, Result } from '~/@/result'
-import { DbConnParam, IDbConn } from '../interface'
 import { z } from 'zod'
-import { Pglite } from '~/@/pglite/pglite'
-import { PubSub, Sub } from '~/@/pub-sub'
 import { ILogger, Logger } from '~/@/logger'
+import { Pglite } from '~/@/pglite/pglite'
+import { Err, Ok, Result } from '~/@/result'
+import { PubSub, Sub } from '~/@/pub-sub'
+import { DbConnParam, IDbConn } from '../interface'
 
 export type Config = {
   t: 'pglite'
@@ -46,7 +46,7 @@ export const DbConn = (config: Config): IDbConn => {
       offset?: number
     }): Sub<Result<{ rows: TRow[] }, Error>> {
       logger.info('liveQuery', { sql: input.sql, params: input.params })
-      const sub = PubSub<Result<{ rows: TRow[] }, Error>>()
+      const pubSub = PubSub<Result<{ rows: TRow[] }, Error>>()
 
       try {
         const ret = config.pglite.live.query({
@@ -64,14 +64,14 @@ export const DbConn = (config: Config): IDbConn => {
               return []
             })
             const result = Ok({ rows: parsedRows })
-            return sub.publish(result)
+            return pubSub.publish(result)
           },
         })
 
         return {
-          ...sub,
+          ...pubSub,
           subscribe(callback) {
-            const unsubscribe = sub.subscribe(callback)
+            const unsubscribe = pubSub.subscribe(callback)
             return () => {
               unsubscribe()
               ret.then((r) => r.unsubscribe())
@@ -80,7 +80,7 @@ export const DbConn = (config: Config): IDbConn => {
         }
       } catch (error) {
         logger.error('liveQuery', { error, sql: input.sql, params: input.params })
-        return sub
+        return pubSub
       }
     },
   }

@@ -18,7 +18,7 @@ export const Fixtures = async () => {
   configs.push({
     t: 'db-conn',
     dbConn,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ type: 'console' }) }),
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'console' }) }),
   })
 
   return configs.map(Fixture)
@@ -29,6 +29,6 @@ export const KeyValueDbFixture = async () => {
   return Fixture({
     t: 'db-conn',
     dbConn,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ type: 'console' }) }),
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'console' }) }),
   })
 }

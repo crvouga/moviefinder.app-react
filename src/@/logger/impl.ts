@@ -4,14 +4,14 @@ import { loggerNoop } from './impl-noop'
 
 export type Impl =
   | {
-      type: 'console'
+      t: 'console'
     }
   | {
-      type: 'noop'
+      t: 'noop'
     }
 
 export const Logger = (impl: Impl): ILogger => {
-  switch (impl.type) {
+  switch (impl.t) {
     case 'console': {
       return LoggerConsole()
     }

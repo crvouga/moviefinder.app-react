@@ -1,11 +1,9 @@
 import { ImageSet } from '~/@/image-set'
-import { useLatestValue } from '~/@/pub-sub'
+import { useSubscription } from '~/@/pub-sub'
 import { NotAsked, Remote } from '~/@/result'
-import { SpinnerBlock } from '~/@/ui/spinner'
+import { Img } from '~/@/ui/img'
+import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
-
-import { Img } from '~/@/ui/image'
-import { ImagePreload } from '~/@/ui/image-preload'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
 import { useAppBottomButtons } from '../@/ui/app-bottom-buttons'
 import { ScreenLayout } from '../@/ui/screen-layout'
@@ -15,9 +13,7 @@ import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
 export const FeedScreen = () => {
   const ctx = useCtx()
 
-  const queried = useLatestValue(
-    //
-    NotAsked,
+  const media = useSubscription(
     () =>
       ctx.mediaDb.liveQuery({
         limit: 20,
@@ -35,7 +31,7 @@ export const FeedScreen = () => {
   const appBottomButtons = useAppBottomButtons()
   return (
     <ScreenLayout topBar={{ title: 'Feed' }} actions={appBottomButtons}>
-      <ViewMediaDbQueryOutput media={queried} />
+      <ViewMediaDbQueryOutput media={media ?? NotAsked} />
     </ScreenLayout>
   )
 }
@@ -43,9 +39,16 @@ export const FeedScreen = () => {
 const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) => {
   const currentScreen = useCurrentScreen()
   switch (props.media.t) {
+    case 'not-asked':
+    case 'loading': {
+      return <Img className="h-full w-full object-cover" alt="Loading..." />
+    }
+    case 'error': {
+      return <div>Error</div>
+    }
     case 'ok': {
       if (props.media.value.media.items.length === 0) {
-        return <SpinnerBlock />
+        return <Img className="h-full w-full object-cover" alt="Loading..." />
       }
       return (
         <Swiper.Container
@@ -65,21 +68,12 @@ const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) =
                   src={ImageSet.toHighestRes(item.poster)}
                   alt={item.title}
                 />
-                <ImagePreload image={ImageSet.toHighestRes(item.backdrop)} />
+                <PreloadImg image={ImageSet.toHighestRes(item.backdrop)} />
               </button>
             </Swiper.Slide>
           ))}
         </Swiper.Container>
       )
-    }
-    case 'not-asked': {
-      return <SpinnerBlock />
-    }
-    case 'loading': {
-      return <SpinnerBlock />
-    }
-    case 'error': {
-      return <div>Error</div>
     }
   }
 }

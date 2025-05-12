@@ -31,10 +31,8 @@ const down = `
 DROP TABLE IF EXISTS media CASCADE
 `
 
-const SCHEMA_KEY = 'media-db-schema'
-
 export const MediaDb = (config: Config): IMediaDb => {
-  const run = config.migrationPolicy.run({ dbConn: config.dbConn, key: SCHEMA_KEY, up, down })
+  const run = config.migrationPolicy.run({ dbConn: config.dbConn, key: 'media', up, down })
   return {
     async query(query) {
       await run

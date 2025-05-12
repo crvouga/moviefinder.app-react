@@ -10,6 +10,15 @@ const parser = z.object({
 
 export type Feed = z.infer<typeof parser>
 
+const random = (): Feed => {
+  return parser.parse({
+    id: FeedId.generate(),
+    clientSessionId: ClientSessionId.generate(),
+    activeIndex: 0,
+  })
+}
+
 export const Feed = {
   parser,
+  random,
 }

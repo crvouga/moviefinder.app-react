@@ -1,6 +1,6 @@
 import { ILogger } from '~/@/logger'
-import { PubSub } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
+import { PubSub } from '~/@/pub-sub'
 import { IMediaDb } from '../interface/interface'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { MediaDbUpsertOutput } from '../interface/upsert-output'

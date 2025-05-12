@@ -6,8 +6,8 @@ import { IKeyValueDb } from '~/@/key-value-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { createPglite } from '~/@/pglite/pglite'
-import { PubSub } from '~/@/pub-sub'
 import { unwrapOr } from '~/@/result'
+import { PubSub } from '~/@/pub-sub'
 import { ClientSessionId } from '../@/client-session-id/client-session-id'
 import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id-storage'
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
@@ -26,7 +26,7 @@ export type Ctx = {
 const init = async (): Promise<Ctx> => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
-  const logger = Logger.prefix('app', Logger({ type: 'console' }))
+  const logger = Logger.prefix('app', Logger({ t: 'console' }))
 
   const pglite = await createPglite({ t: 'indexed-db', databaseName: 'db' })
 

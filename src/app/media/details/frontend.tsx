@@ -1,7 +1,6 @@
 import { ImageSet } from '~/@/image-set'
-import { useLatestValue } from '~/@/pub-sub'
-import { NotAsked } from '~/@/result'
-import { Img } from '~/@/ui/image'
+import { useSubscription } from '~/@/pub-sub'
+import { Img } from '~/@/ui/img'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
@@ -10,8 +9,7 @@ import { MediaId } from '../media-id'
 export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   const ctx = useCtx()
 
-  const queried = useLatestValue(
-    NotAsked,
+  const queried = useSubscription(
     () =>
       ctx.mediaDb.liveQuery({
         where: { op: '=', column: 'id', value: props.mediaId },
@@ -22,13 +20,13 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   )
 
   const currentScreen = useCurrentScreen()
-  const media = queried.t === 'ok' ? queried.value.media.items[0] : null
+  const media = queried?.t === 'ok' ? queried.value.media.items[0] : null
 
   return (
     <ScreenLayout
       topBar={{
         onBack: () => currentScreen.push({ type: 'feed' }),
-        title: media?.title ?? '...',
+        title: media?.title ?? ' ',
       }}
       actions={[]}
     >
@@ -38,7 +36,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
         alt={media?.title ?? ' '}
       />
       <div className="flex flex-col items-center justify-center gap-4 p-6">
-        <p className="text-center text-3xl font-bold">{media?.title ?? '...'}</p>
+        <p className="text-center text-3xl font-bold">{media?.title ?? ' '}</p>
         {media?.description && <p className="text-center">{media?.description}</p>}
       </div>
     </ScreenLayout>

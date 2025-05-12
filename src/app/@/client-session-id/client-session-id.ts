@@ -14,8 +14,13 @@ const codec: Codec<ClientSessionId> = {
   decode: (value) => parser.parse(value),
 }
 
+const fromString = (value: string): ClientSessionId => {
+  return parser.parse(value)
+}
+
 export const ClientSessionId = {
   parser,
   generate,
   codec,
+  fromString,
 }
