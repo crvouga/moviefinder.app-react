@@ -60,10 +60,12 @@ type Action = { t: 'observed-first-slide' } | { t: 'observed-last-slide' }
 
 const reducer = (state: State, action: Action): State => {
   switch (action.t) {
-    case 'observed-first-slide':
+    case 'observed-first-slide': {
       return { ...state, offset: Math.max(0, state.offset - PAGE_SIZE) }
-    case 'observed-last-slide':
+    }
+    case 'observed-last-slide': {
       return { ...state, limit: state.limit + PAGE_SIZE }
+    }
   }
 }
 
@@ -73,12 +75,8 @@ const ViewFeed = (props: { feed: Feed }) => {
 
   const mediaQuery = useSubscription(
     () =>
-      ctx.mediaDb.liveQuery({
-        limit: state.limit,
-        offset: state.offset,
-        orderBy: [{ column: 'popularity', direction: 'desc' }],
-      }),
-    [ctx, state.limit, state.offset]
+      ctx.mediaDb.liveQuery({ ...state, orderBy: [{ column: 'popularity', direction: 'desc' }] }),
+    [ctx, state]
   )
 
   const media = mediaQuery ?? Loading
