@@ -20,7 +20,7 @@ export type Ctx = {
 }
 
 const init = async (): Promise<Ctx> => {
-  const isProd = process.env.NODE_ENV === 'production'
+  const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
   const logger = Logger.prefix('app', Logger({ type: 'console' }))
 
@@ -28,7 +28,7 @@ const init = async (): Promise<Ctx> => {
 
   const dbConn = DbConn({ t: 'pglite', pglite, logger })
 
-  const backendUrl = isProd ? '' : 'http://localhost:8888'
+  const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 
   const trpcClient = TrpcClient({ backendUrl })
 

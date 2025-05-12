@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useRef } from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import { register } from 'swiper/element/bundle'
 register()
 
@@ -39,7 +39,7 @@ interface SwiperProps {
 const Container = (props: SwiperProps) => {
   const ref = useRef<HTMLElement>()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ref.current) {
       if (props.slidesPerView) {
         ref.current.setAttribute('slides-per-view', props.slidesPerView)
@@ -59,6 +59,9 @@ const Container = (props: SwiperProps) => {
       if (props.pagination) {
         ref.current.setAttribute('pagination', props.pagination)
       }
+      if (props.initialSlide) {
+        ref.current.setAttribute('initial-slide', props.initialSlide)
+      }
     }
   }, [props.slidesPerView, props.spaceBetween, props.loop, props.navigation, props.pagination])
   return (
@@ -71,6 +74,7 @@ const Container = (props: SwiperProps) => {
       loop={props.loop}
       navigation={props.navigation}
       pagination={props.pagination}
+      initial-slide={props.initialSlide}
     >
       {props.children}
     </swiper-container>

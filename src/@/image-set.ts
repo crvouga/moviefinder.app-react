@@ -17,12 +17,14 @@ const empty = (): ImageSet => ({
   lowestToHighestRes: [],
 })
 
-const toHighestRes = (imageSet: ImageSet): string | undefined => {
+const toHighestRes = (imageSet: ImageSet | undefined): string | undefined => {
+  if (!imageSet) return undefined
   const maybeSrc = imageSet.lowestToHighestRes[imageSet.lowestToHighestRes.length - 1]
   return maybeSrc ?? undefined
 }
 
-const toMiddleRes = (imageSet: ImageSet): string | undefined => {
+const toMiddleRes = (imageSet: ImageSet | undefined): string | undefined => {
+  if (!imageSet) return undefined
   const middleIndex = Math.floor((imageSet.lowestToHighestRes.length + 1) / 2)
   const maybeSrc = imageSet.lowestToHighestRes[middleIndex]
   return maybeSrc ?? undefined

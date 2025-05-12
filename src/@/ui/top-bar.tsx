@@ -6,7 +6,7 @@ export const TopBar = (props: { title: string; onBack?: () => void }) => {
     <div className="flex h-16 w-full items-center justify-between px-2">
       {props.onBack ? (
         <IconButton
-          onClick={props.onBack}
+          onPointerDown={props.onBack}
           renderIcon={(props) => <IconArrowLeftSolid {...props} />}
         />
       ) : (
