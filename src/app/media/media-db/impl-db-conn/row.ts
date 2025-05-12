@@ -9,6 +9,7 @@ const parser = z.object({
   description: z.string(),
   poster_urls: z.array(z.string()),
   backdrop_urls: z.array(z.string()),
+  popularity: z.number(),
 })
 
 export type Row = z.infer<typeof parser>
@@ -24,6 +25,7 @@ const toMedia = (row: Row): Media => {
     backdrop: ImageSet.init({
       lowestToHighestRes: row.backdrop_urls,
     }),
+    popularity: row.popularity,
   }
 }
 

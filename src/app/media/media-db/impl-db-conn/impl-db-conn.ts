@@ -23,7 +23,8 @@ export const MediaDb = (config: Config): IMediaDb => {
         title TEXT NOT NULL,
         description TEXT NOT NULL,
         poster_urls TEXT[] NOT NULL,
-        backdrop_urls TEXT[] NOT NULL
+        backdrop_urls TEXT[] NOT NULL,
+        popularity REAL NOT NULL
       )
     `,
       params: [],
@@ -60,6 +61,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         media.description,
         media.poster.lowestToHighestRes,
         media.backdrop.lowestToHighestRes,
+        media.popularity,
       ])
 
       const variables = paramsNested
@@ -78,14 +80,16 @@ export const MediaDb = (config: Config): IMediaDb => {
         title,
         description,
         poster_urls,
-        backdrop_urls
+        backdrop_urls,
+        popularity
       )
       VALUES ${variables}
       ON CONFLICT (id) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
         poster_urls = EXCLUDED.poster_urls,
-        backdrop_urls = EXCLUDED.backdrop_urls
+        backdrop_urls = EXCLUDED.backdrop_urls,
+        popularity = EXCLUDED.popularity
       `
 
       const queried = await config.dbConn.query({ sql, params, parser: z.unknown() })
@@ -120,7 +124,8 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     title,
     description,
     poster_urls,
-    backdrop_urls
+    backdrop_urls,
+    popularity
   FROM media
   LIMIT $1 
   OFFSET $2

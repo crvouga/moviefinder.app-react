@@ -5,7 +5,7 @@ import { Media } from '../../media'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { Fixtures } from './fixture'
 
-describe.only('MediaDb Live Query', () => {
+describe('MediaDb Live Query', () => {
   it('should work', async () => {
     for (const f of await Fixtures()) {
       const expected: [Media, Media, Media] = [Media.random(), Media.random(), Media.random()]
