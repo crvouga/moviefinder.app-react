@@ -34,35 +34,47 @@ interface SwiperProps {
   cssMode?: boolean
   grabCursor?: boolean
   effect?: 'slide' | 'fade' | 'cube' | 'coverflow' | 'flip'
-  onSlideChange?: () => void
+  onSlideChange?: (input: { activeIndex: number }) => void
 }
 
 const Container = (props: SwiperProps) => {
   const ref = useRef<HTMLElement>()
 
   useLayoutEffect(() => {
-    if (ref.current) {
-      if (props.slidesPerView) {
-        ref.current.setAttribute('slides-per-view', props.slidesPerView)
-      }
-      if (props.spaceBetween) {
-        ref.current.setAttribute('space-between', props.spaceBetween)
-      }
-      if (props.loop) {
-        ref.current.setAttribute('loop', props.loop)
-      }
-      if (props.navigation) {
-        ref.current.setAttribute('navigation', props.navigation)
-      }
-      if (props.direction) {
-        ref.current.setAttribute('direction', props.direction)
-      }
-      if (props.pagination) {
-        ref.current.setAttribute('pagination', props.pagination)
-      }
-      if (props.initialSlide) {
-        ref.current.setAttribute('initial-slide', props.initialSlide)
-      }
+    if (!ref.current) {
+      return
+    }
+
+    if (props.slidesPerView) {
+      ref.current.setAttribute('slides-per-view', props.slidesPerView)
+    }
+    if (props.spaceBetween) {
+      ref.current.setAttribute('space-between', props.spaceBetween)
+    }
+    if (props.loop) {
+      ref.current.setAttribute('loop', props.loop)
+    }
+    if (props.navigation) {
+      ref.current.setAttribute('navigation', props.navigation)
+    }
+    if (props.direction) {
+      ref.current.setAttribute('direction', props.direction)
+    }
+    if (props.pagination) {
+      ref.current.setAttribute('pagination', props.pagination)
+    }
+    if (props.initialSlide) {
+      ref.current.setAttribute('initial-slide', props.initialSlide)
+    }
+    const onSlideChange = (event: CustomEvent) => {
+      const [swiper] = event.detail
+      const maybeActiveIndex = swiper.activeIndex
+      const activeIndex = typeof maybeActiveIndex === 'number' ? maybeActiveIndex : 0
+      props.onSlideChange?.({ activeIndex })
+    }
+    ref.current.addEventListener('swiperslidechange', onSlideChange)
+    return () => {
+      ref.current.removeEventListener('swiperslidechange', onSlideChange)
     }
   }, [props.slidesPerView, props.spaceBetween, props.loop, props.navigation, props.pagination])
   return (

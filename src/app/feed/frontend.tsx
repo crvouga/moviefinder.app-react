@@ -1,6 +1,7 @@
+import { useEffect } from 'react'
 import { ImageSet } from '~/@/image-set'
 import { useSubscription } from '~/@/pub-sub'
-import { isOk, NotAsked, Remote } from '~/@/result'
+import { isOk, NotAsked, Remote, unwrapOr } from '~/@/result'
 import { Img } from '~/@/ui/img'
 import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
@@ -9,14 +10,13 @@ import { useAppBottomButtons } from '../@/ui/app-bottom-buttons'
 import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../frontend/ctx'
 import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
-import { useEffect } from 'react'
 import { Feed } from './feed'
 import { FeedId } from './feed-id'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
 
-  const feed = useSubscription(
+  const feedQuery = useSubscription(
     () =>
       ctx.feedDb.liveQuery({
         limit: 20,
@@ -30,8 +30,10 @@ export const FeedScreen = () => {
     [ctx]
   )
 
+  const feed: Feed | null = (feedQuery && unwrapOr(feedQuery, () => null)?.items[0]) ?? null
+
   useEffect(() => {
-    if (feed && isOk(feed) && feed.value.items.length === 0) {
+    if (feedQuery && isOk(feedQuery) && feedQuery.value.items.length === 0) {
       ctx.feedDb.upsert([
         {
           id: FeedId.generate(),
@@ -40,9 +42,9 @@ export const FeedScreen = () => {
         },
       ])
     }
-  }, [feed])
+  }, [feedQuery])
 
-  const media = useSubscription(
+  const mediaQuery = useSubscription(
     () =>
       ctx.mediaDb.liveQuery({
         limit: 20,
@@ -55,14 +57,17 @@ export const FeedScreen = () => {
   const appBottomButtons = useAppBottomButtons()
   return (
     <ScreenLayout topBar={{ title: 'Feed' }} actions={appBottomButtons}>
-      <code>{JSON.stringify(feed)}</code>
-      <ViewMediaDbQueryOutput media={media ?? NotAsked} />
+      <ViewMediaDbQueryOutput media={mediaQuery ?? NotAsked} feed={feed} />
     </ScreenLayout>
   )
 }
 
-const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) => {
+const ViewMediaDbQueryOutput = (props: {
+  media: Remote | MediaDbQueryOutput
+  feed: Feed | null
+}) => {
   const currentScreen = useCurrentScreen()
+  const ctx = useCtx()
   switch (props.media.t) {
     case 'not-asked':
     case 'loading': {
@@ -75,14 +80,19 @@ const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) =
       if (props.media.value.media.items.length === 0) {
         return <Img className="h-full w-full object-cover" alt="Loading..." />
       }
+      const { feed } = props
+      if (!feed) {
+        return <Img className="h-full w-full object-cover" alt="Loading..." />
+      }
       return (
         <Swiper.Container
-          initialSlide={2}
+          initialSlide={feed.activeIndex}
           slidesPerView={1}
           className="h-full w-full"
           direction="vertical"
-          onSlideChange={() => {
-            console.log('slide change')
+          onSlideChange={({ activeIndex }) => {
+            const feedNew: Feed = { ...feed, activeIndex }
+            ctx.feedDb.upsert([feedNew])
           }}
         >
           {props.media.value.media.items.map((item) => (
