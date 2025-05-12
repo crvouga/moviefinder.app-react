@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ClientSessionId } from '../@/client-session-id'
+import { ClientSessionId } from '../@/client-session-id/client-session-id'
 import { FeedId } from './feed-id'
 
 const parser = z.object({

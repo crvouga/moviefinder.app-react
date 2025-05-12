@@ -19,6 +19,11 @@ export const unwrap = <T, E>(result: Result<T, E>): T => {
   throw result.error
 }
 
+export const unwrapOr = <T, E>(result: Result<T, E>, f: (e: E) => T): T => {
+  if (isOk(result)) return result.value
+  return f(result.error)
+}
+
 export const mapErr = <T, E, F>(result: Result<T, E>, f: (e: E) => F): Result<T, F> => {
   if (isOk(result)) return result
   return Err(f(result.error))

@@ -7,6 +7,9 @@ import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { createPglite } from '~/@/pglite/pglite'
 import { PubSub } from '~/@/pub-sub'
+import { unwrapOr } from '~/@/result'
+import { ClientSessionId } from '../@/client-session-id/client-session-id'
+import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id-storage'
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
@@ -17,6 +20,7 @@ export type Ctx = {
   dbConn: IDbConn
   logger: ILogger
   keyValueDb: IKeyValueDb
+  clientSessionId: ClientSessionId
 }
 
 const init = async (): Promise<Ctx> => {
@@ -38,6 +42,13 @@ const init = async (): Promise<Ctx> => {
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
   })
 
+  const clientSessionIdStorage = ClientSessionIdStorage({ keyValueDb })
+
+  const clientSessionId =
+    unwrapOr(await clientSessionIdStorage.get(), () => null) ?? ClientSessionId.generate()
+
+  await clientSessionIdStorage.set(clientSessionId)
+
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
     local: MediaDbFrontend({
@@ -56,6 +67,7 @@ const init = async (): Promise<Ctx> => {
     isProd,
     dbConn,
     logger,
+    clientSessionId,
   }
 }
 
