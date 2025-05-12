@@ -149,12 +149,13 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
   }
 }
 
-const toSqlQueryWhere = (query: MediaDbQueryInput, params: DbConnParam[]) => {
+const toSqlQueryWhere = (query: MediaDbQueryInput, _params: DbConnParam[]) => {
   if (!query.where) return ''
   switch (query.where.op) {
     case '=': {
-      params.push(query.where.value)
-      return `WHERE ${query.where.column} = $${params.length}`
+      return `WHERE ${query.where.column} = '${query.where.value}'`
+      // params.push(query.where.value)
+      // return `WHERE ${query.where.column} = $${params.length}`
     }
     default: {
       return exhaustive(query.where.op)
