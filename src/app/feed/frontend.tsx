@@ -9,7 +9,7 @@ import { ImagePreload } from '~/@/ui/image-preload'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
 import { useAppBottomButtons } from '../@/ui/app-bottom-buttons'
 import { ScreenLayout } from '../@/ui/screen-layout'
-import { useCtx } from '../ctx/frontend'
+import { useCtx } from '../frontend/ctx'
 import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
 
 export const FeedScreen = () => {

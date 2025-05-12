@@ -1,5 +1,5 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import { Ctx } from '~/app/ctx/backend'
+import { Ctx } from '~/app/backend/ctx'
 import { ENDPOINT } from '../@/shared'
 import { AppRouter } from './app-router'
 import { createContext } from './context'

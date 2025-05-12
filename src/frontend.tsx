@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { z } from 'zod'
-import { Ctx } from '~/app/ctx/frontend.tsx'
+import { Ctx } from '~/app/frontend/ctx.tsx'
 import { unwrap } from './@/result.ts'
 import { App } from './app/frontend.tsx'
 

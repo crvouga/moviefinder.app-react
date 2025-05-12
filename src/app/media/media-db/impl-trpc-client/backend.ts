@@ -1,4 +1,4 @@
-import { Ctx } from '~/app/ctx/backend'
+import { Ctx } from '~/app/backend/ctx'
 import { publicProcedure } from '~/app/trpc/backend/trpc'
 import { MediaDbQueryInput } from '../interface/query-input'
 import { MediaDbQueryOutput } from '../interface/query-output'

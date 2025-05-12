@@ -1,5 +1,5 @@
 import { App } from '~/app/backend'
-import { Ctx } from '~/app/ctx/backend'
+import { Ctx } from '~/app/backend/ctx'
 import { allowCORS } from './@/cors'
 import { ILogger, Logger } from './@/logger'
 import { ServeSinglePageApp } from './@/serve-single-page-app'

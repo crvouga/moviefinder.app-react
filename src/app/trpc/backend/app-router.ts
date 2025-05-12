@@ -1,4 +1,4 @@
-import { Ctx } from '~/app/ctx/backend'
+import { Ctx } from '~/app/backend/ctx'
 import { MediaDbRouter } from '~/app/media/media-db/impl-trpc-client/backend'
 import { router } from './trpc'
 

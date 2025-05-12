@@ -1,4 +1,4 @@
-import { Ctx } from './ctx/backend'
+import { Ctx } from './backend/ctx'
 import { TrpcServer } from './trpc/backend/trpc-server'
 
 export const App = (config: { ctx: Ctx }) => {
