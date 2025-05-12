@@ -3,10 +3,12 @@ import { useLatestValue } from '~/@/pub-sub'
 import { NotAsked, Remote } from '~/@/result'
 import { SpinnerBlock } from '~/@/ui/spinner'
 import { Swiper } from '~/@/ui/swiper'
-import { AppBottomButtonsLayout } from '~/app/@/ui/app-bottom-buttons'
+
+import { useCurrentScreen } from '../@/screen/use-current-screen'
+import { useAppBottomButtons } from '../@/ui/app-bottom-buttons'
+import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../ctx/frontend'
 import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
-import { useCurrentScreen } from '../@/screen/use-current-screen'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -18,10 +20,11 @@ export const FeedScreen = () => {
     [ctx]
   )
 
+  const appBottomButtons = useAppBottomButtons()
   return (
-    <AppBottomButtonsLayout>
+    <ScreenLayout topBar={{ title: 'Feed' }} actions={appBottomButtons}>
       <ViewMediaDbQueryOutput media={queried} />
-    </AppBottomButtonsLayout>
+    </ScreenLayout>
   )
 }
 
@@ -34,7 +37,7 @@ const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) =
           {props.media.value.media.items.map((item) => (
             <Swiper.Slide key={item.id}>
               <button
-                className="h-full w-full"
+                className="h-full w-full cursor-pointer"
                 onClick={() => currentScreen.push({ type: 'media-details', mediaId: item.id })}
               >
                 <img

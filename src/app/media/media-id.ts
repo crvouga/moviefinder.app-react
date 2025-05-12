@@ -5,7 +5,7 @@ const parser = z.string()
 export type MediaId = z.infer<typeof parser>
 
 const fromTmdbId = (id: number): MediaId => {
-  return MediaId.parser.parse(`media:tmdb:${id}`)
+  return MediaId.parser.parse(`media-tmdb-${id}`)
 }
 
 const fromString = (id: string): MediaId => {

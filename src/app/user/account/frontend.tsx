@@ -1,5 +1,11 @@
-import { AppBottomButtonsLayout } from '~/app/@/ui/app-bottom-buttons'
+import { useAppBottomButtons } from '~/app/@/ui/app-bottom-buttons'
+import { ScreenLayout } from '~/app/@/ui/screen-layout'
 
 export const AccountScreen = () => {
-  return <AppBottomButtonsLayout>account</AppBottomButtonsLayout>
+  const appBottomButtons = useAppBottomButtons()
+  return (
+    <ScreenLayout topBar={{ title: 'Account' }} actions={appBottomButtons}>
+      account
+    </ScreenLayout>
+  )
 }

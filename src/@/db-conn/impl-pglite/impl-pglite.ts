@@ -34,6 +34,7 @@ export const DbConn = (config: Config): IDbConn => {
 
         return Ok({ rows: parsedRows })
       } catch (error) {
+        logger.error('query', { error, sql: input.sql, params: input.params })
         return Err(error instanceof Error ? error : new Error(String(error)))
       }
     },
@@ -47,27 +48,39 @@ export const DbConn = (config: Config): IDbConn => {
       logger.info('liveQuery', { sql: input.sql, params: input.params })
       const sub = PubSub<Result<{ rows: TRow[] }, Error>>()
 
-      const ret = config.pglite.live.query({
-        query: input.sql,
-        params: input.params,
-        limit: input.limit,
-        offset: input.offset,
-        callback: (pgResult) => {
-          const parsedRows = pgResult.rows.map((row) => input.parser.parse(row))
-          const result = Ok({ rows: parsedRows })
-          return sub.publish(result)
-        },
-      })
+      try {
+        const ret = config.pglite.live.query({
+          query: input.sql,
+          params: input.params,
+          limit: input.limit,
+          offset: input.offset,
+          callback: (pgResult) => {
+            const parsedRows = pgResult.rows.flatMap((row) => {
+              const parsed = input.parser.safeParse(row)
+              if (parsed.success) {
+                return parsed.data
+              }
+              logger.error('liveQuery', { error: parsed.error, row })
+              return []
+            })
+            const result = Ok({ rows: parsedRows })
+            return sub.publish(result)
+          },
+        })
 
-      return {
-        ...sub,
-        subscribe(callback) {
-          const unsubscribe = sub.subscribe(callback)
-          return () => {
-            unsubscribe()
-            ret.then((r) => r.unsubscribe())
-          }
-        },
+        return {
+          ...sub,
+          subscribe(callback) {
+            const unsubscribe = sub.subscribe(callback)
+            return () => {
+              unsubscribe()
+              ret.then((r) => r.unsubscribe())
+            }
+          },
+        }
+      } catch (error) {
+        logger.error('liveQuery', { error, sql: input.sql, params: input.params })
+        return sub
       }
     },
   }

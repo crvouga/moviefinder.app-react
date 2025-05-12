@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { IDbConn } from '~/@/db-conn/interface'
+import { DbConnParam, IDbConn } from '~/@/db-conn/interface'
+import { exhaustive } from '~/@/exhaustive-check'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, mapErr, Ok } from '~/@/result'
 import { AppErr } from '~/app/@/error'
@@ -8,7 +9,6 @@ import { IMediaDb } from '../interface/interface'
 import { MediaDbQueryInput } from '../interface/query-input'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { Row } from './row'
-import { exhaustive } from '~/@/exhaustive-check'
 
 export type Config = {
   t: 'db-conn'
@@ -124,9 +124,8 @@ const toQueryOutput = (input: { rows: Row[]; query: MediaDbQueryInput }): MediaD
     },
   })
 }
-
 const toSqlQuery = (query: MediaDbQueryInput) => {
-  const params = [query.limit, query.offset]
+  const params: DbConnParam[] = [query.limit, query.offset]
 
   const sql = `
   SELECT
@@ -138,7 +137,7 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     popularity,
     release_date
   FROM media
-  ${toSqlQueryWhere(query)}
+  ${toSqlQueryWhere(query, params)}
   ${toSqlQueryOrderBy(query)}
   LIMIT $1 
   OFFSET $2
@@ -150,11 +149,12 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
   }
 }
 
-const toSqlQueryWhere = (query: MediaDbQueryInput) => {
+const toSqlQueryWhere = (query: MediaDbQueryInput, params: DbConnParam[]) => {
   if (!query.where) return ''
   switch (query.where.op) {
     case '=': {
-      return `WHERE ${query.where.column} = '${query.where.value}'`
+      params.push(query.where.value)
+      return `WHERE ${query.where.column} = $${params.length}`
     }
     default: {
       return exhaustive(query.where.op)
@@ -165,5 +165,11 @@ const toSqlQueryWhere = (query: MediaDbQueryInput) => {
 const toSqlQueryOrderBy = (query: MediaDbQueryInput) => {
   if (!query.orderBy) return ''
   if (query.orderBy.length === 0) return ''
-  return `ORDER BY ${query.orderBy.map((o) => `${o.column} ${o.direction}`).join(', ')}`
+  const validColumns = ['popularity', 'release_date', 'title']
+  const validDirections = ['asc', 'desc']
+
+  return `ORDER BY ${query.orderBy
+    .filter((o) => validColumns.includes(o.column) && validDirections.includes(o.direction))
+    .map((o) => `${o.column} ${o.direction}`)
+    .join(', ')}`
 }

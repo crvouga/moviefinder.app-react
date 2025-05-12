@@ -6,7 +6,7 @@ import { Fixtures } from './fixture'
 
 const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
 
-describe.only('MediaDb Query By Id', () => {
+describe('MediaDb Query By Id', () => {
   it('should work', async () => {
     for (const f of await Fixtures()) {
       const expected = Media.random({
