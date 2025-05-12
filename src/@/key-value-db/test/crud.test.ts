@@ -3,7 +3,7 @@ import { Codec } from '~/@/codec'
 import { Ok } from '~/@/result'
 import { Fixtures } from './fixture'
 
-describe.only('KeyValueDb', () => {
+describe('KeyValueDb', () => {
   it('should get, set, and zap values', async () => {
     for (const f of await Fixtures()) {
       const codec: Codec<string> = {

@@ -10,6 +10,7 @@ const parser = z.object({
   poster_urls: z.array(z.string()),
   backdrop_urls: z.array(z.string()),
   popularity: z.number(),
+  release_date: z.string().nullable(),
 })
 
 export type Row = z.infer<typeof parser>
@@ -26,6 +27,7 @@ const toMedia = (row: Row): Media => {
       lowestToHighestRes: row.backdrop_urls,
     }),
     popularity: row.popularity,
+    releaseDate: row.release_date,
   }
 }
 

@@ -1,15 +1,16 @@
 import { z } from 'zod'
 import { IDbConn } from '~/@/db-conn/interface'
+import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, Ok } from '~/@/result'
 import { IKeyValueDb } from '../interface'
 
 export type Config = {
   t: 'db-conn'
   dbConn: IDbConn
-  shouldMigrateUp: boolean
+  migrationPolicy: IMigrationPolicy
 }
 
-const UP = `
+const up = `
 CREATE TABLE IF NOT EXISTS key_value (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
@@ -18,14 +19,20 @@ CREATE TABLE IF NOT EXISTS key_value (
   deleted_at_posix REAL
 )
 `
+const down = `
+DROP TABLE IF EXISTS key_value CASCADE
+`
 
 export const KeyValueDb = (config: Config): IKeyValueDb => {
-  if (config.shouldMigrateUp) {
-    config.dbConn.query({ sql: UP, params: [], parser: z.unknown() })
-  }
-
+  const run = config.migrationPolicy.run({
+    dbConn: config.dbConn,
+    key: 'key-value-db-schema',
+    up,
+    down,
+  })
   return {
     async get(codec, key) {
+      await run
       const result = await config.dbConn.query({
         sql: 'SELECT value FROM key_value WHERE key = $1 AND deleted_at_posix IS NULL',
         params: [key],
@@ -41,6 +48,7 @@ export const KeyValueDb = (config: Config): IKeyValueDb => {
       return Ok(decoded)
     },
     async set(codec, key, value) {
+      await run
       const encoded = codec.encode(value)
 
       const result = await config.dbConn.query({
@@ -54,6 +62,7 @@ export const KeyValueDb = (config: Config): IKeyValueDb => {
       return Ok(null)
     },
     async zap(key) {
+      await run
       const result = await config.dbConn.query({
         sql: 'UPDATE key_value SET deleted_at_posix = $1 WHERE key = $2',
         params: [Date.now(), key],

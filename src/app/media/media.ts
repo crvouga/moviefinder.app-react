@@ -10,6 +10,7 @@ const parser = z.object({
   poster: ImageSet.parser,
   backdrop: ImageSet.parser,
   popularity: z.number(),
+  releaseDate: z.string().nullable(),
 })
 
 export type Media = z.infer<typeof parser>
@@ -22,6 +23,7 @@ const random = (): Media => {
     poster: ImageSet.random(),
     backdrop: ImageSet.random(),
     popularity: Number((Math.random() * 100).toFixed(2)),
+    releaseDate: faker.date.past().toISOString(),
   }
 }
 

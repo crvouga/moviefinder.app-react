@@ -3,16 +3,21 @@ import { DbConnParam, IDbConn } from '../interface'
 import { z } from 'zod'
 import { Pglite } from '~/@/pglite/pglite'
 import { PubSub, Sub } from '~/@/pub-sub'
+import { ILogger, Logger } from '~/@/logger'
 
 export type Config = {
   t: 'pglite'
   pglite: Pglite
+  logger: ILogger
 }
 
 export const DbConn = (config: Config): IDbConn => {
+  const logger = Logger.prefix('pglite', config.logger)
+
   return {
     async query(input) {
       try {
+        logger.info('query', { sql: input.sql, params: input.params })
         const { rows } = await config.pglite.query(input.sql, input.params)
 
         if (input.limit !== undefined) {
@@ -39,6 +44,7 @@ export const DbConn = (config: Config): IDbConn => {
       limit?: number
       offset?: number
     }): Sub<Result<{ rows: TRow[] }, Error>> {
+      logger.info('liveQuery', { sql: input.sql, params: input.params })
       const sub = PubSub<Result<{ rows: TRow[] }, Error>>()
 
       const ret = config.pglite.live.query({

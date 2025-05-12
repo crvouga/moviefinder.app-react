@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { IDbConn } from '~/@/db-conn/interface'
+import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, mapErr, Ok } from '~/@/result'
 import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
@@ -11,31 +12,31 @@ import { Row } from './row'
 export type Config = {
   t: 'db-conn'
   dbConn: IDbConn
-  shouldMigrateUp: boolean
+  migrationPolicy: IMigrationPolicy
 }
 
-export const UP = `
+const up = `
 CREATE TABLE IF NOT EXISTS media (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   poster_urls TEXT[] NOT NULL,
   backdrop_urls TEXT[] NOT NULL,
-  popularity REAL NOT NULL
+  popularity REAL NOT NULL,
+  release_date TEXT
 )
 `
-
-export const DOWN = `
-DROP TABLE IF EXISTS media
+const down = `
+DROP TABLE IF EXISTS media CASCADE
 `
 
-export const MediaDb = (config: Config): IMediaDb => {
-  if (config.shouldMigrateUp) {
-    config.dbConn.query({ sql: UP, params: [], parser: z.unknown() })
-  }
+const SCHEMA_KEY = 'media-db-schema'
 
+export const MediaDb = (config: Config): IMediaDb => {
+  const run = config.migrationPolicy.run({ dbConn: config.dbConn, key: SCHEMA_KEY, up, down })
   return {
     async query(query) {
+      await run
       const { sql, params } = toSqlQuery(query)
 
       const queried = await config.dbConn.query({
@@ -57,6 +58,7 @@ export const MediaDb = (config: Config): IMediaDb => {
       })
     },
     async upsert(input) {
+      await run
       const paramsNested = input.media.map((media) => [
         media.id,
         media.title,
@@ -64,6 +66,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         media.poster.lowestToHighestRes,
         media.backdrop.lowestToHighestRes,
         media.popularity,
+        media.releaseDate,
       ])
 
       const variables = paramsNested
@@ -83,7 +86,8 @@ export const MediaDb = (config: Config): IMediaDb => {
         description,
         poster_urls,
         backdrop_urls,
-        popularity
+        popularity,
+        release_date
       )
       VALUES ${variables}
       ON CONFLICT (id) DO UPDATE SET
@@ -91,7 +95,8 @@ export const MediaDb = (config: Config): IMediaDb => {
         description = EXCLUDED.description,
         poster_urls = EXCLUDED.poster_urls,
         backdrop_urls = EXCLUDED.backdrop_urls,
-        popularity = EXCLUDED.popularity
+        popularity = EXCLUDED.popularity,
+        release_date = EXCLUDED.release_date
       `
 
       const queried = await config.dbConn.query({ sql, params, parser: z.unknown() })
@@ -121,6 +126,7 @@ const toQueryOutput = (input: { rows: Row[]; query: MediaDbQueryInput }): MediaD
 
 const toSqlQuery = (query: MediaDbQueryInput) => {
   const params = [query.limit, query.offset]
+
   const sql = `
   SELECT
     id,
@@ -128,9 +134,10 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     description,
     poster_urls,
     backdrop_urls,
-    popularity
+    popularity,
+    release_date
   FROM media
-  ORDER BY ${query.orderBy?.map((o) => `${o.column} ${o.direction}`).join(', ')}
+  ${toSqlQueryOrderBy(query)}
   LIMIT $1 
   OFFSET $2
   `
@@ -139,4 +146,10 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     sql,
     params,
   }
+}
+
+const toSqlQueryOrderBy = (query: MediaDbQueryInput) => {
+  if (!query.orderBy) return ''
+  if (query.orderBy.length === 0) return ''
+  return `ORDER BY ${query.orderBy.map((o) => `${o.column} ${o.direction}`).join(', ')}`
 }

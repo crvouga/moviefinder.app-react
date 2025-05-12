@@ -65,6 +65,7 @@ export const MediaDb = (config: Config): IMediaDb => {
           poster: Configuration.toPosterImageSet(gotConfig.value.body, result.poster_path),
           backdrop: Configuration.toBackdropImageSet(gotConfig.value.body, result.backdrop_path),
           popularity: result.popularity,
+          releaseDate: result.release_date ?? null,
         }
       })
 

@@ -27,7 +27,7 @@ const init = async (): Promise<Ctx> => {
 
   const pglite = await createPglite({ t: 'in-memory' })
 
-  const dbConn = DbConn({ t: 'pglite', pglite })
+  const dbConn = DbConn({ t: 'pglite', pglite, logger })
 
   return {
     mediaDb,

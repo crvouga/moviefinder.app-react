@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { DbConnFixture } from '~/@/db-conn/test/fixture'
 import { Logger } from '~/@/logger'
+import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { PubSub } from '~/@/pub-sub'
 import { unwrap } from '~/@/result'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
@@ -13,7 +14,7 @@ const Fixture = async () => {
   const local = MediaDbBackend({
     t: 'db-conn',
     dbConn,
-    shouldMigrateUp: true,
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ type: 'console' }) }),
   })
   const remote = MediaDbBackend({
     t: 'tmdb-client',

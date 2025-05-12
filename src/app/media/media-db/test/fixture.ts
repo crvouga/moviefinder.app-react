@@ -1,4 +1,6 @@
 import { DbConnFixture } from '~/@/db-conn/test/fixture'
+import { Logger } from '~/@/logger'
+import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
 import { Config, MediaDbBackend } from '../impl/backend'
 
@@ -23,7 +25,7 @@ export const ReadOnlyFixtures = async () => {
   configs.push({
     t: 'db-conn',
     dbConn,
-    shouldMigrateUp: true,
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ type: 'console' }) }),
   })
 
   return await Promise.all(configs.map(Fixture))
@@ -36,7 +38,7 @@ export const Fixtures = async () => {
   configs.push({
     t: 'db-conn',
     dbConn,
-    shouldMigrateUp: true,
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ type: 'console' }) }),
   })
 
   return await Promise.all(configs.map(Fixture))

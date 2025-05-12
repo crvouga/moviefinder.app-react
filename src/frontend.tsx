@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { z } from 'zod'
 import { Ctx } from '~/app/ctx/frontend.tsx'
+import { unwrap } from './@/result.ts'
 import { App } from './app/frontend.tsx'
 
 const main = async () => {
@@ -18,7 +19,7 @@ const main = async () => {
   // @ts-ignore
   window.q = async (sql: string) => {
     const result = await ctx.dbConn.query({ parser: z.unknown(), sql })
-    console.log(result)
+    console.log(unwrap(result))
   }
 
   reactRoot.render(

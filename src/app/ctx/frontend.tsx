@@ -1,14 +1,15 @@
 import { createContext, useContext } from 'react'
 import { DbConn } from '~/@/db-conn/impl'
 import { IDbConn } from '~/@/db-conn/interface'
+import { KeyValueDb } from '~/@/key-value-db/impl'
+import { IKeyValueDb } from '~/@/key-value-db/interface'
 import { ILogger, Logger } from '~/@/logger'
+import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { createPglite } from '~/@/pglite/pglite'
+import { PubSub } from '~/@/pub-sub'
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
-import { PubSub } from '~/@/pub-sub'
-import { IKeyValueDb } from '~/@/key-value-db/interface'
-import { KeyValueDb } from '~/@/key-value-db/impl'
 
 export type Ctx = {
   isProd: boolean
@@ -25,17 +26,25 @@ const init = async (): Promise<Ctx> => {
 
   const pglite = await createPglite({ t: 'indexed-db', databaseName: 'db' })
 
-  const dbConn = DbConn({ t: 'pglite', pglite })
+  const dbConn = DbConn({ t: 'pglite', pglite, logger })
 
   const backendUrl = isProd ? '' : 'http://localhost:8888'
 
   const trpcClient = TrpcClient({ backendUrl })
 
-  const keyValueDb = KeyValueDb({ t: 'db-conn', dbConn, shouldMigrateUp: true })
+  const keyValueDb = KeyValueDb({
+    t: 'db-conn',
+    dbConn,
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
+  })
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
-    local: MediaDbFrontend({ t: 'db-conn', dbConn, shouldMigrateUp: true }),
+    local: MediaDbFrontend({
+      t: 'db-conn',
+      dbConn,
+      migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', keyValueDb, logger }),
+    }),
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
     pubSub: PubSub(),
