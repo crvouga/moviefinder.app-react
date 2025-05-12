@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { ImageSet } from '~/@/image-set'
 import { useSubscription } from '~/@/pub-sub'
-import { isOk, NotAsked, Remote, unwrapOr } from '~/@/result'
+import { NotAsked, Remote } from '~/@/result'
 import { Img } from '~/@/ui/img'
 import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
@@ -11,6 +11,7 @@ import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../frontend/ctx'
 import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
 import { Feed } from './feed'
+import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
 
 export const FeedScreen = () => {
@@ -19,27 +20,19 @@ export const FeedScreen = () => {
   const feedQuery = useSubscription(
     () =>
       ctx.feedDb.liveQuery({
-        limit: 20,
+        limit: 1,
         offset: 0,
-        where: {
-          op: '=',
-          column: 'client-session-id',
-          value: ctx.clientSessionId,
-        },
+        where: { op: '=', column: 'client-session-id', value: ctx.clientSessionId },
       }),
     [ctx]
   )
 
-  const feed: Feed | null = (feedQuery && unwrapOr(feedQuery, () => null)?.items[0]) ?? null
+  const feed = FeedDbQueryOutput.first(feedQuery)
 
   useEffect(() => {
-    if (feedQuery && isOk(feedQuery) && feedQuery.value.items.length === 0) {
+    if (feedQuery && !feed) {
       ctx.feedDb.upsert([
-        {
-          id: FeedId.generate(),
-          activeIndex: 0,
-          clientSessionId: ctx.clientSessionId,
-        },
+        { id: FeedId.generate(), activeIndex: 0, clientSessionId: ctx.clientSessionId },
       ])
     }
   }, [feedQuery])
@@ -91,8 +84,7 @@ const ViewMediaDbQueryOutput = (props: {
           className="h-full w-full"
           direction="vertical"
           onSlideChange={({ activeIndex }) => {
-            const feedNew: Feed = { ...feed, activeIndex }
-            ctx.feedDb.upsert([feedNew])
+            ctx.feedDb.upsert([{ ...feed, activeIndex }])
           }}
         >
           {props.media.value.media.items.map((item) => (

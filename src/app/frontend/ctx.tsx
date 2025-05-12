@@ -12,7 +12,7 @@ import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
-import { IFeedDb } from '../feed/feed-db/interface'
+import { IFeedDb } from '../feed/feed-db/interface/interface'
 import { FeedDb } from '../feed/feed-db/impl'
 
 export type Ctx = {

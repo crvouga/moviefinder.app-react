@@ -1,6 +1,6 @@
 import { Logger } from '~/@/logger'
 import { ImplDbConn } from './impl-db-conn'
-import { IFeedDb } from './interface'
+import { IFeedDb } from './interface/interface'
 
 export type Config = ImplDbConn.Config
 

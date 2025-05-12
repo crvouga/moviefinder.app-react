@@ -8,7 +8,9 @@ import { isErr, Ok, Result } from '~/@/result'
 import { toBulkInsertSql } from '~/@/sql/bulk-insert'
 import { ClientSessionId } from '~/app/@/client-session-id/client-session-id'
 import { Feed } from '../../feed'
-import { FeedColumn, FeedDbQueryInput, FeedDbQueryOutput, IFeedDb } from '../interface'
+import { IFeedDb } from '../interface/interface'
+import { FeedColumn, FeedDbQueryInput } from '../interface/query-input'
+import { FeedDbQueryOutput } from '../interface/query-output'
 
 export type Config = {
   t: 'db-conn'
