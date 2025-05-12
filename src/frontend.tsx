@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { App } from './app/frontend.tsx'
 import { Ctx } from '~/app/ctx/frontend.tsx'
+import { App } from './app/frontend.tsx'
 
 const main = async () => {
   const root = document.getElementById('root')

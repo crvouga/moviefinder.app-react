@@ -6,6 +6,6 @@ import { MediaDbUpsertOutput } from './upsert-output'
 
 export type IMediaDb = {
   query: (query: MediaDbQueryInput) => Promise<MediaDbQueryOutput>
-  liveQuery: (query: MediaDbQueryInput) => Sub<MediaDbQueryOutput>
   upsert: (input: MediaDbUpsertInput) => Promise<MediaDbUpsertOutput>
+  liveQuery: (query: MediaDbQueryInput) => Sub<MediaDbQueryOutput>
 }
