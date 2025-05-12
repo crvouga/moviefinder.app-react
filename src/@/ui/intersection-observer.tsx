@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export const useIntersectionObserver = (
   ref: React.RefObject<HTMLElement | null>,
@@ -21,4 +21,18 @@ export const useIntersectionObserver = (
       observer.disconnect()
     }
   }, [ref, onVisible])
+}
+
+export const WrapIntersectionObserver = (props: {
+  children: React.ReactNode
+  onVisible: () => void
+  className?: string
+}) => {
+  const ref = useRef<HTMLDivElement>(null)
+  useIntersectionObserver(ref, props.onVisible)
+  return (
+    <div ref={ref} className={props.className}>
+      {props.children}
+    </div>
+  )
 }

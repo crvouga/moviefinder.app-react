@@ -1,8 +1,9 @@
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useReducer } from 'react'
 import { ImageSet } from '~/@/image-set'
 import { useSubscription } from '~/@/pub-sub'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
+import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
@@ -12,7 +13,6 @@ import { Media } from '../media/media'
 import { Feed } from './feed'
 import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
-import { useIntersectionObserver } from '~/@/ui/intersection-observer'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -49,28 +49,27 @@ export const FeedScreen = () => {
 }
 
 const PAGE_SIZE = 5
+
+type State = { limit: number; offset: number }
+
+const initialState = (feed: Feed): State => {
+  return { limit: PAGE_SIZE, offset: Math.max(0, feed.activeIndex - PAGE_SIZE) }
+}
+
+type Action = { t: 'observed-first-slide' } | { t: 'observed-last-slide' }
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.t) {
+    case 'observed-first-slide':
+      return { ...state, offset: Math.max(0, state.offset - PAGE_SIZE) }
+    case 'observed-last-slide':
+      return { ...state, limit: state.limit + PAGE_SIZE }
+  }
+}
+
 const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
-
-  const [state, setState] = useState<{ limit: number; offset: number }>({
-    limit: PAGE_SIZE,
-    offset: Math.max(0, props.feed.activeIndex - PAGE_SIZE),
-  })
-  const lastSlideRef = useRef<HTMLDivElement | HTMLImageElement>(null)
-  useIntersectionObserver(lastSlideRef, () => {
-    setState((prev) => ({
-      ...prev,
-      limit: prev.limit + PAGE_SIZE,
-    }))
-  })
-
-  const firstSlideRef = useRef<HTMLDivElement | HTMLImageElement>(null)
-  useIntersectionObserver(firstSlideRef, () => {
-    setState((prev) => ({
-      ...prev,
-      offset: Math.max(0, prev.offset - PAGE_SIZE),
-    }))
-  })
+  const [state, dispatch] = useReducer(reducer, initialState(props.feed))
 
   const mediaQuery = useSubscription(
     () =>
@@ -104,7 +103,9 @@ const ViewFeed = (props: { feed: Feed }) => {
         >
           {state.offset > 0 && (
             <Swiper.Slide>
-              <ImgLoading ref={firstSlideRef} />
+              <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-first-slide' })}>
+                <ImgLoading />
+              </WrapIntersectionObserver>
             </Swiper.Slide>
           )}
           {media.value.media.items.map((item) => (
@@ -113,7 +114,9 @@ const ViewFeed = (props: { feed: Feed }) => {
             </Swiper.Slide>
           ))}
           <Swiper.Slide>
-            <ImgLoading ref={lastSlideRef} />
+            <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-last-slide' })}>
+              <ImgLoading />
+            </WrapIntersectionObserver>
           </Swiper.Slide>
         </Swiper.Container>
       )
