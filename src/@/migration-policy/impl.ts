@@ -7,10 +7,8 @@ import { IMigrationPolicy } from './interface'
 export type Config = ImplDangerouslyWipeOnNewSchema.Config | ImplNoop.Config | ImplAlwaysRun.Config
 
 export const MigrationPolicy = (config: Config): IMigrationPolicy => {
-  const logger = Logger.prefix(
-    'migration-policy',
-    'logger' in config ? config.logger : Logger({ t: 'console' })
-  )
+  const configLogger = 'logger' in config ? config.logger : Logger({ t: 'noop' })
+  const logger = Logger.prefix('migration-policy', configLogger)
   switch (config.t) {
     case 'noop':
       return ImplNoop.MigrationPolicy({ ...config })

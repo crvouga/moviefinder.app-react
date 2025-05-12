@@ -5,7 +5,7 @@ import { Media } from '../../media'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { Fixtures } from './fixture'
 
-describe('MediaDb Live Query', () => {
+describe.only('MediaDb Live Query', () => {
   it('should work', async () => {
     for (const f of await Fixtures()) {
       const expected: [Media, Media, Media] = [
@@ -15,9 +15,15 @@ describe('MediaDb Live Query', () => {
       ]
 
       const results: MediaDbQueryOutput[] = []
-      f.mediaDb.liveQuery({ limit: 10, offset: 0 }).subscribe((result) => {
-        results.push(result)
-      })
+      f.mediaDb
+        .liveQuery({
+          limit: 10,
+          offset: 0,
+          where: { op: 'in', column: 'id', value: expected.map((e) => e.id) },
+        })
+        .subscribe((result) => {
+          results.push(result)
+        })
 
       const wait = () => {
         return new Promise((resolve) => setTimeout(() => resolve(null), 0))

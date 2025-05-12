@@ -25,7 +25,7 @@ export const ReadOnlyFixtures = async () => {
   configs.push({
     t: 'db-conn',
     dbConn,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'console' }) }),
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })
 
   return await Promise.all(configs.map(Fixture))
@@ -38,7 +38,7 @@ export const Fixtures = async () => {
   configs.push({
     t: 'db-conn',
     dbConn,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'console' }) }),
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })
 
   return await Promise.all(configs.map(Fixture))

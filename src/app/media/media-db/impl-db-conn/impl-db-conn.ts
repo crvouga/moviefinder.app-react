@@ -51,7 +51,9 @@ export const MediaDb = (config: Config): IMediaDb => {
       const { sql, params } = toSqlQuery(query)
       return config.dbConn
         .liveQuery({ sql, params, parser: Row.parser, waitFor: run })
-        .map((queried) => toQueryOutput({ queried, query }))
+        .map((queried) => {
+          return toQueryOutput({ queried, query })
+        })
     },
     async upsert(input) {
       await run
@@ -157,8 +159,11 @@ const toSqlQueryWhere = (query: MediaDbQueryInput, _params: DbConnParam[]) => {
       // params.push(query.where.value)
       // return `WHERE ${query.where.column} = $${params.length}`
     }
+    case 'in': {
+      return `WHERE ${query.where.column} IN (${query.where.value.map((v) => `'${v}'`).join(',')})`
+    }
     default: {
-      return exhaustive(query.where.op)
+      return exhaustive(query.where)
     }
   }
 }
