@@ -1,6 +1,6 @@
 import { Logger } from '~/@/logger'
-import { createPgliteTestEnv } from '~/@/pglite/pglite-test-env.test'
 import { Config, DbConn } from '../impl'
+import { createPglite } from '~/@/pglite/pglite'
 
 const Fixture = (config: Config) => {
   const dbConn = DbConn(config)
@@ -9,12 +9,14 @@ const Fixture = (config: Config) => {
   }
 }
 
+const pglite = createPglite({ t: 'in-memory' })
+
 export const Fixtures = async () => {
   const configs: Config[] = []
 
   configs.push({
     t: 'pglite',
-    pglite: createPgliteTestEnv(),
+    pglite,
     logger: Logger({ t: 'noop' }),
   })
 
@@ -22,8 +24,11 @@ export const Fixtures = async () => {
 }
 
 export const DbConnFixture = async () => {
-  const pglite = createPgliteTestEnv()
-  const dbConn = DbConn({ t: 'pglite', pglite, logger: Logger({ t: 'noop' }) })
+  const dbConn = DbConn({
+    t: 'pglite',
+    pglite,
+    logger: Logger({ t: 'noop' }),
+  })
 
   return { dbConn }
 }
