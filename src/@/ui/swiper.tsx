@@ -34,7 +34,7 @@ interface SwiperProps {
   cssMode?: boolean
   grabCursor?: boolean
   effect?: 'slide' | 'fade' | 'cube' | 'coverflow' | 'flip'
-  onSlideChange?: (input: { activeIndex: number }) => void
+  onSlideChange?: (input: { activeSlideIndex: number; data: unknown }) => void
 }
 
 const Container = (props: SwiperProps) => {
@@ -70,7 +70,10 @@ const Container = (props: SwiperProps) => {
       const [swiper] = event.detail
       const maybeActiveIndex = swiper.activeIndex
       const activeIndex = typeof maybeActiveIndex === 'number' ? maybeActiveIndex : 0
-      props.onSlideChange?.({ activeIndex })
+      const swiperSlide = swiper?.slides?.[activeIndex]
+      const slideData = swiperSlide?.getAttribute?.('data')
+      const data = slideData ? decodeData(slideData) : undefined
+      props.onSlideChange?.({ activeSlideIndex: activeIndex, data })
     }
     ref.current.addEventListener('swiperslidechange', onSlideChange)
     return () => {
@@ -94,8 +97,26 @@ const Container = (props: SwiperProps) => {
   )
 }
 
-const Slide = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => {
-  return <swiper-slide className={className}>{children}</swiper-slide>
+const Slide = ({
+  children,
+  className = '',
+  data,
+}: {
+  children: React.ReactNode
+  className?: string
+  data?: unknown
+}) => {
+  return (
+    <swiper-slide className={className} data={encodeData(data)}>
+      {children}
+    </swiper-slide>
+  )
+}
+const encodeData = (data: unknown) => {
+  return btoa(JSON.stringify(data))
+}
+const decodeData = (data: string) => {
+  return JSON.parse(atob(data))
 }
 
 export const Swiper = {

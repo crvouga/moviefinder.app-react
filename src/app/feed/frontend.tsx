@@ -13,6 +13,8 @@ import { Media } from '../media/media'
 import { Feed } from './feed'
 import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
+import { FeedItem } from './feed-item'
+import { z } from 'zod'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -75,7 +77,10 @@ const ViewFeed = (props: { feed: Feed }) => {
 
   const mediaQuery = useSubscription(
     () =>
-      ctx.mediaDb.liveQuery({ ...state, orderBy: [{ column: 'popularity', direction: 'desc' }] }),
+      ctx.mediaDb.liveQuery({
+        ...state,
+        orderBy: [{ column: 'popularity', direction: 'desc' }],
+      }),
     [ctx, state]
   )
 
@@ -89,26 +94,35 @@ const ViewFeed = (props: { feed: Feed }) => {
     case 'ok': {
       if (media.value.media.items.length === 0) return <ImgLoading />
 
+      const feedItems = FeedItem.fromPaginatedMedia(media.value.media)
+
+      const hasFirstSlideLoader = state.offset > 0
+
+      const initialSlideIndex =
+        feedItems.findIndex((item) => item.feedIndex === props.feed.activeIndex) +
+        (hasFirstSlideLoader ? 1 : 0)
+
       return (
         <Swiper.Container
-          initialSlide={props.feed.activeIndex}
+          initialSlide={initialSlideIndex}
           slidesPerView={1}
           className="h-full w-full"
           direction="vertical"
-          onSlideChange={({ activeIndex }) => {
-            ctx.feedDb.upsert([{ ...props.feed, activeIndex }])
+          onSlideChange={(event) => {
+            const parsed = z.object({ feedIndex: z.number().int().min(0) }).parse(event.data)
+            ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.feedIndex }])
           }}
         >
-          {state.offset > 0 && (
+          {hasFirstSlideLoader && (
             <Swiper.Slide>
               <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-first-slide' })}>
                 <ImgLoading />
               </WrapIntersectionObserver>
             </Swiper.Slide>
           )}
-          {media.value.media.items.map((item) => (
-            <Swiper.Slide key={item.id}>
-              <SlideContent item={item} />
+          {feedItems.map((item) => (
+            <Swiper.Slide key={item.media.id} data={{ feedIndex: item.feedIndex }}>
+              <SlideContent item={item.media} />
             </Swiper.Slide>
           ))}
           <Swiper.Slide>
