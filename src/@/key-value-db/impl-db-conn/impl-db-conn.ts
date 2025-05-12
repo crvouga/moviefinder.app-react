@@ -24,12 +24,7 @@ DROP TABLE IF EXISTS key_value CASCADE
 `
 
 export const KeyValueDb = (config: Config): IKeyValueDb => {
-  const run = config.migrationPolicy.run({
-    dbConn: config.dbConn,
-    key: 'key-value',
-    up,
-    down,
-  })
+  const run = config.migrationPolicy.run({ dbConn: config.dbConn, up, down })
   return {
     async get(codec, key) {
       await run

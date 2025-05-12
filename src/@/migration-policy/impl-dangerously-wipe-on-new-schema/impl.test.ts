@@ -25,13 +25,11 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     const f = await Fixture()
     const up = 'CREATE TABLE test (id TEXT)'
     const down = 'DROP TABLE test'
-    const key = 'test-schema'
 
     await f.migrationPolicy.run({
       dbConn: f.dbConn,
       up,
       down,
-      key,
     })
 
     const result = await f.dbConn.query({
@@ -47,14 +45,12 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     const f = await Fixture()
     const up = 'CREATE TABLE test (id TEXT)'
     const down = 'DROP TABLE test'
-    const key = 'test-schema'
 
     // First run
     await f.migrationPolicy.run({
       dbConn: f.dbConn,
       up,
       down,
-      key,
     })
 
     // Second run with same schema
@@ -62,7 +58,6 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
       dbConn: f.dbConn,
       up,
       down,
-      key,
     })
 
     // Verify table still exists
@@ -79,14 +74,12 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     const f = await Fixture()
     const initialUp = 'CREATE TABLE test (id TEXT)'
     const initialDown = 'DROP TABLE test'
-    const key = 'test-schema'
 
     // First run
     await f.migrationPolicy.run({
       dbConn: f.dbConn,
       up: initialUp,
       down: initialDown,
-      key,
     })
 
     // Second run with modified schema
@@ -97,7 +90,6 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
       dbConn: f.dbConn,
       up: modifiedUp,
       down: modifiedDown,
-      key,
     })
 
     // Verify table exists with new schema

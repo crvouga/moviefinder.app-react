@@ -44,18 +44,17 @@ const rowToFeed = (row: Row): Feed => {
 }
 
 export const FeedDb = (config: Config): IFeedDb => {
-  const run = config.migrationPolicy.run({
-    dbConn: config.dbConn,
-    key: 'feed',
-    up,
-    down,
-  })
+  const run = config.migrationPolicy.run({ dbConn: config.dbConn, up, down })
 
   return {
     async get(feedId) {
       await run
       const result = await config.dbConn.query({
-        sql: 'SELECT id, client_session_id, active_index FROM feed WHERE id = $1',
+        sql: `
+          SELECT id, client_session_id, active_index 
+          FROM feed 
+          WHERE id = $1
+        `,
         params: [feedId],
         parser: Row,
       })

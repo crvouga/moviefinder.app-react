@@ -11,12 +11,12 @@ const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
 describe('MediaDb Query By Id', () => {
   it('should work', async () => {
     for (const f of await Fixtures()) {
-      const expected = Media.random({
+      const expected = await Media.random({
         id: FIGHT_CLUB_ID,
       })
 
       for (let i = 0; i < 10; i++) {
-        unwrap(await f.mediaDb.upsert({ media: [Media.random()] }))
+        unwrap(await f.mediaDb.upsert({ media: [await Media.random()] }))
       }
 
       const before = await f.mediaDb.query({
@@ -40,10 +40,10 @@ describe('MediaDb Query By Id', () => {
 
   it('should work for live query', async () => {
     for (const f of await Fixtures()) {
-      const expected = Media.random({ id: FIGHT_CLUB_ID })
+      const expected = await Media.random({ id: FIGHT_CLUB_ID })
 
       for (let i = 0; i < 10; i++) {
-        unwrap(await f.mediaDb.upsert({ media: [Media.random()] }))
+        unwrap(await f.mediaDb.upsert({ media: [await Media.random()] }))
       }
 
       const results: MediaDbQueryOutput[] = []
@@ -61,7 +61,7 @@ describe('MediaDb Query By Id', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
       const before = clone(results)
 
-      unwrap(await f.mediaDb.upsert({ media: [expected] }))
+      unwrap(await f.mediaDb.upsert({ media: [await Media.random()] }))
 
       await new Promise((resolve) => setTimeout(resolve, 10))
       const after = clone(results)

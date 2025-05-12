@@ -8,7 +8,11 @@ import { Fixtures } from './fixture'
 describe('MediaDb Live Query', () => {
   it('should work', async () => {
     for (const f of await Fixtures()) {
-      const expected: [Media, Media, Media] = [Media.random(), Media.random(), Media.random()]
+      const expected: [Media, Media, Media] = [
+        await Media.random(),
+        await Media.random(),
+        await Media.random(),
+      ]
 
       const results: MediaDbQueryOutput[] = []
       f.mediaDb.liveQuery({ limit: 10, offset: 0 }).subscribe((result) => {

@@ -4,10 +4,11 @@ import { Pglite } from '~/@/pglite/pglite'
 import { Err, Ok, Result } from '~/@/result'
 import { PubSub, Sub } from '~/@/pub-sub'
 import { DbConnParam, IDbConn } from '../interface'
+import { LiveQuery } from '@electric-sql/pglite/live'
 
 export type Config = {
   t: 'pglite'
-  pglite: Pglite
+  pglite: Promise<Pglite>
   logger: ILogger
 }
 
@@ -18,7 +19,8 @@ export const DbConn = (config: Config): IDbConn => {
     async query(input) {
       try {
         logger.info('query', { sql: input.sql, params: input.params })
-        const { rows } = await config.pglite.query(input.sql, input.params)
+        const pglite = await config.pglite
+        const { rows } = await pglite.query(input.sql, input.params)
 
         if (input.limit !== undefined) {
           rows.splice(input.limit)
@@ -44,28 +46,34 @@ export const DbConn = (config: Config): IDbConn => {
       params?: DbConnParam[]
       limit?: number
       offset?: number
+      waitFor?: Promise<unknown>
     }): Sub<Result<{ rows: TRow[] }, Error>> {
       logger.info('liveQuery', { sql: input.sql, params: input.params })
       const pubSub = PubSub<Result<{ rows: TRow[] }, Error>>()
 
       try {
-        const ret = config.pglite.live.query({
-          query: input.sql,
-          params: input.params,
-          limit: input.limit,
-          offset: input.offset,
-          callback: (pgResult) => {
-            const parsedRows = pgResult.rows.flatMap((row) => {
-              const parsed = input.parser.safeParse(row)
-              if (parsed.success) {
-                return parsed.data
-              }
-              logger.error('liveQuery', { error: parsed.error, row })
-              return []
-            })
-            const result = Ok({ rows: parsedRows })
-            return pubSub.publish(result)
-          },
+        let ret: Promise<LiveQuery<{ [key: string]: any }>> | undefined
+
+        config.pglite.then(async (pglite) => {
+          await input.waitFor
+          ret = pglite.live.query({
+            query: input.sql,
+            params: input.params,
+            limit: input.limit,
+            offset: input.offset,
+            callback: (pgResult) => {
+              const parsedRows = pgResult.rows.flatMap((row) => {
+                const parsed = input.parser.safeParse(row)
+                if (parsed.success) {
+                  return parsed.data
+                }
+                logger.error('liveQuery', { error: parsed.error, row })
+                return []
+              })
+              const result = Ok({ rows: parsedRows })
+              return pubSub.publish(result)
+            },
+          })
         })
 
         return {
@@ -74,7 +82,7 @@ export const DbConn = (config: Config): IDbConn => {
             const unsubscribe = pubSub.subscribe(callback)
             return () => {
               unsubscribe()
-              ret.then((r) => r.unsubscribe())
+              ret?.then((r) => r.unsubscribe())
             }
           },
         }

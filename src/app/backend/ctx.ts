@@ -14,7 +14,7 @@ export type Ctx = {
   dbConn: IDbConn
 }
 
-const init = async (): Promise<Ctx> => {
+const init = (): Ctx => {
   const logger = Logger.prefix('app', Logger({ t: 'console' }))
 
   const TMDB_API_READ_ACCESS_TOKEN = TmdbApiKey.parse(process.env.TMDB_API_READ_ACCESS_TOKEN)
@@ -25,7 +25,7 @@ const init = async (): Promise<Ctx> => {
 
   const isProd = process.env.NODE_ENV === 'production'
 
-  const pglite = await createPglite({ t: 'in-memory' })
+  const pglite = createPglite({ t: 'in-memory' })
 
   const dbConn = DbConn({ t: 'pglite', pglite, logger })
 

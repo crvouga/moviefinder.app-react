@@ -14,7 +14,7 @@ export const Fixtures = async () => {
 
   configs.push({
     t: 'pglite',
-    pglite: await createPglite({ t: 'in-memory' }),
+    pglite: createPglite({ t: 'in-memory' }),
     logger: Logger({ t: 'console' }),
   })
 
@@ -22,7 +22,7 @@ export const Fixtures = async () => {
 }
 
 export const DbConnFixture = async () => {
-  const pglite = await createPglite({ t: 'in-memory' })
+  const pglite = createPglite({ t: 'in-memory' })
   const dbConn = DbConn({ t: 'pglite', pglite, logger: Logger({ t: 'console' }) })
 
   return { dbConn }

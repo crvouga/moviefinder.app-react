@@ -6,7 +6,6 @@ import { IKeyValueDb } from '~/@/key-value-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { createPglite } from '~/@/pglite/pglite'
-import { unwrapOr } from '~/@/result'
 import { PubSub } from '~/@/pub-sub'
 import { ClientSessionId } from '../@/client-session-id/client-session-id'
 import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id-storage'
@@ -23,12 +22,12 @@ export type Ctx = {
   clientSessionId: ClientSessionId
 }
 
-const init = async (): Promise<Ctx> => {
+const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
   const logger = Logger.prefix('app', Logger({ t: 'console' }))
 
-  const pglite = await createPglite({ t: 'indexed-db', databaseName: 'db' })
+  const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
 
   const dbConn = DbConn({ t: 'pglite', pglite, logger })
 
@@ -42,12 +41,9 @@ const init = async (): Promise<Ctx> => {
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
   })
 
-  const clientSessionIdStorage = ClientSessionIdStorage({ keyValueDb })
-
-  const clientSessionId =
-    unwrapOr(await clientSessionIdStorage.get(), () => null) ?? ClientSessionId.generate()
-
-  await clientSessionIdStorage.set(clientSessionId)
+  const clientSessionIdStorage = ClientSessionIdStorage({ storage: localStorage })
+  const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
+  clientSessionIdStorage.set(clientSessionId)
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',

@@ -6,7 +6,7 @@ import { Fixtures } from './fixture'
 describe('MediaDb Query', () => {
   it('should work', async () => {
     for (const f of await Fixtures()) {
-      const expected = [Media.random(), Media.random(), Media.random()]
+      const expected = [await Media.random(), await Media.random(), await Media.random()]
       const before = await f.mediaDb.query({ limit: 10, offset: 0 })
       const upserted = await f.mediaDb.upsert({ media: expected })
       const after = await f.mediaDb.query({ limit: 10, offset: 0 })

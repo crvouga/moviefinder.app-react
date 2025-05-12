@@ -1,7 +1,7 @@
-import { faker } from '@faker-js/faker'
 import { z } from 'zod'
 import { ImageSet } from '~/@/image-set'
 import { MediaId } from './media-id'
+import { createFaker } from '~/@/faker'
 
 const parser = z.object({
   id: MediaId.parser,
@@ -15,13 +15,15 @@ const parser = z.object({
 
 export type Media = z.infer<typeof parser>
 
-const random = (override?: Partial<Media>): Media => {
+const random = async (override?: Partial<Media>): Promise<Media> => {
+  const faker = await createFaker()
+
   return {
     id: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
     title: faker.lorem.words(3),
     description: faker.lorem.paragraph(),
-    poster: ImageSet.random(),
-    backdrop: ImageSet.random(),
+    poster: await ImageSet.random(),
+    backdrop: await ImageSet.random(),
     popularity: Number((Math.random() * 100).toFixed(2)),
     releaseDate: faker.date.past().toISOString(),
     ...override,

@@ -1,26 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { z } from 'zod'
 import { Ctx } from '~/app/frontend/ctx.tsx'
-import { unwrap } from './@/result.ts'
+import { Err, Ok, Result, unwrap } from './@/result.ts'
 import { App } from './app/frontend.tsx'
+import { attachTools } from './app/frontend/window.ts'
 
-const main = async () => {
+const main = (): Result<null, Error> => {
   const root = document.getElementById('root')
 
-  if (!root) throw new Error('Root element not found')
+  if (!root) return Err(new Error('Root element not found'))
 
   const reactRoot = ReactDOM.createRoot(root)
 
-  const ctx = await Ctx.init()
+  const ctx = Ctx.init()
 
-  // @ts-ignore
-  window.ctx = ctx
-  // @ts-ignore
-  window.q = async (sql: string) => {
-    const result = await ctx.dbConn.query({ parser: z.unknown(), sql })
-    console.log(unwrap(result))
-  }
+  attachTools(ctx)
 
   reactRoot.render(
     <React.StrictMode>
@@ -29,6 +23,8 @@ const main = async () => {
       </Ctx.Provider>
     </React.StrictMode>
   )
+
+  return Ok(null)
 }
 
-main()
+unwrap(main())

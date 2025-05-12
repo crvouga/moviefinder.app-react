@@ -18,5 +18,6 @@ export type IDbConn = {
     params?: DbConnParam[]
     limit?: number
     offset?: number
+    waitFor?: Promise<unknown>
   }) => Sub<Result<{ rows: TRow[] }, Error>>
 }

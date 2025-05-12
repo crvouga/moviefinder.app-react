@@ -14,7 +14,6 @@ export type Config = {
 const Entry = z.object({
   up: z.string(),
   down: z.string(),
-  key: z.string(),
 })
 
 type Entry = z.infer<typeof Entry>
@@ -36,7 +35,8 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
   return {
     async run(input) {
       logger.info('running migration policy', { input })
-      const prevSchema = await config.keyValueDb.get(EntryCodec, input.key)
+      const key = await hash(input.up)
+      const prevSchema = await config.keyValueDb.get(EntryCodec, key)
       if (isErr(prevSchema)) {
         logger.error('failed to get previous schema', { error: prevSchema.error })
         return
@@ -52,10 +52,9 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         const entryNew: Entry = {
           up: input.up,
           down: input.down,
-          key: input.key,
         }
         logger.info('up migration complete. writing new schema', { input, entryNew })
-        await config.keyValueDb.set(EntryCodec, input.key, entryNew)
+        await config.keyValueDb.set(EntryCodec, key, entryNew)
         logger.info('new schema written', { input, entryNew })
         return
       }
@@ -82,9 +81,8 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       const entryNew: Entry = {
         up: input.up,
         down: input.down,
-        key: input.key,
       }
-      await config.keyValueDb.set(EntryCodec, input.key, entryNew)
+      await config.keyValueDb.set(EntryCodec, key, entryNew)
       logger.info('new schema written', { input, entryNew })
     },
   }

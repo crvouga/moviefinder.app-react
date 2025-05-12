@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { DbConnParam, IDbConn } from '~/@/db-conn/interface'
 import { exhaustive } from '~/@/exhaustive-check'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
-import { isErr, mapErr, Ok } from '~/@/result'
+import { isErr, mapErr, Ok, Result } from '~/@/result'
 import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
 import { IMediaDb } from '../interface/interface'
@@ -32,10 +32,11 @@ DROP TABLE IF EXISTS media CASCADE
 `
 
 export const MediaDb = (config: Config): IMediaDb => {
-  const run = config.migrationPolicy.run({ dbConn: config.dbConn, key: 'media', up, down })
+  const run = config.migrationPolicy.run({ dbConn: config.dbConn, up, down })
   return {
     async query(query) {
       await run
+
       const { sql, params } = toSqlQuery(query)
 
       const queried = await config.dbConn.query({
@@ -44,17 +45,13 @@ export const MediaDb = (config: Config): IMediaDb => {
         parser: Row.parser,
       })
 
-      if (isErr(queried)) return mapErr(queried, AppErr.from)
-
-      return toQueryOutput({ rows: queried.value.rows, query })
+      return toQueryOutput({ queried, query })
     },
     liveQuery(query) {
       const { sql, params } = toSqlQuery(query)
-
-      return config.dbConn.liveQuery({ sql, params, parser: Row.parser }).map((m) => {
-        if (isErr(m)) return mapErr(m, AppErr.from)
-        return toQueryOutput({ rows: m.value.rows, query })
-      })
+      return config.dbConn
+        .liveQuery({ sql, params, parser: Row.parser, waitFor: run })
+        .map((queried) => toQueryOutput({ queried, query }))
     },
     async upsert(input) {
       await run
@@ -107,8 +104,13 @@ export const MediaDb = (config: Config): IMediaDb => {
   }
 }
 
-const toQueryOutput = (input: { rows: Row[]; query: MediaDbQueryInput }): MediaDbQueryOutput => {
-  const media = input.rows.map((row): Media => {
+const toQueryOutput = (input: {
+  queried: Result<{ rows: Row[] }, Error>
+  query: MediaDbQueryInput
+}): MediaDbQueryOutput => {
+  if (isErr(input.queried)) return mapErr(input.queried, AppErr.from)
+
+  const media = input.queried.value.rows.map((row): Media => {
     const media = Row.toMedia(row)
     return media
   })
