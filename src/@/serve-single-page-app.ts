@@ -23,7 +23,13 @@ const respond = async (input: {
   input.logger.info('File not found, serving index', { filePath })
   const indexFile = Bun.file(`${input.distDir}/${input.indexHtml}`)
 
-  return new Response(indexFile)
+  if (await indexFile.exists()) {
+    input.logger.info('Serving index', { filePath })
+    return new Response(indexFile)
+  }
+
+  input.logger.error('Index file not found', { filePath })
+  return new Response('Not found', { status: 404 })
 }
 
 export const ServeSinglePageApp = {
