@@ -31,10 +31,14 @@ export const FeedScreen = () => {
   useEffect(() => {
     if (feedQuery && !feed) {
       ctx.feedDb.upsert([
-        { id: FeedId.generate(), activeIndex: 0, clientSessionId: ctx.clientSessionId },
+        {
+          id: FeedId.generate(),
+          activeIndex: 0,
+          clientSessionId: ctx.clientSessionId,
+        },
       ])
     }
-  }, [feedQuery])
+  }, [ctx, feedQuery, feed])
 
   return (
     <ScreenLayout topBar={{ title: 'Feed' }} includeAppBottomButtons>
@@ -76,11 +80,11 @@ const ViewFeed = (props: { feed: Feed }) => {
             ctx.feedDb.upsert([{ ...props.feed, activeIndex }])
           }}
         >
-          <Swiper.Slide>
-            {media.value.media.items.map((item) => (
-              <SlideContent key={item.id} item={item} />
-            ))}
-          </Swiper.Slide>
+          {media.value.media.items.map((item) => (
+            <Swiper.Slide key={item.id}>
+              <SlideContent item={item} />
+            </Swiper.Slide>
+          ))}
         </Swiper.Container>
       )
     }
