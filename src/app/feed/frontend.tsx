@@ -64,19 +64,18 @@ const ViewMediaDbQueryOutput = (props: {
   switch (props.media.t) {
     case 'not-asked':
     case 'loading': {
-      return <Img className="h-full w-full object-cover" alt="Loading..." />
+      return <Loading />
     }
     case 'error': {
       return <div>Error</div>
     }
     case 'ok': {
-      if (props.media.value.media.items.length === 0) {
-        return <Img className="h-full w-full object-cover" alt="Loading..." />
-      }
+      if (props.media.value.media.items.length === 0) return <Loading />
+
       const { feed } = props
-      if (!feed) {
-        return <Img className="h-full w-full object-cover" alt="Loading..." />
-      }
+
+      if (!feed) return <Loading />
+
       return (
         <Swiper.Container
           initialSlide={feed.activeIndex}
@@ -106,4 +105,8 @@ const ViewMediaDbQueryOutput = (props: {
       )
     }
   }
+}
+
+const Loading = () => {
+  return <Img className="h-full w-full object-cover" alt="Loading..." />
 }
