@@ -13,7 +13,7 @@ const Fixture = async () => {
   const local = MediaDbBackend({
     t: 'db-conn',
     dbConn,
-    shouldCreateTable: true,
+    shouldMigrateUp: true,
   })
   const remote = MediaDbBackend({
     t: 'tmdb-client',

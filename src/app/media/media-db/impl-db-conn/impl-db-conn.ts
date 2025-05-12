@@ -11,25 +11,27 @@ import { Row } from './row'
 export type Config = {
   t: 'db-conn'
   dbConn: IDbConn
-  shouldCreateTable: boolean
+  shouldMigrateUp: boolean
 }
 
+export const UP = `
+CREATE TABLE IF NOT EXISTS media (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  poster_urls TEXT[] NOT NULL,
+  backdrop_urls TEXT[] NOT NULL,
+  popularity REAL NOT NULL
+)
+`
+
+export const DOWN = `
+DROP TABLE IF EXISTS media
+`
+
 export const MediaDb = (config: Config): IMediaDb => {
-  if (config.shouldCreateTable) {
-    config.dbConn.query({
-      sql: `
-      CREATE TABLE IF NOT EXISTS media (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        description TEXT NOT NULL,
-        poster_urls TEXT[] NOT NULL,
-        backdrop_urls TEXT[] NOT NULL,
-        popularity REAL NOT NULL
-      )
-    `,
-      params: [],
-      parser: z.unknown(),
-    })
+  if (config.shouldMigrateUp) {
+    config.dbConn.query({ sql: UP, params: [], parser: z.unknown() })
   }
 
   return {

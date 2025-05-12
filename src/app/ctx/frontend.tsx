@@ -7,12 +7,15 @@ import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
 import { PubSub } from '~/@/pub-sub'
+import { IKeyValueDb } from '~/@/key-value-db/interface'
+import { KeyValueDb } from '~/@/key-value-db/impl'
 
 export type Ctx = {
   isProd: boolean
   mediaDb: IMediaDb
   dbConn: IDbConn
   logger: ILogger
+  keyValueDb: IKeyValueDb
 }
 
 const init = async (): Promise<Ctx> => {
@@ -28,15 +31,18 @@ const init = async (): Promise<Ctx> => {
 
   const trpcClient = TrpcClient({ backendUrl })
 
+  const keyValueDb = KeyValueDb({ t: 'db-conn', dbConn, shouldMigrateUp: true })
+
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
-    local: MediaDbFrontend({ t: 'db-conn', dbConn, shouldCreateTable: true }),
+    local: MediaDbFrontend({ t: 'db-conn', dbConn, shouldMigrateUp: true }),
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
     pubSub: PubSub(),
   })
 
   return {
+    keyValueDb,
     mediaDb,
     isProd,
     dbConn,

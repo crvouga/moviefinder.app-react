@@ -23,7 +23,7 @@ export const ReadOnlyFixtures = async () => {
   configs.push({
     t: 'db-conn',
     dbConn,
-    shouldCreateTable: true,
+    shouldMigrateUp: true,
   })
 
   return await Promise.all(configs.map(Fixture))
@@ -36,7 +36,7 @@ export const Fixtures = async () => {
   configs.push({
     t: 'db-conn',
     dbConn,
-    shouldCreateTable: true,
+    shouldMigrateUp: true,
   })
 
   return await Promise.all(configs.map(Fixture))
