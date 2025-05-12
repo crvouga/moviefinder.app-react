@@ -18,7 +18,6 @@ export const DbConn = (config: Config): IDbConn => {
   return {
     async query(input) {
       try {
-        logger.info('query', { sql: input.sql, params: input.params })
         const pglite = await config.pglite
         const { rows } = await pglite.query(input.sql, input.params)
 
@@ -33,6 +32,8 @@ export const DbConn = (config: Config): IDbConn => {
         const parser = input.parser ?? z.unknown()
 
         const parsedRows = rows.map((row) => parser.parse(row))
+
+        logger.info('query', { sql: input.sql, params: input.params, rows: parsedRows })
 
         return Ok({ rows: parsedRows })
       } catch (error) {

@@ -58,8 +58,10 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         logger.info('new schema written', { input, entryNew })
         return
       }
-      const didChange = hash(prevSchema.value?.up.trim() ?? '') !== hash(input.up.trim())
 
+      const prevHash = await hash(prevSchema.value?.up.trim() ?? '')
+      const newHash = await hash(input.up.trim())
+      const didChange = prevHash !== newHash
       if (!didChange) {
         logger.info('no change in schema. skipping.', { input })
         return
