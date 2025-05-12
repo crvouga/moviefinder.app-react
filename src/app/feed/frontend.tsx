@@ -16,7 +16,17 @@ export const FeedScreen = () => {
   const queried = useLatestValue(
     //
     NotAsked,
-    () => ctx.mediaDb.liveQuery({ limit: 20, offset: 0 }),
+    () =>
+      ctx.mediaDb.liveQuery({
+        limit: 20,
+        offset: 0,
+        orderBy: [
+          {
+            column: 'popularity',
+            direction: 'desc',
+          },
+        ],
+      }),
     [ctx]
   )
 
@@ -42,7 +52,7 @@ const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) =
               >
                 <img
                   className="h-full w-full object-cover"
-                  src={ImageSet.toHighestRes(item.poster) ?? ''}
+                  src={ImageSet.toHighestRes(item.poster)}
                   alt={item.title}
                 />
               </button>
