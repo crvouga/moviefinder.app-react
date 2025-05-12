@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { useState } from 'react'
 
@@ -50,13 +50,20 @@ export const PubSub = <T>(): PubSub<T> => {
   }
 }
 
-export const useLatest = <T>(createSub: () => Sub<T>, initial: T): T => {
-  const [value, setValue] = useState<T>(initial)
+export const useLatestValue = <T, U>(
+  initial: U,
+  createSub: () => Sub<T>,
+  deps: unknown[]
+): T | U => {
+  const subCallback = useCallback(() => createSub(), deps)
+
+  const [value, setValue] = useState<T | U>(initial)
+
   useEffect(() => {
-    const sub = createSub()
+    const sub = subCallback()
     return sub.subscribe((value) => {
       setValue(value)
     })
-  }, [createSub])
+  }, [subCallback])
   return value
 }

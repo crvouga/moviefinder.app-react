@@ -1,18 +1,21 @@
 import { ImageSet } from '~/@/image-set'
-import { useLatest } from '~/@/pub-sub'
+import { useLatestValue } from '~/@/pub-sub'
 import { NotAsked, Remote } from '~/@/result'
+import { SpinnerBlock } from '~/@/ui/spinner'
 import { Swiper } from '~/@/ui/swiper'
 import { AppBottomButtonsLayout } from '~/app/@/ui/app-bottom-buttons'
 import { useCtx } from '../ctx/frontend'
 import { MediaDbQueryOutput } from '../media/media-db/interface/query-output'
-import { useCallback } from 'react'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
 
-  const liveQuery = useCallback(() => ctx.mediaDb.liveQuery({ limit: 20, offset: 0 }), [ctx])
-
-  const queried = useLatest<Remote | MediaDbQueryOutput>(liveQuery, NotAsked)
+  const queried = useLatestValue(
+    //
+    NotAsked,
+    () => ctx.mediaDb.liveQuery({ limit: 20, offset: 0 }),
+    [ctx]
+  )
 
   return (
     <AppBottomButtonsLayout>
@@ -39,10 +42,10 @@ const ViewMediaDbQueryOutput = (props: { media: Remote | MediaDbQueryOutput }) =
       )
     }
     case 'not-asked': {
-      return <div>NotAsked</div>
+      return <SpinnerBlock />
     }
     case 'loading': {
-      return <div>Loading</div>
+      return <SpinnerBlock />
     }
     case 'error': {
       return <div>Error</div>
