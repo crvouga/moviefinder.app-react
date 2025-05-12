@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { cn } from './cn'
 
-export const Img = (props: { src?: string | undefined; className?: string; alt?: string }) => {
+export const Img = forwardRef<
+  HTMLDivElement | HTMLImageElement,
+  { src?: string | undefined; className?: string; alt?: string }
+>((props, ref) => {
   const [state, setState] = useState<'loading' | 'error' | 'loaded'>('loading')
 
   useEffect(() => {
@@ -17,10 +20,22 @@ export const Img = (props: { src?: string | undefined; className?: string; alt?:
   switch (state) {
     case 'loading':
     case 'error': {
-      return <div className={cn(props.className, 'animate-pulse bg-neutral-700')} />
+      return (
+        <div
+          ref={ref as React.Ref<HTMLDivElement>}
+          className={cn(props.className, 'animate-pulse bg-neutral-700')}
+        />
+      )
     }
     case 'loaded': {
-      return <img src={props.src} className={props.className} alt={props.alt} />
+      return (
+        <img
+          ref={ref as React.Ref<HTMLImageElement>}
+          src={props.src}
+          className={props.className}
+          alt={props.alt}
+        />
+      )
     }
   }
-}
+})

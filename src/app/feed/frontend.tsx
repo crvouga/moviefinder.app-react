@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import { ImageSet } from '~/@/image-set'
 import { useSubscription } from '~/@/pub-sub'
 import { Loading } from '~/@/result'
@@ -12,6 +12,7 @@ import { Media } from '../media/media'
 import { Feed } from './feed'
 import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
+import { useIntersectionObserver } from '~/@/ui/intersection-observer'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -47,17 +48,38 @@ export const FeedScreen = () => {
   )
 }
 
+const PAGE_SIZE = 5
 const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
+
+  const [state, setState] = useState<{ limit: number; offset: number }>({
+    limit: PAGE_SIZE,
+    offset: Math.max(0, props.feed.activeIndex - PAGE_SIZE),
+  })
+  const lastSlideRef = useRef<HTMLDivElement | HTMLImageElement>(null)
+  useIntersectionObserver(lastSlideRef, () => {
+    setState((prev) => ({
+      ...prev,
+      limit: prev.limit + PAGE_SIZE,
+    }))
+  })
+
+  const firstSlideRef = useRef<HTMLDivElement | HTMLImageElement>(null)
+  useIntersectionObserver(firstSlideRef, () => {
+    setState((prev) => ({
+      ...prev,
+      offset: Math.max(0, prev.offset - PAGE_SIZE),
+    }))
+  })
 
   const mediaQuery = useSubscription(
     () =>
       ctx.mediaDb.liveQuery({
-        limit: 20,
-        offset: 0,
+        limit: state.limit,
+        offset: state.offset,
         orderBy: [{ column: 'popularity', direction: 'desc' }],
       }),
-    [ctx]
+    [ctx, state.limit, state.offset]
   )
 
   const media = mediaQuery ?? Loading
@@ -80,11 +102,19 @@ const ViewFeed = (props: { feed: Feed }) => {
             ctx.feedDb.upsert([{ ...props.feed, activeIndex }])
           }}
         >
+          {state.offset > 0 && (
+            <Swiper.Slide>
+              <ImgLoading ref={firstSlideRef} />
+            </Swiper.Slide>
+          )}
           {media.value.media.items.map((item) => (
             <Swiper.Slide key={item.id}>
               <SlideContent item={item} />
             </Swiper.Slide>
           ))}
+          <Swiper.Slide>
+            <ImgLoading ref={lastSlideRef} />
+          </Swiper.Slide>
         </Swiper.Container>
       )
     }
@@ -108,6 +138,6 @@ const SlideContent = (props: { item: Media }) => {
   )
 }
 
-const ImgLoading = () => {
-  return <Img className="h-full w-full object-cover" alt="Loading..." />
-}
+const ImgLoading = forwardRef<HTMLDivElement | HTMLImageElement>((_props, ref) => {
+  return <Img className="h-full w-full object-cover" alt="Loading..." ref={ref} />
+})
