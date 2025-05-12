@@ -1,17 +1,26 @@
-import { distinct } from '~/@/distinct'
 import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
 import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
 import { TmdbClient } from '~/@/tmdb-client'
 import { Configuration } from '~/@/tmdb-client/configuration/configuration'
+import { TmdbDiscoverMovieSortBy } from '~/@/tmdb-client/discover/movie'
 import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { IMediaDb } from '../interface/interface'
+import { MediaDbQueryInput } from '../interface/query-input'
 
 export type Config = {
   t: 'tmdb-client'
   tmdbClient: TmdbClient
+}
+
+const toTmdbDiscoverMovieSortBy = (query: MediaDbQueryInput): TmdbDiscoverMovieSortBy => {
+  const { column, direction } = query.orderBy?.[0] ?? { column: 'popularity', direction: 'desc' }
+  switch (column) {
+    case 'popularity':
+      return direction === 'desc' ? 'popularity.desc' : 'popularity.asc'
+  }
 }
 
 export const MediaDb = (config: Config): IMediaDb => {
@@ -33,6 +42,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         pathParams: {},
         queryParams: {
           page: PageBasedPagination.fromPagination(query).page,
+          sort_by: toTmdbDiscoverMovieSortBy(query),
         },
       })
 
@@ -62,7 +72,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         total: got.value.body.total_results ?? 0,
         limit: query.limit,
         offset: query.offset,
-        items: distinct(items, (item) => item.id),
+        items,
       }
 
       return Ok({

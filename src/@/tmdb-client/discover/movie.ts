@@ -5,6 +5,29 @@ import { TmdbClientConfig } from '../@/tmdb-client-config'
 
 // https://developers.themoviedb.org/3/discover/movie-discover
 
+export const TmdbDiscoverMovieSortBy = z
+  .enum([
+    '',
+    'popularity.asc',
+    'popularity.desc',
+    'release_date.asc',
+    'release_date.desc',
+    'revenue.asc',
+    'revenue.desc',
+    'primary_release_date.asc',
+    'primary_release_date.desc',
+    'original_title.asc',
+    'original_title.desc',
+    'vote_average.asc',
+    'vote_average.desc',
+    'vote_count.asc',
+    'vote_count.desc',
+  ])
+  .default('popularity.desc')
+  .optional()
+
+export type TmdbDiscoverMovieSortBy = z.infer<typeof TmdbDiscoverMovieSortBy>
+
 export const TmdbDiscoverMovieQueryParams = z.object({
   //   api_key: z.string().nonempty(),
   language: z
@@ -16,26 +39,7 @@ export const TmdbDiscoverMovieQueryParams = z.object({
     .string()
     .regex(/^[A-Z]{2}$/)
     .optional(),
-  sort_by: z
-    .enum([
-      '',
-      'popularity.asc',
-      'popularity.desc',
-      'release_date.asc',
-      'release_date.desc',
-      'revenue.asc',
-      'revenue.desc',
-      'primary_release_date.asc',
-      'primary_release_date.desc',
-      'original_title.asc',
-      'original_title.desc',
-      'vote_average.asc',
-      'vote_average.desc',
-      'vote_count.asc',
-      'vote_count.desc',
-    ])
-    .default('popularity.desc')
-    .optional(),
+  sort_by: TmdbDiscoverMovieSortBy,
   certification_country: z.string().optional(),
   certification: z.string().optional(),
   'certification.lte': z.string().optional(),

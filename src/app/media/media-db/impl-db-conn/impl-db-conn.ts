@@ -118,6 +118,7 @@ const toQueryOutput = (input: { rows: Row[]; query: MediaDbQueryInput }): MediaD
 }
 
 const toSqlQuery = (query: MediaDbQueryInput) => {
+  const params = [query.limit, query.offset]
   const sql = `
   SELECT
     id,
@@ -127,11 +128,10 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     backdrop_urls,
     popularity
   FROM media
+  ORDER BY ${query.orderBy?.map((o) => `${o.column} ${o.direction}`).join(', ')}
   LIMIT $1 
   OFFSET $2
   `
-
-  const params = [query.limit, query.offset]
 
   return {
     sql,
