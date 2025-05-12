@@ -6,7 +6,6 @@ import { Img } from '~/@/ui/img'
 import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
-import { useAppBottomButtons } from '../@/ui/app-bottom-buttons'
 import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../frontend/ctx'
 import { Media } from '../media/media'
@@ -37,74 +36,52 @@ export const FeedScreen = () => {
     }
   }, [feedQuery])
 
-  const appBottomButtons = useAppBottomButtons()
   return (
-    <ScreenLayout topBar={{ title: 'Feed' }} actions={appBottomButtons}>
-      <ViewMediaDbQueryOutput feed={feed} />
+    <ScreenLayout topBar={{ title: 'Feed' }} includeAppBottomButtons>
+      {feed ? <ViewFeed feed={feed} /> : <ImgLoading />}
     </ScreenLayout>
   )
 }
 
-const ViewMediaDbQueryOutput = (props: { feed: Feed | null }) => {
-  const ctx = useCtx()
-
-  const { feed } = props
-
-  if (!feed) return <ImgLoading />
-
-  return (
-    <Swiper.Container
-      initialSlide={feed.activeIndex}
-      slidesPerView={1}
-      className="h-full w-full"
-      direction="vertical"
-      onSlideChange={({ activeIndex }) => {
-        ctx.feedDb.upsert([{ ...feed, activeIndex }])
-      }}
-    >
-      <SlidesFragment limit={20} offset={0} />
-    </Swiper.Container>
-  )
-}
-
-const SlidesFragment = (props: { limit: number; offset: number }) => {
+const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
 
   const mediaQuery = useSubscription(
     () =>
       ctx.mediaDb.liveQuery({
-        limit: props.limit,
-        offset: props.offset,
+        limit: 20,
+        offset: 0,
         orderBy: [{ column: 'popularity', direction: 'desc' }],
       }),
     [ctx]
   )
+
   const media = mediaQuery ?? Loading
+
   switch (media.t) {
     case 'error':
     case 'loading': {
-      return (
-        <Swiper.Slide>
-          <ImgLoading />
-        </Swiper.Slide>
-      )
+      return <ImgLoading />
     }
     case 'ok': {
-      if (media.value.media.items.length === 0)
-        return (
-          <Swiper.Slide>
-            <ImgLoading />
-          </Swiper.Slide>
-        )
+      if (media.value.media.items.length === 0) return <ImgLoading />
 
       return (
-        <>
-          {media.value.media.items.map((item) => (
-            <Swiper.Slide key={item.id}>
-              <SlideContent item={item} />
-            </Swiper.Slide>
-          ))}
-        </>
+        <Swiper.Container
+          initialSlide={props.feed.activeIndex}
+          slidesPerView={1}
+          className="h-full w-full"
+          direction="vertical"
+          onSlideChange={({ activeIndex }) => {
+            ctx.feedDb.upsert([{ ...props.feed, activeIndex }])
+          }}
+        >
+          <Swiper.Slide>
+            {media.value.media.items.map((item) => (
+              <SlideContent key={item.id} item={item} />
+            ))}
+          </Swiper.Slide>
+        </Swiper.Container>
       )
     }
   }
