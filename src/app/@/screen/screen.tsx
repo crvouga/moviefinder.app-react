@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { Codec } from '~/@/codec'
+import { MediaId } from '~/app/media/media-id'
 
 const parser = z.discriminatedUnion('type', [
   z.object({
@@ -7,6 +8,10 @@ const parser = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('account'),
+  }),
+  z.object({
+    type: z.literal('media-details'),
+    mediaId: MediaId.parser,
   }),
 ])
 

@@ -23,6 +23,7 @@ export const createPglite = async (config: PgliteConfig) => {
     extensions: {
       live,
     },
+    relaxedDurability: true,
     fs: configToFs(config),
   })
 
