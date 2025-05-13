@@ -2,16 +2,19 @@ import { z } from 'zod'
 import { Codec } from '~/@/codec'
 import { MediaId } from '~/app/media/media-id'
 
-const parser = z.discriminatedUnion('type', [
+const parser = z.discriminatedUnion('t', [
   z.object({
-    type: z.literal('feed'),
+    t: z.literal('feed'),
   }),
   z.object({
-    type: z.literal('account'),
+    t: z.literal('account'),
   }),
   z.object({
-    type: z.literal('media-details'),
+    t: z.literal('media-details'),
     mediaId: MediaId.parser,
+  }),
+  z.object({
+    t: z.literal('login'),
   }),
 ])
 

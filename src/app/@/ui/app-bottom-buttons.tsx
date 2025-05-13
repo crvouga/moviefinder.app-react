@@ -9,14 +9,14 @@ export const useAppBottomButtons = (): BottomButton[] => {
     {
       icon: (props) => <IconHomeSolid {...props} />,
       label: 'Feed',
-      selected: currentScreen.value.type === 'feed',
-      onClick: () => currentScreen.push({ type: 'feed' }),
+      selected: currentScreen.value.t === 'feed',
+      onClick: () => currentScreen.push({ t: 'feed' }),
     },
     {
       icon: (props) => <IconUserCircleSolid {...props} />,
       label: 'Account',
-      selected: currentScreen.value.type === 'account',
-      onClick: () => currentScreen.push({ type: 'account' }),
+      selected: currentScreen.value.t === 'account',
+      onClick: () => currentScreen.push({ t: 'account' }),
     },
   ]
 }

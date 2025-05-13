@@ -6,7 +6,7 @@ export const useCurrentScreen = () => {
     param: 'screen',
     codec: Screen,
     defaultValue: {
-      type: 'feed',
+      t: 'feed',
     },
   })
 

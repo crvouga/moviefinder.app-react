@@ -139,7 +139,7 @@ const SlideContent = (props: { item: Media }) => {
   return (
     <button
       className="h-full w-full cursor-pointer"
-      onClick={() => currentScreen.push({ type: 'media-details', mediaId: props.item.id })}
+      onClick={() => currentScreen.push({ t: 'media-details', mediaId: props.item.id })}
     >
       <Img
         className="h-full w-full object-cover"

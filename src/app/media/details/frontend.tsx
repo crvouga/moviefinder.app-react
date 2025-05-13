@@ -25,7 +25,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   return (
     <ScreenLayout
       topBar={{
-        onBack: () => currentScreen.push({ type: 'feed' }),
+        onBack: () => currentScreen.push({ t: 'feed' }),
         title: media?.title ?? ' ',
       }}
       actions={[]}
