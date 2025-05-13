@@ -109,7 +109,6 @@ const ViewFeed = (props: { feed: Feed }) => {
           onSlideChange={(event) => {
             const parsed = z.object({ feedIndex: z.number().int().min(0) }).parse(event.data)
             ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.feedIndex }])
-            console.log('onSlideChange', event.data)
           }}
         >
           {hasFirstSlideLoader && (
