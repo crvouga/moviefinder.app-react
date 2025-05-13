@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useReducer } from 'react'
+import { z } from 'zod'
 import { ImageSet } from '~/@/image-set'
 import { useSubscription } from '~/@/pub-sub'
 import { Loading } from '~/@/result'
@@ -14,7 +15,6 @@ import { Feed } from './feed'
 import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
 import { FeedItem } from './feed-item'
-import { z } from 'zod'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -50,24 +50,22 @@ export const FeedScreen = () => {
   )
 }
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 2
 
 type State = { limit: number; offset: number }
 
 const initialState = (feed: Feed): State => {
-  return { limit: PAGE_SIZE, offset: Math.max(0, feed.activeIndex - PAGE_SIZE) }
+  return { limit: PAGE_SIZE + 1, offset: Math.max(0, feed.activeIndex - PAGE_SIZE) }
 }
 
 type Action = { t: 'observed-first-slide' } | { t: 'observed-last-slide' }
 
 const reducer = (state: State, action: Action): State => {
   switch (action.t) {
-    case 'observed-first-slide': {
+    case 'observed-first-slide':
       return { ...state, offset: Math.max(0, state.offset - PAGE_SIZE) }
-    }
-    case 'observed-last-slide': {
+    case 'observed-last-slide':
       return { ...state, limit: state.limit + PAGE_SIZE }
-    }
   }
 }
 
@@ -111,6 +109,7 @@ const ViewFeed = (props: { feed: Feed }) => {
           onSlideChange={(event) => {
             const parsed = z.object({ feedIndex: z.number().int().min(0) }).parse(event.data)
             ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.feedIndex }])
+            console.log('onSlideChange', event.data)
           }}
         >
           {hasFirstSlideLoader && (
