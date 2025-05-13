@@ -7,13 +7,14 @@ import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { createPglite } from '~/@/pglite/pglite'
 import { PubSub } from '~/@/pub-sub'
+import { TimeSpan } from '~/@/time-span'
 import { ClientSessionId } from '../@/client-session-id/client-session-id'
 import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id-storage'
+import { FeedDb } from '../feed/feed-db/impl'
+import { IFeedDb } from '../feed/feed-db/interface/interface'
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
-import { IFeedDb } from '../feed/feed-db/interface/interface'
-import { FeedDb } from '../feed/feed-db/impl'
 
 export type Ctx = {
   isProd: boolean
@@ -58,6 +59,7 @@ const init = (): Ctx => {
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
     pubSub: PubSub(),
+    throttle: TimeSpan.seconds(10),
   })
 
   const feedDb = FeedDb({

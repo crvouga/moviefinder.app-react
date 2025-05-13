@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'bun:test'
 import { DbConnFixture } from '~/@/db-conn/test/fixture'
+import { intersectionWith } from '~/@/intersection-with'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
-import { unwrap } from '~/@/result'
 import { PubSub } from '~/@/pub-sub'
+import { unwrap } from '~/@/result'
+import { TimeSpan } from '~/@/time-span'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
 import { MediaDbBackend } from '../impl/backend'
-import { OneWaySyncRemoteToLocalMsg } from './impl-one-way-sync-remote-to-local'
 import { MediaDbQueryInput } from '../interface/query-input'
-import { intersectionWith } from '~/@/intersection-with'
+import { OneWaySyncRemoteToLocalMsg } from './impl-one-way-sync-remote-to-local'
 
 const Fixture = async () => {
   const { dbConn } = await DbConnFixture()
@@ -29,6 +30,7 @@ const Fixture = async () => {
     remote,
     logger: Logger({ t: 'noop' }),
     pubSub,
+    throttle: TimeSpan.seconds(0),
   })
   return {
     mediaDb,
