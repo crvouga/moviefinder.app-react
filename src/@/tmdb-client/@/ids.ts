@@ -1,0 +1,4 @@
+export const TMDB_IDS = {
+  FIGHT_CLUB: 550,
+  LORD_OF_THE_RINGS_RETURN_OF_THE_KING_ID: 122,
+}

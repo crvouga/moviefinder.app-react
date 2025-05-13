@@ -27,10 +27,17 @@ const TmdbMovieDetailsQueryParams = z.object({
 
 export type TmdbMovieDetailsQueryParamsType = z.infer<typeof TmdbMovieDetailsQueryParams>
 
+const TmdbBelongsToCollection = z.object({
+  id: z.number().int().optional(),
+  name: z.string().optional(),
+  poster_path: z.string().nullable().optional(),
+  backdrop_path: z.string().nullable().optional(),
+})
+
 export const TmdbMovieDetailsOkResponse = z.object({
   adult: z.boolean().optional(),
   backdrop_path: z.string().nullable().optional(),
-  belongs_to_collection: z.nullable(z.object({})).optional(),
+  belongs_to_collection: TmdbBelongsToCollection.nullish(),
   budget: z.number().int().optional(),
   genres: z
     .array(
