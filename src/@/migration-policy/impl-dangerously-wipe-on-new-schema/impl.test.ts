@@ -108,14 +108,14 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
 
     unwrap(
       await f.dbConn.query({
-        sql: 'CREATE TABLE test (id TEXT)',
+        sql: 'CREATE TABLE my_test_test (id TEXT)',
         params: [],
         parser: z.unknown(),
       })
     )
 
-    const up = 'CREATE TABLE IF NOT EXISTS test (id TEXT, name TEXT)'
-    const down = 'DROP TABLE IF EXISTS test'
+    const up = 'CREATE TABLE IF NOT EXISTS my_test_test (id TEXT, foo TEXT)'
+    const down = 'DROP TABLE IF EXISTS my_test_test'
 
     await f.migrationPolicy.run({
       dbConn: f.dbConn,
@@ -123,12 +123,18 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
       down,
     })
 
-    const result = await f.dbConn.query({
-      sql: 'SELECT id, name FROM test',
-      params: [],
+    await f.dbConn.query({
+      sql: 'INSERT INTO my_test_test (id, foo) VALUES (?, ?)',
+      params: ['1', 'bar'],
       parser: z.unknown(),
     })
 
-    expect(result).toBeDefined()
+    unwrap(
+      await f.dbConn.query({
+        sql: 'SELECT id, foo FROM my_test_test',
+        params: [],
+        parser: z.unknown(),
+      })
+    )
   })
 })

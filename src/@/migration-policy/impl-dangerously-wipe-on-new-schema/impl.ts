@@ -34,7 +34,11 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
   const logger = Logger.prefix('dangerously-wipe-on-new-schema', config.logger)
   return {
     async run(input) {
-      logger.info('running migration policy', { input })
+      const logPayload = {
+        up: input.up,
+        down: input.down,
+      }
+      logger.info('running migration policy', logPayload)
       const key = await hash(input.up)
       const prevSchema = await config.keyValueDb.get(EntryCodec, key)
       if (isErr(prevSchema)) {
@@ -42,13 +46,19 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         return
       }
       if (!prevSchema.value) {
-        logger.info('no previous schema. running up migration', { input })
+        logger.info('no previous schema. running up migration', logPayload)
+
+        logger.info('running down migration to ensure the up migration succeeds', logPayload)
+
+        await input.dbConn.query({ sql: input.down, params: [], parser: z.unknown() })
+
+        logger.info('running up migration', logPayload)
+
         await input.dbConn.query({
           sql: input.up,
           params: [],
           parser: z.unknown(),
         })
-
         const entryNew: Entry = {
           up: input.up,
           down: input.down,
@@ -63,23 +73,23 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       const newHash = await hash(input.up.trim())
       const didChange = prevHash !== newHash
       if (!didChange) {
-        logger.info('no change in schema. skipping.', { input })
+        logger.info('no change in schema. skipping.', logPayload)
         return
       }
 
-      logger.info('schema changed. running down migration', { input })
+      logger.info('schema changed. running down migration', logPayload)
       await input.dbConn.query({
         sql: prevSchema.value.down,
         params: [],
         parser: z.unknown(),
       })
-      logger.info('down migration complete. running up migration', { input })
+      logger.info('down migration complete. running up migration', logPayload)
       await input.dbConn.query({
         sql: input.up,
         params: [],
         parser: z.unknown(),
       })
-      logger.info('up migration complete. writing new schema', { input })
+      logger.info('up migration complete. writing new schema', logPayload)
       const entryNew: Entry = {
         up: input.up,
         down: input.down,
