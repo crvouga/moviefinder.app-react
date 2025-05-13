@@ -1,6 +1,6 @@
 import { Logger } from '~/@/logger'
 import { Config, DbConn } from '../impl'
-import { createPglite } from '~/@/pglite/pglite'
+import { createPglite } from '~/@/pglite/create-pglite'
 
 const Fixture = (config: Config) => {
   const dbConn = DbConn(config)

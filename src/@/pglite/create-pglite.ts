@@ -1,13 +1,6 @@
-export type PgliteConfig =
-  | {
-      t: 'in-memory'
-    }
-  | {
-      t: 'indexed-db'
-      databaseName: string
-    }
+import { PgliteInstance, PgliteConfig } from './types'
 
-export const createPglite = async (config: PgliteConfig) => {
+export const createPglite = async (config: PgliteConfig): Promise<PgliteInstance> => {
   const { PGlite, MemoryFS, IdbFs } = await import('@electric-sql/pglite')
   const { live } = await import('@electric-sql/pglite/live')
 
@@ -30,5 +23,3 @@ export const createPglite = async (config: PgliteConfig) => {
 
   return pglite
 }
-
-export type Pglite = Awaited<ReturnType<typeof createPglite>>

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ILogger, Logger } from '~/@/logger'
-import { Pglite } from '~/@/pglite/pglite'
+import { PgliteInstance } from '~/@/pglite/types'
 import { Err, Ok, Result } from '~/@/result'
 import { PubSub, Sub } from '~/@/pub-sub'
 import { DbConnParam, IDbConn } from '../interface'
@@ -8,7 +8,7 @@ import { LiveQuery } from '@electric-sql/pglite/live'
 
 export type Config = {
   t: 'pglite'
-  pglite: Promise<Pglite>
+  pglite: Promise<PgliteInstance>
   logger: ILogger
 }
 

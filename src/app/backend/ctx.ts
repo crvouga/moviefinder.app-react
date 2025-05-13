@@ -1,7 +1,7 @@
 import { DbConn } from '~/@/db-conn/impl'
 import { IDbConn } from '~/@/db-conn/interface'
 import { ILogger, Logger } from '~/@/logger'
-import { createPglite } from '~/@/pglite/pglite'
+import { createPglite } from '~/@/pglite/create-pglite'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbApiKey } from '~/@/tmdb-client/@/api-key'
 import { MediaDbBackend } from '../media/media-db/impl/backend'
