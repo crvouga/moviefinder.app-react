@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { DbConnFixture } from '~/@/db-conn/test/fixture'
 import { KeyValueDbFixture } from '~/@/key-value-db/test/fixture'
 import { Logger } from '~/@/logger'
+import { unwrap } from '~/@/result'
 import { MigrationPolicy } from './impl'
 
 const Fixture = async () => {
@@ -95,6 +96,35 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     // Verify table exists with new schema
     const result = await f.dbConn.query({
       sql: 'SELECT * FROM test',
+      params: [],
+      parser: z.unknown(),
+    })
+
+    expect(result).toBeDefined()
+  })
+
+  it('should run up migration when a previous schema exists but its not within the key value db', async () => {
+    const f = await Fixture()
+
+    unwrap(
+      await f.dbConn.query({
+        sql: 'CREATE TABLE test (id TEXT)',
+        params: [],
+        parser: z.unknown(),
+      })
+    )
+
+    const up = 'CREATE TABLE IF NOT EXISTS test (id TEXT, name TEXT)'
+    const down = 'DROP TABLE IF EXISTS test'
+
+    await f.migrationPolicy.run({
+      dbConn: f.dbConn,
+      up,
+      down,
+    })
+
+    const result = await f.dbConn.query({
+      sql: 'SELECT id, name FROM test',
       params: [],
       parser: z.unknown(),
     })
