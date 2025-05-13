@@ -50,7 +50,7 @@ export const FeedScreen = () => {
   )
 }
 
-const PAGE_SIZE = 2
+const PAGE_SIZE = 5
 
 type State = { limit: number; offset: number }
 

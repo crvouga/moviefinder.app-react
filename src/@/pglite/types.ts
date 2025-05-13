@@ -1,5 +1,6 @@
 import type { PGlite } from '@electric-sql/pglite'
 import type { LiveNamespace } from '@electric-sql/pglite/live'
+import type { PGliteWorker } from '@electric-sql/pglite/worker'
 
 export type PgliteConfig =
   | {
@@ -11,5 +12,9 @@ export type PgliteConfig =
     }
 
 export type PgliteInstance = PGlite & {
+  live: LiveNamespace
+}
+
+export type PgliteWorkerInstance = PGliteWorker & {
   live: LiveNamespace
 }
