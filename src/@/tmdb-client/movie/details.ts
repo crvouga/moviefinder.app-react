@@ -2,6 +2,15 @@ import { z } from 'zod'
 import { ErrResponse } from '../@/error-response'
 import { HttpClientGet } from '../@/http-client-get'
 import { TmdbClientConfig } from '../@/tmdb-client-config'
+import { MovieCreditsClient } from './credits'
+import { MovieExternalIdsClient } from './external-ids'
+import { MovieImagesClient } from './images'
+import { MovieKeywordsClient } from './keywords'
+import { MovieRecommendationsClient } from './recommendations'
+import { MovieReviewsClient } from './reviews'
+import { MovieSimilarClient } from './similar'
+import { MovieVideosClient } from './videos'
+import { MovieWatchProvidersClient } from './watch-providers'
 
 const TmdbMovieDetailsQueryParams = z.object({
   language: z
@@ -76,6 +85,15 @@ export const TmdbMovieDetailsOkResponse = z.object({
   video: z.boolean().optional(),
   vote_average: z.number().optional(),
   vote_count: z.number().int().optional(),
+  videos: MovieVideosClient.OkResponse.optional(),
+  credits: MovieCreditsClient.OkResponse.optional(),
+  external_ids: MovieExternalIdsClient.OkResponse.optional(),
+  recommendations: MovieRecommendationsClient.OkResponse.optional(),
+  similar: MovieSimilarClient.OkResponse.optional(),
+  'watch/providers': MovieWatchProvidersClient.OkResponse.optional(),
+  reviews: MovieReviewsClient.OkResponse.optional(),
+  images: MovieImagesClient.OkResponse.optional(),
+  keywords: MovieKeywordsClient.OkResponse.optional(),
 })
 
 export type TmdbMovieDetailsOkResponse = z.infer<typeof TmdbMovieDetailsOkResponse>
@@ -87,6 +105,9 @@ const ApiResponse = z.discriminatedUnion('status', [
 ])
 type ApiResponse = z.infer<typeof ApiResponse>
 
+const APPEND_TO_RESPONSE_ALL =
+  'videos,credits,images,keywords,reviews,similar,recommendations,translations,watch/providers,external_ids,release_dates,content_ratings,alternative_titles,changes,lists,account_states'
+
 export const MovieDetailsClient = (config: TmdbClientConfig) => {
   return {
     get: HttpClientGet({
@@ -97,3 +118,5 @@ export const MovieDetailsClient = (config: TmdbClientConfig) => {
     }),
   }
 }
+
+MovieDetailsClient.APPEND_TO_RESPONSE_ALL = APPEND_TO_RESPONSE_ALL

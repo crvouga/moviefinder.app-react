@@ -1,4 +1,4 @@
-import { TmdbMovieVideo } from '../movie/video'
+import { TmdbMovieVideo } from '../movie/videos'
 
 export const toVideoSrc = (data: TmdbMovieVideo) => {
   const { site, key } = data

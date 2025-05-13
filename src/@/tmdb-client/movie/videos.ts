@@ -43,7 +43,7 @@ const ApiResponse = z.discriminatedUnion('status', [
 ])
 type ApiResponse = z.infer<typeof ApiResponse>
 
-export const MovieVideoClient = (config: TmdbClientConfig) => {
+export const MovieVideosClient = (config: TmdbClientConfig) => {
   return {
     get: HttpClientGet({
       config,
@@ -53,3 +53,6 @@ export const MovieVideoClient = (config: TmdbClientConfig) => {
     }),
   }
 }
+
+MovieVideosClient.OkResponse = OkResponse
+MovieVideosClient.TmdbMovieVideo = TmdbMovieVideo
