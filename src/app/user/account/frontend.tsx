@@ -1,5 +1,5 @@
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
-import { LoginCta } from './login-cta'
+import { LoginCta } from './frontend/login-cta'
 
 export const AccountScreen = () => {
   return (
