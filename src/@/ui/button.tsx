@@ -36,7 +36,7 @@ export const Button = (input: ButtonInput) => {
       type={input.type ?? 'button'}
       className={cn(
         input.className,
-        'clickable relative flex shrink-0 appearance-none flex-nowrap items-center justify-center truncate overflow-hidden rounded font-semibold select-none',
+        'relative flex shrink-0 cursor-pointer appearance-none flex-nowrap items-center justify-center truncate overflow-hidden rounded font-semibold select-none',
         toColorClass(input),
         toSizeClass(input),
         input.rounded && 'rounded-3xl shadow-2xl',
@@ -104,7 +104,7 @@ const toColorClass = (input: ButtonInput): string => {
   const combo: Combo = `${input.variant ?? 'outlined'}-${input.color ?? 'primary'}`
   switch (combo) {
     case 'contained-primary':
-      return 'bg-blue-600 text-white ring-blue-500'
+      return 'bg-blue-500 text-white ring-blue-500'
     case 'contained-danger':
       return 'bg-red-600 text-white ring-red-500'
     case 'contained-default':
