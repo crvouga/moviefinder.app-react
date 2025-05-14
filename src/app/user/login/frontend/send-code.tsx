@@ -51,6 +51,7 @@ export const SendCodeScreen = () => {
             label="Phone Number"
             id="phone-number"
             value={state.phoneNumber}
+            required
             onChange={(phoneNumber) => patch({ phoneNumber })}
           />
         )}

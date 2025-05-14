@@ -57,6 +57,7 @@ export const VerifyCodeScreen = ({ phoneNumber }: { phoneNumber: string }) => {
               id="code"
               value={state.code}
               onChange={(code) => patch({ code })}
+              required
             />
           </>
         )}

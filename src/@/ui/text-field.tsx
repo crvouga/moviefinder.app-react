@@ -17,6 +17,7 @@ export const TextField = (input: {
   onClear?: () => void
   onChange: (value: string) => void
   disabled?: boolean
+  required?: boolean
 }) => {
   return (
     <label className="flex w-full flex-col gap-1">
@@ -45,6 +46,7 @@ export const TextField = (input: {
           auto-correct="off"
           auto-save="off"
           step={input.step}
+          required={input.required}
           disabled={input.disabled}
           // Controlled inputs are bugging out in React and Inferno. The cursor jumps to the end of the input on every change.
           // value={input.value}
