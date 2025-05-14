@@ -23,7 +23,7 @@
     "noImplicitOverride": true,
 
     /* Types */
-    "types": ["@types/bun"],
+    "types": ["@types/bun", "vite-plugin-pwa/client"],
 
     /* Paths */
     "baseUrl": ".",

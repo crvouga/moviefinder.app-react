@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom/client'
 import { Ctx } from '~/app/frontend/ctx.tsx'
 import { Err, Ok, Result, unwrap } from './@/result.ts'
 import { App } from './app/frontend.tsx'
-import { attachTools } from './app/frontend/window.ts'
+import { registerConsoleTools } from './app/frontend/register-console-tools.ts'
+import { registerServiceWorker } from './app/frontend/register-service-worker.ts'
 
 const main = (): Result<null, Error> => {
   const root = document.getElementById('root')
@@ -14,7 +15,8 @@ const main = (): Result<null, Error> => {
 
   const ctx = Ctx.init()
 
-  attachTools(ctx)
+  registerConsoleTools(ctx)
+  registerServiceWorker()
 
   reactRoot.render(
     <React.StrictMode>
