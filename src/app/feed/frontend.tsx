@@ -107,8 +107,10 @@ const ViewFeed = (props: { feed: Feed }) => {
           className="h-full w-full"
           direction="vertical"
           onSlideChange={(event) => {
-            const parsed = z.object({ feedIndex: z.number().int().min(0) }).parse(event.data)
-            ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.feedIndex }])
+            const parsed = z.object({ feedIndex: z.number().int().min(0) }).safeParse(event.data)
+            if (parsed.success) {
+              ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.data.feedIndex }])
+            }
           }}
         >
           {hasFirstSlideLoader && (

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useLayoutEffect } from 'react'
 
 import { useState } from 'react'
 
@@ -54,7 +54,7 @@ export const PubSub = <T>(): PubSub<T> => {
 export const useSubscription = <T>(createSub: () => Sub<T>, deps: unknown[]): T | null => {
   const subCallback = useCallback(() => createSub(), deps)
   const [value, setValue] = useState<T | null>(null)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const sub = subCallback()
     return sub.subscribe((value) => {
       setValue(value)
