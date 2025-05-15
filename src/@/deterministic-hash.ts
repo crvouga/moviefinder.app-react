@@ -5,7 +5,7 @@
  * @param obj The value to hash
  * @returns A deterministic hash string
  */
-export const hashObject = <T>(obj: T): string => {
+export const toDeterministicHash = <T>(obj: T): string => {
   // Handle primitive types directly
   if (obj === null) return 'null'
   if (obj === undefined) return 'undefined'
@@ -15,7 +15,7 @@ export const hashObject = <T>(obj: T): string => {
 
   // Handle arrays by recursively hashing elements
   if (Array.isArray(obj)) {
-    return `[${obj.map((item) => hashObject(item)).join(',')}]`
+    return `[${obj.map((item) => toDeterministicHash(item)).join(',')}]`
   }
 
   // Handle objects by sorting keys and recursively hashing values
@@ -23,7 +23,7 @@ export const hashObject = <T>(obj: T): string => {
     const sortedKeys = Object.keys(obj).sort()
     const pairs = sortedKeys.map((key) => {
       const value = obj[key as keyof T]
-      return `${key}:${hashObject(value)}`
+      return `${key}:${toDeterministicHash(value)}`
     })
     return `{${pairs.join(',')}}`
   }

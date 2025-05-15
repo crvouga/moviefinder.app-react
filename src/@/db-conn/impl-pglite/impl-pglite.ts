@@ -15,6 +15,7 @@ export type Config = {
 export const DbConn = (config: Config): IDbConn => {
   const logger = Logger.prefix('pglite', config.logger)
 
+
   return {
     async query(input) {
       try {
@@ -52,17 +53,7 @@ export const DbConn = (config: Config): IDbConn => {
       logger.info('liveQuery', { sql: input.sql, params: input.params })
       const pubSub = PubSub<Result<{ rows: TRow[] }, Error>>()
 
-      // const hash = toHash({
-      //   sql: input.sql,
-      //   params: input.params,
-      //   limit: input.limit,
-      //   offset: input.offset,
-      // })
-
-      // const lastValue = cache.get(hash)
-      // if (lastValue) {
-      //   pubSub.publish(lastValue)
-      // }
+  
 
       try {
         let ret: Promise<LiveQuery<{ [key: string]: any }>> | undefined
