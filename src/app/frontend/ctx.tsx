@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react'
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
-import { KeyValueDb } from '~/@/key-value-db/impl'
-import { IKeyValueDb } from '~/@/key-value-db/interface'
+import { KvDb } from '~/@/kv-db/impl'
+import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { createPglite } from '~/@/pglite/create-pglite'
@@ -21,7 +21,7 @@ export type Ctx = {
   mediaDb: IMediaDb
   sqlDb: ISqlDb
   logger: ILogger
-  keyValueDb: IKeyValueDb
+  kvDb: IKvDb
   clientSessionId: ClientSessionId
   feedDb: IFeedDb
 }
@@ -39,7 +39,7 @@ const init = (): Ctx => {
 
   const trpcClient = TrpcClient({ backendUrl })
 
-  const keyValueDb = KeyValueDb({
+  const kvDb = KvDb({
     t: 'db-conn',
     sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
@@ -54,7 +54,7 @@ const init = (): Ctx => {
     local: MediaDbFrontend({
       t: 'db-conn',
       sqlDb,
-      migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', keyValueDb, logger }),
+      migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger }),
     }),
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
@@ -68,13 +68,13 @@ const init = (): Ctx => {
     logger,
     migrationPolicy: MigrationPolicy({
       t: 'dangerously-wipe-on-new-schema',
-      keyValueDb,
+      kvDb,
       logger,
     }),
   })
 
   return {
-    keyValueDb,
+    kvDb,
     mediaDb,
     isProd,
     sqlDb,

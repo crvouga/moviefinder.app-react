@@ -1,12 +1,12 @@
 import { Ok } from '../../result'
-import { IKeyValueDb } from '../interface'
+import { IKvDb } from '../interface'
 
 export type Config = {
   t: 'browser-storage'
   storage: Storage
 }
 
-export const KeyValueDb = (config: Config): IKeyValueDb => {
+export const KvDb = (config: Config): IKvDb => {
   return {
     async get(codec, key) {
       const value = config.storage.getItem(key)

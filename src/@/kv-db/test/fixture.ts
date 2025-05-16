@@ -1,12 +1,12 @@
 import { SqlDbFixture } from '~/@/sql-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
-import { Config, KeyValueDb } from '../impl'
+import { Config, KvDb } from '../impl'
 
 const Fixture = (config: Config) => {
-  const keyValueDb = KeyValueDb(config)
+  const kvDb = KvDb(config)
   return {
-    keyValueDb,
+    kvDb,
   }
 }
 
@@ -24,7 +24,7 @@ export const Fixtures = async () => {
   return configs.map(Fixture)
 }
 
-export const KeyValueDbFixture = async () => {
+export const KvDbFixture = async () => {
   const { sqlDb } = await SqlDbFixture()
   return Fixture({
     t: 'db-conn',

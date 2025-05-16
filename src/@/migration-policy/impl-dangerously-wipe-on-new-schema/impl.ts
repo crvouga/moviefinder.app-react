@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { Codec } from '~/@/codec'
 import { ILogger, Logger } from '~/@/logger'
 import { isErr } from '~/@/result'
-import { IKeyValueDb } from '../../key-value-db/interface'
+import { IKvDb } from '../../kv-db/interface'
 import { IMigrationPolicy } from '../interface'
 
 export type Config = {
   t: 'dangerously-wipe-on-new-schema'
-  keyValueDb: IKeyValueDb
+  kvDb: IKvDb
   logger: ILogger
 }
 
@@ -40,7 +40,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       }
       logger.info('running migration policy', logPayload)
       const key = await hash(input.up)
-      const prevSchema = await config.keyValueDb.get(EntryCodec, key)
+      const prevSchema = await config.kvDb.get(EntryCodec, key)
       if (isErr(prevSchema)) {
         logger.error('failed to get previous schema', { error: prevSchema.error })
         return
@@ -64,7 +64,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
           down: input.down,
         }
         logger.info('up migration complete. writing new schema', { input, entryNew })
-        await config.keyValueDb.set(EntryCodec, key, entryNew)
+        await config.kvDb.set(EntryCodec, key, entryNew)
         logger.info('new schema written', { input, entryNew })
         return
       }
@@ -94,7 +94,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         up: input.up,
         down: input.down,
       }
-      await config.keyValueDb.set(EntryCodec, key, entryNew)
+      await config.kvDb.set(EntryCodec, key, entryNew)
       logger.info('new schema written', { input, entryNew })
     },
   }

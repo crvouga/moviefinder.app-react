@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, Ok } from '~/@/result'
-import { IKeyValueDb } from '../interface'
+import { IKvDb } from '../interface'
 
 export type Config = {
   t: 'db-conn'
@@ -23,7 +23,7 @@ const down = `
 DROP TABLE IF EXISTS key_value CASCADE
 `
 
-export const KeyValueDb = (config: Config): IKeyValueDb => {
+export const KvDb = (config: Config): IKvDb => {
   const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up, down })
   return {
     async get(codec, key) {

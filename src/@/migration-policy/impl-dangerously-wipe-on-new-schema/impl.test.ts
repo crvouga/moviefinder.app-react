@@ -1,22 +1,22 @@
 import { describe, expect, it } from 'bun:test'
 import { z } from 'zod'
 import { SqlDbFixture } from '~/@/sql-db/test/fixture'
-import { KeyValueDbFixture } from '~/@/key-value-db/test/fixture'
+import { KvDbFixture } from '~/@/kv-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { unwrap } from '~/@/result'
 import { MigrationPolicy } from './impl'
 
 const Fixture = async () => {
   const { sqlDb } = await SqlDbFixture()
-  const { keyValueDb } = await KeyValueDbFixture()
+  const { kvDb } = await KvDbFixture()
   const migrationPolicy = MigrationPolicy({
     t: 'dangerously-wipe-on-new-schema',
-    keyValueDb,
+    kvDb,
     logger: Logger({ t: 'noop' }),
   })
   return {
     sqlDb,
-    keyValueDb,
+    kvDb,
     migrationPolicy,
   }
 }
