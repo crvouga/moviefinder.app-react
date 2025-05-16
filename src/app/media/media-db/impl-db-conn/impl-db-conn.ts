@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { DbConnParam, IDbConn } from '~/@/db-conn/interface'
+import { DbConnParam, IDbConn } from '~/@/sql-db/interface'
+import { AppErr } from '~/@/error'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
-import { OrderBy } from '~/@/query/order-by'
-import { Where } from '~/@/query/where'
+import { OrderBy } from '~/@/query/query-input/order-by'
+import { Where } from '~/@/query/query-input/where'
 import { isErr, mapErr, Ok, Result } from '~/@/result'
 import { toBulkInsertSql } from '~/@/sql/bulk-insert'
-import { AppErr } from '~/app/@/error'
 import { Media } from '../../media'
 import { IMediaDb } from '../interface/interface'
 import { MediaColumn, MediaDbQueryInput } from '../interface/query-input'
@@ -154,7 +154,7 @@ const toSqlQuery = (query: MediaDbQueryInput) => {
     release_date
   FROM media
   ${query.where ? Where.toSql(query.where, mediaColumnToSqlColumn) : ''}
-  ${query.orderBy ? OrderBy.toSql(query.orderBy, mediaColumnToSqlColumn) : ''}
+  ${query.orderBy ? OrderBy .toSql(query.orderBy, mediaColumnToSqlColumn) : ''}
   LIMIT $1 
   OFFSET $2
   `

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { exhaustive } from '../exhaustive-check'
+import { exhaustive } from '~/@/exhaustive-check'
 
 const parser = <T>(column: z.ZodType<T>) => {
   return z.discriminatedUnion('op', [

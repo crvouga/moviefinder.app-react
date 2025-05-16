@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { z } from 'zod'
-import { DbConnFixture } from '~/@/db-conn/test/fixture'
+import { DbConnFixture } from '~/@/sql-db/test/fixture'
 import { KeyValueDbFixture } from '~/@/key-value-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { unwrap } from '~/@/result'

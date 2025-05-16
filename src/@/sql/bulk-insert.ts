@@ -1,4 +1,4 @@
-import { DbConnParam } from '../db-conn/interface'
+import { DbConnParam } from '../sql-db/interface'
 
 export const toBulkInsertSql = (input: { params: DbConnParam[][] }) => {
   const variables = input.params

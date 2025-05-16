@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
-import { DbConn } from '~/@/db-conn/impl'
-import { IDbConn } from '~/@/db-conn/interface'
+import { DbConn } from '~/@/sql-db/impl'
+import { IDbConn } from '~/@/sql-db/interface'
 import { KeyValueDb } from '~/@/key-value-db/impl'
 import { IKeyValueDb } from '~/@/key-value-db/interface'
 import { ILogger, Logger } from '~/@/logger'

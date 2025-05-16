@@ -11,8 +11,8 @@ const parser = <T>(column: z.ZodType<T>) => {
   })
 }
 
-export type Query<T> = z.infer<ReturnType<typeof parser<T>>>
+export type QueryInput<T> = z.infer<ReturnType<typeof parser<T>>>
 
-export const Query = {
+export const QueryInput = {
   parser,
 }

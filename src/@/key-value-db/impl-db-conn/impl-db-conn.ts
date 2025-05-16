@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { IDbConn } from '~/@/db-conn/interface'
+import { IDbConn } from '~/@/sql-db/interface'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, Ok } from '~/@/result'
 import { IKeyValueDb } from '../interface'

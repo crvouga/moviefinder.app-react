@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { Paginated } from '~/@/pagination/paginated'
 import { Result } from '~/@/result'
-import { AppErr } from '~/app/@/error'
+import { AppErr } from '~/@/error'
 import { Credit } from '../../credit/credit'
 import { Media } from '../../media'
 import { Person } from '../../person/person'

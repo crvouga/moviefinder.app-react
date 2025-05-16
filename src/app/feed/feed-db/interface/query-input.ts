@@ -1,5 +1,6 @@
-import { OrderBy } from '~/@/query/order-by'
-import { Where } from '~/@/query/where'
+import { OrderBy } from "~/@/query/query-input/order-by"
+import { Where } from "~/@/query/query-input/where"
+
 
 export type FeedColumn = 'id' | 'client-session-id'
 

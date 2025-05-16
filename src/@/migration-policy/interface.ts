@@ -1,4 +1,4 @@
-import { IDbConn } from '../db-conn/interface'
+import { IDbConn } from '../sql-db/interface'
 
 /**
  *

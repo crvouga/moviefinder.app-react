@@ -1,4 +1,4 @@
-import { DbConnFixture } from '~/@/db-conn/test/fixture'
+import { DbConnFixture } from '~/@/sql-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { FeedDb } from '../impl'

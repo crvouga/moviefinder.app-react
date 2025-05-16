@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { DbConnFixture } from '~/@/db-conn/test/fixture'
+import { DbConnFixture } from '~/@/sql-db/test/fixture'
 import { intersectionWith } from '~/@/intersection-with'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'

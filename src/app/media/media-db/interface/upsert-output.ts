@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Result } from '~/@/result'
-import { AppErr } from '~/app/@/error'
+import { AppErr } from '~/@/error'
 
 const parser = Result.parser(z.null(), AppErr.parser)
 
