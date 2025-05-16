@@ -2,11 +2,11 @@ import { describe, expect, it } from 'bun:test'
 import { intersectionWith } from '~/@/intersection-with'
 import { Pagination } from '~/@/pagination/pagination'
 import { unwrap } from '~/@/result'
-import { ReadOnlyFixtures } from './fixture'
+import { Fixtures } from './fixture'
 
 describe.only('MediaDb Pagination', () => {
   it('should work for limit 20', async () => {
-    for (const f of await ReadOnlyFixtures()) {
+    for (const f of await Fixtures(['db-conn'])) {
       const PAGE_SIZE = 20
       const page1 = unwrap(await f.mediaDb.query({ limit: PAGE_SIZE, offset: 0 }))
       const page2 = unwrap(await f.mediaDb.query(Pagination.nextPage(page1.media)))
@@ -24,7 +24,7 @@ describe.only('MediaDb Pagination', () => {
   })
 
   it('should work for limit 3', async () => {
-    for (const f of await ReadOnlyFixtures()) {
+    for (const f of await Fixtures(['db-conn'])) {
       const page1 = unwrap(await f.mediaDb.query({ limit: 3, offset: 0 }))
       const page2 = unwrap(await f.mediaDb.query(Pagination.nextPage(page1.media)))
 

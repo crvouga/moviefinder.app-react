@@ -12,34 +12,29 @@ const Fixture = async (config: Config) => {
   }
 }
 
-export const ReadOnlyFixtures = async () => {
+export const ReadOnlyFixtures = async () => {}
+
+export const Fixtures = async (
+  include: ('tmdb-client' | 'db-conn')[] = ['tmdb-client', 'db-conn']
+) => {
   const configs: Config[] = []
 
-  const { tmdbClient } = TmdbClientFixture()
-  configs.push({
-    t: 'tmdb-client',
-    tmdbClient,
-  })
+  if (include.includes('tmdb-client')) {
+    const { tmdbClient } = TmdbClientFixture()
+    configs.push({
+      t: 'tmdb-client',
+      tmdbClient,
+    })
+  }
 
-  const { dbConn } = await DbConnFixture()
-  configs.push({
-    t: 'db-conn',
-    dbConn,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
-  })
-
-  return await Promise.all(configs.map(Fixture))
-}
-
-export const Fixtures = async () => {
-  const configs: Config[] = []
-
-  const { dbConn } = await DbConnFixture()
-  configs.push({
-    t: 'db-conn',
-    dbConn,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
-  })
+  if (include.includes('db-conn')) {
+    const { dbConn } = await DbConnFixture()
+    configs.push({
+      t: 'db-conn',
+      dbConn,
+      migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
+    })
+  }
 
   return await Promise.all(configs.map(Fixture))
 }

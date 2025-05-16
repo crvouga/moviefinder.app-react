@@ -4,13 +4,13 @@ import { Ok, unwrap } from '~/@/result'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { MediaDbQueryOutput } from '../interface/query-output'
-import { Fixtures, ReadOnlyFixtures } from './fixture'
+import { Fixtures } from './fixture'
 
 describe.only('MediaDb Query By Id', () => {
   it('should work', async () => {
     const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
 
-    for (const f of await ReadOnlyFixtures()) {
+    for (const f of await Fixtures(['db-conn'])) {
       const expected = await Media.random({
         id: FIGHT_CLUB_ID,
       })

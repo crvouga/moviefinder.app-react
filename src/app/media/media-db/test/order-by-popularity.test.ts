@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { unwrap } from '~/@/result'
 import { isAscend, isDescend } from '~/@/sort'
-import { ReadOnlyFixtures } from './fixture'
+import { Fixtures } from './fixture'
 
 describe('MediaDb Order by popularity', () => {
   it('should work ascending', async () => {
-    for (const f of await ReadOnlyFixtures()) {
+    for (const f of await Fixtures()) {
       const queried = unwrap(
         await f.mediaDb.query({
           limit: 10,
@@ -18,7 +18,7 @@ describe('MediaDb Order by popularity', () => {
   })
 
   it.skip('should work descending', async () => {
-    for (const f of await ReadOnlyFixtures()) {
+    for (const f of await Fixtures()) {
       const queried = unwrap(
         await f.mediaDb.query({
           limit: 10,
