@@ -123,6 +123,7 @@ export const MovieDetailsClient = (config: TmdbClientConfig) => {
       queryParams: TmdbMovieDetailsQueryParams,
       response: ApiResponse,
     }),
+    APPEND_TO_RESPONSE_ALL,
   }
 }
 

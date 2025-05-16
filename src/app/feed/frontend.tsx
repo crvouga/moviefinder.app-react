@@ -146,7 +146,7 @@ const SlideContent = (props: { item: Media }) => {
       <Img
         className="h-full w-full object-cover"
         src={ImageSet.toHighestRes(props.item.poster)}
-        alt={props.item.title}
+        alt={props.item.title ?? ''}
       />
       <PreloadImg image={ImageSet.toHighestRes(props.item.backdrop)} />
     </button>

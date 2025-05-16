@@ -13,7 +13,7 @@ describe('MediaDb Order by popularity', () => {
           orderBy: [{ column: 'popularity', direction: 'asc' }],
         })
       )
-      expect(isAscend(queried.media.items, (item) => item.popularity)).toBe(true)
+      expect(isAscend(queried.media.items, (item) => item.popularity ?? 0)).toBe(true)
     }
   })
 
@@ -27,7 +27,7 @@ describe('MediaDb Order by popularity', () => {
         })
       )
 
-      expect(isDescend(queried.media.items, (item) => item.popularity)).toBe(true)
+      expect(isDescend(queried.media.items, (item) => item.popularity ?? 0)).toBe(true)
     }
   })
 })

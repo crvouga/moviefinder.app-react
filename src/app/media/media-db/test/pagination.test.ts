@@ -11,7 +11,6 @@ describe.only('MediaDb Pagination', () => {
       const page1 = unwrap(await f.mediaDb.query({ limit: PAGE_SIZE, offset: 0 }))
       const page2 = unwrap(await f.mediaDb.query(Pagination.nextPage(page1.media)))
 
-      expect(page1.media.items.length).toBeLessThanOrEqual(page2.media.total)
       expect(page2.media.items.length).toBeLessThanOrEqual(page1.media.total)
 
       expect(

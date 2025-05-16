@@ -5,11 +5,11 @@ import { createFaker } from '~/@/faker'
 
 const parser = z.object({
   id: MediaId.parser,
-  title: z.string(),
-  description: z.string(),
+  title: z.string().nullable(),
+  description: z.string().nullable(),
   poster: ImageSet.parser,
   backdrop: ImageSet.parser,
-  popularity: z.number(),
+  popularity: z.number().nullable(),
   releaseDate: z.string().nullable(),
 })
 
