@@ -1,18 +1,25 @@
 import { ImageSet } from '~/@/image-set'
 import { Avatar } from '~/@/ui/avatar'
 import { Person } from '../../person/person'
-import { PersonId } from '../../person/person-id'
 import { Credit } from '../credit'
 
-export const CreditCard = (props: { credit: Credit; person: { [personId: PersonId]: Person } }) => {
-  const person = props.person[props.credit.personId]
-  if (!person) return null
+export const CreditCard = (props: { credit: Credit; person: Person }) => {
   return (
-    <div className="flex h-full w-36 flex-col items-center justify-center gap-2 rounded-lg bg-neutral-900 p-2">
-      <Avatar className="size-20 rounded-full" src={ImageSet.toHighestRes(person.profile)} />
-      <p className="text-center text-sm font-bold">{person.name}</p>
-      <p className="text-center text-sm text-neutral-400">{props.credit.job}</p>
-      <p className="text-center text-sm text-neutral-400">{props.credit.character}</p>
+    <div className="flex h-full w-36 flex-col items-center justify-start gap-2 rounded-lg p-2">
+      <Avatar
+        className="size-24 rounded-full border"
+        src={ImageSet.toHighestRes(props.person.profile)}
+      />
+
+      <p className="text-center text-sm font-bold">{props.person.name}</p>
+
+      {props.credit.job && (
+        <p className="text-center text-xs text-neutral-400">{props.credit.job}</p>
+      )}
+
+      {props.credit.character && (
+        <p className="text-center text-xs text-neutral-400">{props.credit.character}</p>
+      )}
     </div>
   )
 }

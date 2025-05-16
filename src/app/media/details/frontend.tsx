@@ -7,7 +7,7 @@ import { useCtx } from '~/app/frontend/ctx'
 import { CreditsCardSwiper } from '../credit/frontend/credit-card-swiper'
 import { Media } from '../media'
 import { MediaId } from '../media-id'
-import { RecommendationMediaPosterSwiper } from '../relationship/frontend/recommendation-media-poster-swiper'
+import { RelationshipTypeMediaPosterSwiper } from '../relationship/frontend/relationship-type-media-poster-swiper'
 
 const SLIDES_OFFSET_BEFORE = 24
 const SLIDES_OFFSET_AFTER = 24
@@ -31,7 +31,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   return (
     <ScreenLayout
       includeGutter
-      key={media?.id}
+      // key={media?.id}
       topBar={{
         onBack: () => currentScreen.push({ t: 'feed' }),
         title: media?.title ?? ' ',
@@ -47,19 +47,21 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
         />
       </Section>
 
-      <Section title="Recommendations">
-        <RecommendationMediaPosterSwiper
+      <Section title="Similar">
+        <RelationshipTypeMediaPosterSwiper
           slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
           slidesOffsetAfter={SLIDES_OFFSET_AFTER}
           mediaId={media?.id ?? null}
+          relationshipType="similar"
         />
       </Section>
 
-      <Section title="Similar">
-        <RecommendationMediaPosterSwiper
+      <Section title="Recommendations">
+        <RelationshipTypeMediaPosterSwiper
           slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
           slidesOffsetAfter={SLIDES_OFFSET_AFTER}
           mediaId={media?.id ?? null}
+          relationshipType="recommendation"
         />
       </Section>
     </ScreenLayout>

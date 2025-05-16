@@ -30,16 +30,26 @@ export const CreditsCardSwiper = (
   if (!isOk(queried)) return null
 
   return (
-    <Swiper.Container {...props} direction="horizontal" className="w-full" slidesPerView="auto">
-      {queried.value.entities.items.map((credit, index) => (
-        <Swiper.Slide key={credit.id} className="w-fit">
-          <div
-            className={cn('flex h-full items-center justify-center p-1', index === 0 ? 'pl-4' : '')}
-          >
-            <CreditCard credit={credit} person={queried.value.related.person} />
-          </div>
-        </Swiper.Slide>
-      ))}
+    <Swiper.Container
+      {...props}
+      direction="horizontal"
+      className="w-full"
+      slidesPerView="auto"
+      initialSlide={0}
+    >
+      {queried.value.entities.items.flatMap((credit, index) => {
+        const person = queried.value.related.person[credit.personId]
+        if (!person) return []
+        return [
+          <Swiper.Slide key={credit.id} className="w-fit">
+            <div
+              className={cn('flex h-full items-center justify-center', index === 0 ? 'pl-4' : '')}
+            >
+              <CreditCard credit={credit} person={person} />
+            </div>
+          </Swiper.Slide>,
+        ]
+      })}
     </Swiper.Container>
   )
 }

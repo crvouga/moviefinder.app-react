@@ -1,27 +1,54 @@
 import { z } from 'zod'
-import { exhaustive } from '~/@/exhaustive-check'
 
-const parser = <T>(column: z.ZodType<T>) => {
-  return z.discriminatedUnion('op', [
-    z.object({ op: z.literal('='), column: column, value: z.string() }),
-    z.object({ op: z.literal('in'), column: column, value: z.array(z.string()) }),
+export type Where<T> =
+  | {
+      op: '='
+      column: T
+      value: string
+    }
+  | {
+      op: 'in'
+      column: T
+      value: string[]
+    }
+  | {
+      op: 'and'
+      clauses: Where<T>[]
+    }
+
+const parser = <T>(column: z.ZodType<T>): z.ZodType<Where<T>> => {
+  const schema = z.discriminatedUnion('op', [
+    z.object({
+      op: z.literal('='),
+      column,
+      value: z.string(),
+    }),
+    z.object({
+      op: z.literal('in'),
+      column,
+      value: z.array(z.string()),
+    }),
+    z.object({
+      op: z.literal('and'),
+      clauses: z.any(),
+    }),
   ])
+  // @ts-ignore
+  return schema
 }
 
-export type Where<T> = z.infer<ReturnType<typeof parser<T>>>
-
-export const toSql = <T>(where: Where<T>, columnToSqlColumn: (column: T) => string) => {
-  const sqlColumn = columnToSqlColumn(where.column as T)
+export const toSql = <T>(where: Where<T>, columnToSqlColumn: (column: T) => string): string => {
   switch (where.op) {
     case 'in': {
       if (where.value.length === 0) return ''
-      return `WHERE ${sqlColumn} IN (${(where.value as string[]).map((v) => `'${v}'`).join(',')})`
+      return `WHERE ${columnToSqlColumn(where.column)} IN (${where.value.map((v) => `'${v}'`).join(',')})`
     }
     case '=': {
-      return `WHERE ${sqlColumn} = '${where.value}'`
+      return `WHERE ${columnToSqlColumn(where.column)} = '${where.value}'`
     }
-    default: {
-      throw new Error('Unreachable')
+    case 'and': {
+      if (where.clauses.length === 0) return ''
+      return `WHERE ${where.clauses.map((clause) => toSql(clause, columnToSqlColumn).replace('WHERE ', '')).join(' AND ')}`
     }
   }
 }
@@ -31,20 +58,22 @@ const mapColumn = <T, U>(where: Where<T>, mapFn: (column: T) => U): Where<U> => 
     case 'in': {
       return {
         op: 'in',
-        value: where.value as string[],
-        column: mapFn(where.column as T),
-      } as Where<U>
+        value: where.value,
+        column: mapFn(where.column),
+      }
     }
     case '=': {
       return {
         op: '=',
-        value: where.value as string,
-        column: mapFn(where.column as T),
-      } as Where<U>
+        value: where.value,
+        column: mapFn(where.column),
+      }
     }
-    default: {
-      exhaustive(where as never)
-      throw new Error('Unreachable')
+    case 'and': {
+      return {
+        op: 'and',
+        clauses: where.clauses.map((clause) => mapColumn(clause, mapFn)),
+      }
     }
   }
 }
