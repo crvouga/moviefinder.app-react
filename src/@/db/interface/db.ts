@@ -36,6 +36,9 @@ export type Infer<T> =
     ? Db<TField, TEntity, TRelated>
     : never
 
+export type InferQueryInput<T> =
+  T extends Parser<infer TField, infer TEntity, infer TRelated> ? QueryInput<TField> : never
+
 export type Db<TField, TEntity, TRelated> = {
   query: (query: QueryInput<TField>) => Promise<QueryOutput<TEntity, TRelated>>
   liveQuery: (query: QueryInput<TField>) => Sub<QueryOutput<TEntity, TRelated>>

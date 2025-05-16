@@ -1,15 +1,18 @@
 {
-    "cSpell.words": [
-        "coverflow",
-        "flatrate",
-        "imdb",
-        "pglite",
-        "schemaname",
-        "swiperslidechange",
-        "tablename",
-        "tmdb",
-        "upserted",
-        "VITE"
-    ],
-    "editor.formatOnSave": true
+  "cSpell.words": [
+    "coverflow",
+    "flatrate",
+    "imdb",
+    "pglite",
+    "schemaname",
+    "swiperslidechange",
+    "tablename",
+    "tmdb",
+    "upserted",
+    "VITE"
+  ],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true
 }

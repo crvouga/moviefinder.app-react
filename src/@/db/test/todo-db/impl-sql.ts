@@ -1,4 +1,3 @@
-
 import { z } from 'zod'
 import { createDbFromSqlDb } from '~/@/db/impl/impl-sql-db'
 import { IKvDb } from '~/@/kv-db/interface'
@@ -19,8 +18,8 @@ CREATE TABLE IF NOT EXISTS todo (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     completed BOOLEAN NOT NULL,
-    created_at_utc TIMESTAMPZ NOT NULL,
-    updated_at_utc TIMESTAMPZ NULL
+    created_at_utc TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at_utc TIMESTAMP WITH TIME ZONE NULL
 )
 `
 
@@ -50,12 +49,19 @@ export const TodoDb = (config: Config): ITodoDb => {
       created_at_utc: z.date(),
       updated_at_utc: z.date().nullable(),
     }),
-    fieldToSqlColumn: {
-      id: 'id',
-      title: 'title',
-      completed: 'completed',
-      createdAt: 'created_at_utc',
-      updatedAt: 'updated_at_utc',
+    fieldToSqlColumn: (field) => {
+      switch (field) {
+        case 'id':
+          return 'id'
+        case 'title':
+          return 'title'
+        case 'completed':
+          return 'completed'
+        case 'createdAt':
+          return 'created_at_utc'
+        case 'updatedAt':
+          return 'updated_at_utc'
+      }
     },
     rowToEntity(row) {
       return {

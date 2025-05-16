@@ -1,8 +1,7 @@
 import { z } from 'zod'
 import { Sub } from '../pub-sub'
 import { Result } from '../result'
-
-export type SqlDbParam = string | number | boolean | null | undefined | SqlDbParam[]
+import { SqlDbParam } from './sql-db-param'
 
 export type ISqlDb = {
   query: <TRow>(input: {

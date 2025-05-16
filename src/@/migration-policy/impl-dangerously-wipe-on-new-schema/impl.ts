@@ -50,15 +50,28 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
 
         logger.info('running down migration to ensure the up migration succeeds', logPayload)
 
-        await input.sqlDb.query({ sql: input.down, params: [], parser: z.unknown() })
+        const downResult = await input.sqlDb.query({
+          sql: input.down,
+          params: [],
+          parser: z.unknown(),
+        })
+
+        if (isErr(downResult)) {
+          logger.error('failed to run down migration', { error: downResult.error })
+        }
 
         logger.info('running up migration', logPayload)
 
-        await input.sqlDb.query({
+        const upResult = await input.sqlDb.query({
           sql: input.up,
           params: [],
           parser: z.unknown(),
         })
+
+        if (isErr(upResult)) {
+          logger.error('failed to run up migration', { error: upResult.error })
+          return
+        }
         const entryNew: Entry = {
           up: input.up,
           down: input.down,
@@ -78,17 +91,27 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       }
 
       logger.info('schema changed. running down migration', logPayload)
-      await input.sqlDb.query({
+      const downResult = await input.sqlDb.query({
         sql: prevSchema.value.down,
         params: [],
         parser: z.unknown(),
       })
+      if (isErr(downResult)) {
+        logger.error('failed to run down migration', { error: downResult.error })
+        return
+      }
+
       logger.info('down migration complete. running up migration', logPayload)
-      await input.sqlDb.query({
+      const upResult = await input.sqlDb.query({
         sql: input.up,
         params: [],
         parser: z.unknown(),
       })
+      if (isErr(upResult)) {
+        logger.error('failed to run up migration', { error: upResult.error })
+        return
+      }
+
       logger.info('up migration complete. writing new schema', logPayload)
       const entryNew: Entry = {
         up: input.up,

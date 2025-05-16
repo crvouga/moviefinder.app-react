@@ -54,10 +54,15 @@ export const PersonDb = (config: Config): IPersonDb => {
         },
       }
     },
-    fieldToSqlColumn: {
-      id: 'id',
-      name: 'name',
-      popularity: 'popularity',
+    fieldToSqlColumn: (field) => {
+      switch (field) {
+        case 'id':
+          return 'id'
+        case 'name':
+          return 'name'
+        case 'popularity':
+          return 'popularity'
+      }
     },
     primaryKey: 'id',
     entityToRow(entity) {

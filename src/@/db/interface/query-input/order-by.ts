@@ -7,9 +7,9 @@ const parser = <T>(column: z.ZodType<T>) => {
 
 export type OrderBy<T> = z.infer<ReturnType<typeof parser<T>>>
 
-const toSql = <T>(orderBy: OrderBy<T>, columnToSqlColumn: (column: T) => string) => {
+const toSql = <TField>(orderBy: OrderBy<TField>, fieldToSqlColumn: (field: TField) => string) => {
   const sql = orderBy
-    .map((o) => `${columnToSqlColumn(o.column as T)} ${o.direction.toUpperCase()}`)
+    .map((o) => `${fieldToSqlColumn(o.column as TField)} ${o.direction.toUpperCase()}`)
     .join(', ')
   return sql ? `ORDER BY ${sql}` : ''
 }

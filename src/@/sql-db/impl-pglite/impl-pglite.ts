@@ -4,7 +4,8 @@ import { ILogger, Logger } from '~/@/logger'
 import { PgliteInstance, PgliteWorkerInstance } from '~/@/pglite/types'
 import { PubSub, Sub } from '~/@/pub-sub'
 import { Err, Ok, Result } from '~/@/result'
-import { SqlDbParam, ISqlDb } from '../interface'
+import { ISqlDb } from '~/@/sql-db/interface'
+import { SqlDbParam } from '~/@/sql-db/sql-db-param'
 
 export type Config = {
   t: 'pglite'
