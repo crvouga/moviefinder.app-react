@@ -46,8 +46,8 @@ export const PersonDb = (config: Config): IPersonDb => {
         logger: config.logger,
         kvDb: config.kvDb,
       }),
-      up,
-      down,
+      up: [up],
+      down: [down],
     },
     entityKeyToSqlColumn: (key) => {
       switch (key) {

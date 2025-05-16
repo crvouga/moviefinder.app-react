@@ -14,7 +14,8 @@ export type Config = {
   kvDb: IKvDb
 }
 
-const up = `
+const up = [
+  `
 CREATE TABLE IF NOT EXISTS video (
     id TEXT PRIMARY KEY,
     iso_639_1 TEXT,
@@ -27,11 +28,14 @@ CREATE TABLE IF NOT EXISTS video (
     official BOOLEAN,
     published_at TIMESTAMP
 )
-`
+`,
+]
 
-const down = `
+const down = [
+  `
 DROP TABLE IF EXISTS video CASCADE
-`
+`,
+]
 
 const Row = z.object({
   id: z.string(),

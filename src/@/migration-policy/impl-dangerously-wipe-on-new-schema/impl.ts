@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { Codec } from '~/@/codec'
+import { toDeterministicHash } from '~/@/deterministic-hash'
 import { ILogger, Logger } from '~/@/logger'
 import { isErr } from '~/@/result'
 import { IKvDb } from '../../kv-db/interface'
@@ -12,22 +13,27 @@ export type Config = {
 }
 
 const Entry = z.object({
-  up: z.string(),
-  down: z.string(),
+  up: z.array(z.string()),
+  down: z.array(z.string()),
 })
 
 type Entry = z.infer<typeof Entry>
 
 const EntryCodec: Codec<Entry> = {
-  encode: (input) => JSON.stringify(input),
-  decode: (input) => Entry.parse(JSON.parse(input)),
-}
-
-const hash = async (up: string) => {
-  const msgBuffer = new TextEncoder().encode(up.trim())
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  encode: (input) => {
+    try {
+      return JSON.stringify(input)
+    } catch (error) {
+      return ''
+    }
+  },
+  decode: (input) => {
+    try {
+      return Entry.parse(JSON.parse(input))
+    } catch (error) {
+      return null
+    }
+  },
 }
 
 export const MigrationPolicy = (config: Config): IMigrationPolicy => {
@@ -39,7 +45,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         down: input.down,
       }
       logger.info('running migration policy', logPayload)
-      const key = await hash(input.up)
+      const key = toDeterministicHash(input.up)
       const prevSchema = await config.kvDb.get(EntryCodec, key)
       if (isErr(prevSchema)) {
         logger.error('failed to get previous schema', { error: prevSchema.error })
@@ -50,27 +56,32 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
 
         logger.info('running down migration to ensure the up migration succeeds', logPayload)
 
-        const downResult = await input.sqlDb.query({
-          sql: input.down,
-          params: [],
-          parser: z.unknown(),
-        })
+        for (const down of input.down) {
+          const downResult = await input.sqlDb.query({
+            sql: down,
+            params: [],
+            parser: z.unknown(),
+          })
 
-        if (isErr(downResult)) {
-          logger.error('failed to run down migration', { error: downResult.error })
+          if (isErr(downResult)) {
+            logger.error('failed to run down migration', { error: downResult.error })
+            continue
+          }
         }
 
         logger.info('running up migration', logPayload)
 
-        const upResult = await input.sqlDb.query({
-          sql: input.up,
-          params: [],
-          parser: z.unknown(),
-        })
+        for (const up of input.up) {
+          const upResult = await input.sqlDb.query({
+            sql: up,
+            params: [],
+            parser: z.unknown(),
+          })
 
-        if (isErr(upResult)) {
-          logger.error('failed to run up migration', { error: upResult.error })
-          return
+          if (isErr(upResult)) {
+            logger.error('failed to run up migration', { error: upResult.error })
+            continue
+          }
         }
         const entryNew: Entry = {
           up: input.up,
@@ -82,8 +93,8 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         return
       }
 
-      const prevHash = await hash(prevSchema.value?.up.trim() ?? '')
-      const newHash = await hash(input.up.trim())
+      const prevHash = toDeterministicHash(prevSchema.value?.up ?? [])
+      const newHash = toDeterministicHash(input.up)
       const didChange = prevHash !== newHash
       if (!didChange) {
         logger.info('no change in schema. skipping.', logPayload)
@@ -91,25 +102,29 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       }
 
       logger.info('schema changed. running down migration', logPayload)
-      const downResult = await input.sqlDb.query({
-        sql: prevSchema.value.down,
-        params: [],
-        parser: z.unknown(),
-      })
-      if (isErr(downResult)) {
-        logger.error('failed to run down migration', { error: downResult.error })
-        return
+      for (const down of prevSchema.value.down) {
+        const downResult = await input.sqlDb.query({
+          sql: down,
+          params: [],
+          parser: z.unknown(),
+        })
+        if (isErr(downResult)) {
+          logger.error('failed to run down migration', { error: downResult.error })
+          continue
+        }
       }
 
       logger.info('down migration complete. running up migration', logPayload)
-      const upResult = await input.sqlDb.query({
-        sql: input.up,
-        params: [],
-        parser: z.unknown(),
-      })
-      if (isErr(upResult)) {
-        logger.error('failed to run up migration', { error: upResult.error })
-        return
+      for (const up of input.up) {
+        const upResult = await input.sqlDb.query({
+          sql: up,
+          params: [],
+          parser: z.unknown(),
+        })
+        if (isErr(upResult)) {
+          logger.error('failed to run up migration', { error: upResult.error })
+          continue
+        }
       }
 
       logger.info('up migration complete. writing new schema', logPayload)

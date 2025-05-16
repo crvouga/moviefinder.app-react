@@ -64,7 +64,7 @@ const feedColumnToSqlColumn = (column: FeedColumn): string => {
 }
 
 export const FeedDb = (config: Config): IFeedDb => {
-  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up, down })
+  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up: [up], down: [down] })
 
   return {
     async query(input) {

@@ -16,8 +16,9 @@ export type Config = {
   kvDb: IKvDb
 }
 
-const up = `
-CREATE TYPE credit_type AS ENUM ('cast', 'crew');
+const up = [
+  `CREATE TYPE credit_type AS ENUM ('cast', 'crew')`,
+  `
 CREATE TABLE IF NOT EXISTS credit (
     id TEXT PRIMARY KEY,
     media_id TEXT NOT NULL,
@@ -27,12 +28,17 @@ CREATE TABLE IF NOT EXISTS credit (
     "order" INTEGER,
     type credit_type NOT NULL
 )
-`
+`,
+]
 
-const down = `
+const down = [
+  `
 DROP TABLE IF EXISTS credit CASCADE;
+`,
+  `
 DROP TYPE IF EXISTS credit_type CASCADE;
-`
+`,
+]
 
 const CreditTypePostgres = z.enum(['cast', 'crew'])
 

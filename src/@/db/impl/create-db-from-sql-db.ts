@@ -23,8 +23,8 @@ export type Config<
   viewName: string
   primaryKey: string
   migration?: {
-    up: string
-    down: string
+    up: string[]
+    down: string[]
     policy: IMigrationPolicy
   }
   fieldToSqlColumn: (field: TField) => string
@@ -154,9 +154,6 @@ ON CONFLICT (${config.primaryKey})
 DO UPDATE SET
 ${sqlColumns.map((column) => `\t${column} = EXCLUDED.${column}`).join(',\n')}
 `
-
-      console.log(sql)
-      console.log(flatParams)
 
       const queried = await config.sqlDb.query({ sql, params: flatParams, parser: z.unknown() })
 

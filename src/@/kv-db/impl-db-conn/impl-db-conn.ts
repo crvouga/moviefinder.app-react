@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS key_value CASCADE
 `
 
 export const KvDb = (config: Config): IKvDb => {
-  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up, down })
+  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up: [up], down: [down] })
   return {
     async get(codec, key) {
       await run

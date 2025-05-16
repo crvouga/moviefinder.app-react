@@ -13,20 +13,28 @@ export type Config = {
   kvDb: IKvDb
 }
 
-const up = `
+const up = [
+  `
 CREATE TYPE relationship_type AS ENUM ('recommendation', 'similar');
+`,
+  `
 CREATE TABLE IF NOT EXISTS relationship (
     id TEXT PRIMARY KEY,
-    from TEXT,
-    to TEXT,
+    "from" TEXT,
+    "to" TEXT,
     type relationship_type
-)
-`
+);
+`,
+]
 
-const down = `
-DROP TABLE IF EXISTS relationship CASCADE
-DROP TYPE IF EXISTS relationship_type CASCADE
-`
+const down = [
+  `
+DROP TABLE IF EXISTS relationship CASCADE;
+`,
+  `
+DROP TYPE IF EXISTS relationship_type CASCADE;
+`,
+]
 
 const RelationshipTypePostgres = z.enum(['recommendation', 'similar'])
 

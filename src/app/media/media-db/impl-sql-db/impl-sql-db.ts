@@ -110,8 +110,8 @@ export const MediaDb = (config: Config): IMediaDb => {
     viewName: 'media',
     primaryKey: 'id',
     migration: {
-      up,
-      down,
+      up: [up],
+      down: [down],
       policy: config.migrationPolicy,
     },
   })

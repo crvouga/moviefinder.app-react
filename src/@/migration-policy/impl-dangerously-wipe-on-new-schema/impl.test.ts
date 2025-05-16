@@ -24,8 +24,8 @@ const Fixture = async () => {
 describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
   it('should run up migration when no previous schema exists', async () => {
     const f = await Fixture()
-    const up = 'CREATE TABLE test (id TEXT)'
-    const down = 'DROP TABLE test'
+    const up = ['CREATE TABLE test (id TEXT)']
+    const down = ['DROP TABLE test']
 
     await f.migrationPolicy.run({
       sqlDb: f.sqlDb,
@@ -44,8 +44,8 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
 
   it('should skip migration when schema has not changed', async () => {
     const f = await Fixture()
-    const up = 'CREATE TABLE test (id TEXT)'
-    const down = 'DROP TABLE test'
+    const up = ['CREATE TABLE test (id TEXT)']
+    const down = ['DROP TABLE test']
 
     // First run
     await f.migrationPolicy.run({
@@ -73,8 +73,8 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
 
   it('should run down and up migrations when schema has changed', async () => {
     const f = await Fixture()
-    const initialUp = 'CREATE TABLE test (id TEXT)'
-    const initialDown = 'DROP TABLE test'
+    const initialUp = ['CREATE TABLE test (id TEXT)']
+    const initialDown = ['DROP TABLE test']
 
     // First run
     await f.migrationPolicy.run({
@@ -84,8 +84,8 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     })
 
     // Second run with modified schema
-    const modifiedUp = 'CREATE TABLE test (id TEXT, name TEXT)'
-    const modifiedDown = 'DROP TABLE test'
+    const modifiedUp = ['CREATE TABLE test (id TEXT, name TEXT)']
+    const modifiedDown = ['DROP TABLE test']
 
     await f.migrationPolicy.run({
       sqlDb: f.sqlDb,
@@ -114,8 +114,8 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
       })
     )
 
-    const up = 'CREATE TABLE IF NOT EXISTS my_test_test (id TEXT, foo TEXT)'
-    const down = 'DROP TABLE IF EXISTS my_test_test'
+    const up = ['CREATE TABLE IF NOT EXISTS my_test_test (id TEXT, foo TEXT)']
+    const down = ['DROP TABLE IF EXISTS my_test_test']
 
     await f.migrationPolicy.run({
       sqlDb: f.sqlDb,

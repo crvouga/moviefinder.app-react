@@ -74,10 +74,6 @@ export const Psql = (config: { ctx: Ctx }) => {
       const result = await config.ctx.sqlDb.query({ parser: z.unknown(), sql })
       const { rows } = unwrap(result)
 
-      if (rows.length === 0) {
-        console.log('no rows')
-        return
-      }
       console.table(rows)
     },
   })
