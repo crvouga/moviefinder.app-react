@@ -5,6 +5,10 @@ import { PubSub } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
 import { throttleByKey } from '~/@/throttle'
 import { TimeSpan } from '~/@/time-span'
+import { ICreditDb } from '../../credit/credit-db/interface'
+import { IPersonDb } from '../../person/person-db/interface'
+import { IRelationshipDb } from '../../relationship/relationship-db/interface'
+import { IVideoDb } from '../../video/video-db/interface'
 import { IMediaDb } from '../interface/interface'
 
 export type OneWaySyncRemoteToLocalMsg = {
@@ -20,6 +24,12 @@ export type Config = {
   remote: IMediaDb
   pubSub: PubSub<OneWaySyncRemoteToLocalMsg>
   throttle: TimeSpan
+  relatedDbs: {
+    creditDb: ICreditDb
+    relationshipDb: IRelationshipDb
+    videoDb: IVideoDb
+    personDb: IPersonDb
+  }
 }
 
 export const MediaDb = (config: Config): IMediaDb => {
@@ -32,6 +42,25 @@ export const MediaDb = (config: Config): IMediaDb => {
       const remoteQueried = await config.remote.query(query)
       const media = isOk(remoteQueried) ? remoteQueried.value.entities.items : []
       const localUpsert = await config.local.upsert({ entities: media })
+      if (isOk(remoteQueried)) {
+        await Promise.all([
+          config.relatedDbs.creditDb.upsert({
+            entities: Object.values(remoteQueried.value.related.credit),
+          }),
+          config.relatedDbs.relationshipDb.upsert({
+            entities: Object.values(remoteQueried.value.related.relationship),
+          }),
+          config.relatedDbs.videoDb.upsert({
+            entities: Object.values(remoteQueried.value.related.video),
+          }),
+          config.relatedDbs.personDb.upsert({
+            entities: Object.values(remoteQueried.value.related.person),
+          }),
+          config.local.upsert({
+            entities: Object.values(remoteQueried.value.related.media),
+          }),
+        ])
+      }
       config.pubSub.publish({
         t: 'synced-remote-to-local',
         remoteQuery: remoteQueried,

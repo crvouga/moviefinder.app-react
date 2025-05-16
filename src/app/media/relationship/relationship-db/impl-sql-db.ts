@@ -50,7 +50,7 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
     getRelated: async () => ({}),
     parser: IRelationshipDb.parser,
     sqlDb: config.sqlDb,
-    viewName: 'person',
+    viewName: 'relationship',
     migration: {
       policy: MigrationPolicy({
         t: 'dangerously-wipe-on-new-schema',
@@ -65,9 +65,9 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
         case 'id':
           return 'id'
         case 'from':
-          return 'from'
+          return '"from"'
         case 'to':
-          return 'to'
+          return '"to"'
         case 'type':
           return 'type'
         default:
@@ -88,9 +88,9 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
         case 'id':
           return 'id'
         case 'from':
-          return 'from'
+          return '"from"'
         case 'to':
-          return 'to'
+          return '"to"'
         case 'type':
           return 'type'
         default:

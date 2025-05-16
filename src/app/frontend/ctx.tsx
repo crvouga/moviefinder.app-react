@@ -61,6 +61,11 @@ const init = (): Ctx => {
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
   clientSessionIdStorage.set(clientSessionId)
 
+  const personDb = PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  const relationshipDb = RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  const creditDb = CreditDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  const videoDb = VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
+
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
     local: MediaDbFrontend({
@@ -72,45 +77,19 @@ const init = (): Ctx => {
     logger,
     pubSub: PubSub(),
     throttle: TimeSpan.seconds(10),
+    relatedDbs: {
+      personDb,
+      relationshipDb,
+      creditDb,
+      videoDb,
+    },
   })
 
   const feedDb = FeedDb({
     t: 'db-conn',
     sqlDb,
     logger,
-    migrationPolicy: MigrationPolicy({
-      t: 'dangerously-wipe-on-new-schema',
-      kvDb,
-      logger,
-    }),
-  })
-
-  const personDb = PersonDb({
-    t: 'sql-db',
-    sqlDb,
-    logger,
-    kvDb,
-  })
-
-  const relationshipDb = RelationshipDb({
-    t: 'sql-db',
-    sqlDb,
-    logger,
-    kvDb,
-  })
-
-  const creditDb = CreditDb({
-    t: 'sql-db',
-    sqlDb,
-    logger,
-    kvDb,
-  })
-
-  const videoDb = VideoDb({
-    t: 'sql-db',
-    sqlDb,
-    logger,
-    kvDb,
+    migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger }),
   })
 
   return {

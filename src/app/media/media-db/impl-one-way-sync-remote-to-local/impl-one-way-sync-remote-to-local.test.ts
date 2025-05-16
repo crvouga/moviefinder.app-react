@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { Db } from '~/@/db/interface'
 import { intersectionWith } from '~/@/intersection-with'
+import { KvDb } from '~/@/kv-db/impl-db-conn/impl-db-conn'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { PubSub } from '~/@/pub-sub'
@@ -8,10 +9,13 @@ import { unwrap } from '~/@/result'
 import { SqlDbFixture } from '~/@/sql-db/test/fixture'
 import { TimeSpan } from '~/@/time-span'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
+import { CreditDb } from '../../credit/credit-db/impl-sql-db'
+import { PersonDb } from '../../person/person-db/impl-sql-db'
+import { RelationshipDb } from '../../relationship/relationship-db/impl-sql-db'
+import { VideoDb } from '../../video/video-db/impl-sql-db'
 import { MediaDbBackend } from '../impl/backend'
 import { IMediaDb } from '../interface/interface'
 import { OneWaySyncRemoteToLocalMsg } from './impl-one-way-sync-remote-to-local'
-
 const Fixture = async () => {
   const { sqlDb } = await SqlDbFixture()
   const { tmdbClient } = await TmdbClientFixture()
@@ -25,6 +29,12 @@ const Fixture = async () => {
     tmdbClient,
   })
   const pubSub = PubSub<OneWaySyncRemoteToLocalMsg>()
+  const logger = Logger({ t: 'noop' })
+  const kvDb = KvDb({
+    t: 'db-conn',
+    sqlDb,
+    migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
+  })
   const mediaDb = MediaDbBackend({
     t: 'one-way-sync-remote-to-local',
     local,
@@ -32,6 +42,12 @@ const Fixture = async () => {
     logger: Logger({ t: 'noop' }),
     pubSub,
     throttle: TimeSpan.seconds(0),
+    relatedDbs: {
+      creditDb: CreditDb({ t: 'sql-db', sqlDb, kvDb, logger }),
+      relationshipDb: RelationshipDb({ t: 'sql-db', sqlDb, kvDb, logger }),
+      videoDb: VideoDb({ t: 'sql-db', sqlDb, kvDb, logger }),
+      personDb: PersonDb({ t: 'sql-db', sqlDb, kvDb, logger }),
+    },
   })
   return {
     mediaDb,

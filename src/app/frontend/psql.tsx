@@ -33,37 +33,39 @@ export const Psql = (config: { ctx: Ctx }) => {
     },
   })
 
-  commands.push({
-    description: 'Describe a table',
-    match: /d\s+\w+/,
-    handler: async (strings: TemplateStringsArray, ..._values: any[]) => {
-      const tableName = strings[0]?.trim().replaceAll('  ', ' ').split(' ')?.[1]
-      if (!tableName) {
-        console.error('No table name provided')
-        return
-      }
+  if (false)
+    commands.push({
+      description: 'Describe a table',
+      match: /d\s+\w+/,
+      handler: async (strings: TemplateStringsArray, ..._values: any[]) => {
+        const tableName = strings[0]?.trim().replaceAll('  ', ' ').split(' ')?.[1]
+        if (!tableName) {
+          console.error('No table name provided')
+          return
+        }
 
-      const result = await config.ctx.sqlDb.query({
-        sql: `SELECT column_name, data_type, is_nullable, column_default 
+        const result = await config.ctx.sqlDb.query({
+          sql: `SELECT column_name, data_type, is_nullable, column_default 
              FROM information_schema.columns 
              WHERE table_name = $1 
              ORDER BY ordinal_position`,
-        params: [tableName],
-        parser: z.unknown(),
-      })
+          params: [tableName],
+          parser: z.unknown(),
+        })
 
-      const { rows } = unwrap(result)
-      console.table(rows)
-    },
-  })
+        const { rows } = unwrap(result)
+        console.table(rows)
+      },
+    })
 
-  commands.push({
-    description: 'help',
-    match: /help|h/,
-    handler: async (_strings: TemplateStringsArray, ..._values: any[]) => {
-      console.table(commands.map((c) => [c.match.source, c.description]))
-    },
-  })
+  if (false)
+    commands.push({
+      description: 'help',
+      match: /help|h/,
+      handler: async (_strings: TemplateStringsArray, ..._values: any[]) => {
+        console.table(commands.map((c) => [c.match.source, c.description]))
+      },
+    })
 
   commands.push({
     description: 'Execute a raw SQL query',
@@ -73,7 +75,10 @@ export const Psql = (config: { ctx: Ctx }) => {
 
       const result = await config.ctx.sqlDb.query({ parser: z.unknown(), sql })
       const { rows } = unwrap(result)
-
+      if (rows.length === 0) {
+        console.log('No rows returned')
+        return
+      }
       console.table(rows)
     },
   })

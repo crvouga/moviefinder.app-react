@@ -58,7 +58,7 @@ export const PersonDb = (config: Config): IPersonDb => {
         case 'popularity':
           return 'popularity'
         case 'profile':
-          return 'profile'
+          return 'profile_urls'
         default:
           throw new Error(`Unreachable: ${key}`)
       }
