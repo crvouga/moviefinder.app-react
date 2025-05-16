@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "frontend": "vite",
     "backend": "bun start",
+    "build": "vite build",
     "format": "bun x sort-package-json && prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md,json}\"",
+    "frontend": "vite",
     "kp": "bun x kill-port 3000",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "bun install && bun run build && bun start",
     "start": "bun --hot ./src/backend.ts",
     "tc": "tsc --watch --noEmit",
-    "preview": "bun install && bun run build && bun start",
     "viz-bundle": "bun x vite-bundle-visualizer"
   },
   "prettier": {

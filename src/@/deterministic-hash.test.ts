@@ -46,17 +46,17 @@ describe('hashObject', () => {
   it('should hash nested structures consistently', () => {
     const nested1 = {
       arr: [1, { x: 'test' }],
-      obj: { a: null, b: [true] }
+      obj: { a: null, b: [true] },
     }
     const nested2 = {
       obj: { b: [true], a: null },
-      arr: [1, { x: 'test' }]
+      arr: [1, { x: 'test' }],
     }
     expect(toDeterministicHash(nested1)).toBe(toDeterministicHash(nested2))
 
     const nested3 = {
       arr: [1, { x: 'different' }],
-      obj: { a: null, b: [true] }
+      obj: { a: null, b: [true] },
     }
     expect(toDeterministicHash(nested1)).not.toBe(toDeterministicHash(nested3))
   })
