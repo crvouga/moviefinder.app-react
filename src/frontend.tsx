@@ -15,7 +15,7 @@ const main = (): Result<null, Error> => {
 
   const ctx = Ctx.init()
 
-  registerConsoleTools({ ctx })
+registerConsoleTools({ ctx })
   registerServiceWorker()
 
   reactRoot.render(

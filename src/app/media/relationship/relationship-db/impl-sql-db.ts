@@ -1,11 +1,10 @@
 import { z } from 'zod'
 import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
-import { ImageSet } from '~/@/image-set'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
-import { IPersonDb } from './interface'
+import { IRelationshipDb } from './interface'
 
 export type Config = {
   t: 'sql-db'
@@ -15,29 +14,33 @@ export type Config = {
 }
 
 const up = `
-CREATE TABLE IF NOT EXISTS person (
+CREATE TYPE relationship_type AS ENUM ('recommendation', 'similar');
+CREATE TABLE IF NOT EXISTS relationship (
     id TEXT PRIMARY KEY,
-    name TEXT,
-    popularity REAL,
-    profile_urls TEXT[]
+    from TEXT,
+    to TEXT,
+    type relationship_type
 )
 `
 
 const down = `
-DROP TABLE IF EXISTS person CASCADE
+DROP TABLE IF EXISTS relationship CASCADE
+DROP TYPE IF EXISTS relationship_type CASCADE
 `
+
+const RelationshipTypePostgres = z.enum(['recommendation', 'similar'])
 
 const Row = z.object({
   id: z.string(),
-  name: z.string().nullable(),
-  popularity: z.number().nullable(),
-  profile_urls: z.array(z.string()).nullable(),
+  from: z.string(),
+  to: z.string(),
+  type: RelationshipTypePostgres,
 })
 
-export const PersonDb = (config: Config): IPersonDb => {
+export const RelationshipDb = (config: Config): IRelationshipDb => {
   return createDbFromSqlDb({
     getRelated: async () => ({}),
-    parser: IPersonDb.parser,
+    parser: IRelationshipDb.parser,
     sqlDb: config.sqlDb,
     viewName: 'person',
     migration: {
@@ -53,12 +56,12 @@ export const PersonDb = (config: Config): IPersonDb => {
       switch (key) {
         case 'id':
           return 'id'
-        case 'name':
-          return 'name'
-        case 'popularity':
-          return 'popularity'
-        case 'profile':
-          return 'profile'
+        case 'from':
+          return 'from'
+        case 'to':
+          return 'to'
+        case 'type':
+          return 'type'
         default:
           throw new Error(`Unreachable: ${key}`)
       }
@@ -67,30 +70,32 @@ export const PersonDb = (config: Config): IPersonDb => {
     rowToEntity(row) {
       return {
         id: row.id,
-        name: row.name,
-        popularity: row.popularity,
-        profile: ImageSet.init({
-          lowestToHighestRes: row.profile_urls ?? [],
-        }),
+        from: row.from,
+        to: row.to,
+        type: row.type,
       }
     },
     fieldToSqlColumn: (field) => {
       switch (field) {
         case 'id':
           return 'id'
-        case 'name':
-          return 'name'
-        case 'popularity':
-          return 'popularity'
+        case 'from':
+          return 'from'
+        case 'to':
+          return 'to'
+        case 'type':
+          return 'type'
+        default:
+          throw new Error(`Unreachable: ${field}`)
       }
     },
     primaryKey: 'id',
     entityToRow(entity) {
       return {
         id: entity.id,
-        name: entity.name,
-        popularity: entity.popularity,
-        profile_urls: entity.profile.lowestToHighestRes,
+        from: entity.from,
+        to: entity.to,
+        type: entity.type,
       }
     },
   })

@@ -1,8 +1,9 @@
 import { Db } from '~/@/db/interface'
+import { toDeterministicHash } from '~/@/deterministic-hash'
 import { ILogger } from '~/@/logger'
 import { PubSub } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
-import { throttle } from '~/@/throttle'
+import { throttleByKey } from '~/@/throttle'
 import { TimeSpan } from '~/@/time-span'
 import { IMediaDb } from '../interface/interface'
 
@@ -22,8 +23,11 @@ export type Config = {
 }
 
 export const MediaDb = (config: Config): IMediaDb => {
-  const remoteToLocalSync = throttle(
+  const remoteToLocalSync = throttleByKey(
     config.throttle,
+    (query: Db.InferQueryInput<typeof IMediaDb.parser>) => {
+      return toDeterministicHash(query)
+    },
     async (query: Db.InferQueryInput<typeof IMediaDb.parser>) => {
       const remoteQueried = await config.remote.query(query)
       const media = isOk(remoteQueried) ? remoteQueried.value.entities.items : []

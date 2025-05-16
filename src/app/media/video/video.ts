@@ -1,7 +1,8 @@
 import { z } from 'zod'
+import { VideoId } from './video-id'
 
 const parser = z.object({
-  id: z.string().nullable(),
+  id: VideoId.parser,
   iso_639_1: z.string().nullable(),
   iso_3166_1: z.string().nullable(),
   name: z.string().nullable(),

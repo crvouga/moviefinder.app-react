@@ -1,12 +1,12 @@
 import { createContext, useContext } from 'react'
-import { SqlDb } from '~/@/sql-db/impl'
-import { ISqlDb } from '~/@/sql-db/interface'
 import { KvDb } from '~/@/kv-db/impl'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { createPglite } from '~/@/pglite/create-pglite'
 import { PubSub } from '~/@/pub-sub'
+import { SqlDb } from '~/@/sql-db/impl'
+import { ISqlDb } from '~/@/sql-db/interface'
 import { TimeSpan } from '~/@/time-span'
 import { ClientSessionId } from '../@/client-session-id/client-session-id'
 import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id-storage'
@@ -14,6 +14,10 @@ import { FeedDb } from '../feed/feed-db/impl'
 import { IFeedDb } from '../feed/feed-db/interface/interface'
 import { MediaDbFrontend } from '../media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media-db/interface/interface'
+import { PersonDb } from '../media/person/person-db/impl-sql-db'
+import { IPersonDb } from '../media/person/person-db/interface'
+import { RelationshipDb } from '../media/relationship/relationship-db/impl-sql-db'
+import { IRelationshipDb } from '../media/relationship/relationship-db/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
 
 export type Ctx = {
@@ -24,6 +28,8 @@ export type Ctx = {
   kvDb: IKvDb
   clientSessionId: ClientSessionId
   feedDb: IFeedDb
+  personDb: IPersonDb
+  relationshipDb: IRelationshipDb
 }
 
 const init = (): Ctx => {
@@ -73,6 +79,20 @@ const init = (): Ctx => {
     }),
   })
 
+  const personDb = PersonDb({
+    t: 'sql-db',
+    sqlDb,
+    logger,
+    kvDb,
+  })
+
+  const relationshipDb = RelationshipDb({
+    t: 'sql-db',
+    sqlDb,
+    logger,
+    kvDb,
+  })
+
   return {
     kvDb,
     mediaDb,
@@ -81,6 +101,8 @@ const init = (): Ctx => {
     logger,
     clientSessionId,
     feedDb,
+    personDb,
+    relationshipDb,
   }
 }
 
