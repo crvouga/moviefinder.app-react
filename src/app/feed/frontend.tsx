@@ -15,6 +15,7 @@ import { Feed } from './feed'
 import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
 import { FeedItem } from './feed-item'
+import { MediaId } from '../media/media-id'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -107,9 +108,21 @@ const ViewFeed = (props: { feed: Feed }) => {
           className="h-full w-full"
           direction="vertical"
           onSlideChange={(event) => {
-            const parsed = z.object({ feedIndex: z.number().int().min(0) }).safeParse(event.data)
+            const parsed = z
+              .object({
+                feedIndex: z.number().int().min(0),
+                mediaId: MediaId.parser,
+              })
+              .safeParse(event.data)
+
             if (parsed.success) {
               ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.data.feedIndex }])
+              const mediaId = parsed.data.mediaId
+              ctx.mediaDb.query({
+                where: { op: '=', column: 'id', value: mediaId },
+                limit: 1,
+                offset: 0,
+              })
             }
           }}
         >
@@ -121,7 +134,10 @@ const ViewFeed = (props: { feed: Feed }) => {
             </Swiper.Slide>
           )}
           {feedItems.map((item) => (
-            <Swiper.Slide key={item.media.id} data={{ feedIndex: item.feedIndex }}>
+            <Swiper.Slide
+              key={item.media.id}
+              data={{ feedIndex: item.feedIndex, mediaId: item.media.id }}
+            >
               <SlideContent item={item.media} />
             </Swiper.Slide>
           ))}
