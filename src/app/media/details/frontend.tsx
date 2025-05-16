@@ -25,11 +25,11 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
 
   return (
     <ScreenLayout
+      includeGutter
       topBar={{
         onBack: () => currentScreen.push({ t: 'feed' }),
         title: media?.title ?? ' ',
       }}
-      actions={[]}
     >
       <Img
         className="aspect-video w-full object-cover"

@@ -1,39 +1,57 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>moviefinder.app</title>
+    <meta name="theme-color" content="#000000" />
+    <style>
+      @import 'tailwindcss';
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>moviefinder.app</title>
-  <meta name="theme-color" content="#000000" />
-  <style>
-    @import "tailwindcss";
-
-    @layer base {
-
-      *,
-      ::after,
-      ::before,
-      ::backdrop,
-      ::file-selector-button {
-        border-color: var(--color-neutral-600, currentColor);
+      @layer base {
+        *,
+        ::after,
+        ::before,
+        ::backdrop,
+        ::file-selector-button {
+          border-color: var(--color-neutral-600, currentColor);
+        }
       }
-    }
 
-    * {
-      touch-action: manipulation !important;
-    }
-  </style>
-</head>
+      * {
+        touch-action: manipulation !important;
+      }
 
-<body class="bg-black">
-  <div id="root">
-    <div class="absolute inset-0 flex h-full w-full flex-col items-center justify-center text-6xl animate-pulse">
-      🍿
+      /* Customize scrollbar appearance */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #444;
+      }
+    </style>
+  </head>
+
+  <body class="bg-black">
+    <div id="root">
+      <div
+        class="absolute inset-0 flex h-full w-full animate-pulse flex-col items-center justify-center text-6xl"
+      >
+        🍿
+      </div>
     </div>
-  </div>
 
-  <script type="module" src="./src/frontend.tsx"></script>
-</body>
-
+    <script type="module" src="./src/frontend.tsx"></script>
+  </body>
 </html>

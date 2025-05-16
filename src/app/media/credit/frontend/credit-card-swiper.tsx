@@ -1,10 +1,10 @@
 import { useSubscription } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
+import { cn } from '~/@/ui/cn'
 import { Swiper } from '~/@/ui/swiper'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../../media-id'
 import { CreditCard } from './credit-card'
-import { cn } from '~/@/ui/cn'
 
 export const CreditsCardSwiper = (props: { mediaId: MediaId }) => {
   const ctx = useCtx()
@@ -18,7 +18,7 @@ export const CreditsCardSwiper = (props: { mediaId: MediaId }) => {
           value: props.mediaId,
         },
         orderBy: [{ column: 'personId', direction: 'asc' }],
-        limit: 500,
+        limit: 25,
         offset: 0,
       }),
     [ctx, props.mediaId]
@@ -28,7 +28,7 @@ export const CreditsCardSwiper = (props: { mediaId: MediaId }) => {
   if (!isOk(queried)) return null
 
   return (
-    <Swiper.Container direction="horizontal" className="w-full px-2" slidesPerView={3}>
+    <Swiper.Container direction="horizontal" className="w-full px-2" slidesPerView="auto">
       {queried.value.entities.items.map((credit, index) => (
         <Swiper.Slide key={credit.id}>
           <div

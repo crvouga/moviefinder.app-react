@@ -22,7 +22,7 @@ interface SwiperProps {
   className?: string
   navigation?: boolean
   pagination?: boolean | { type: string } // Allow object config
-  slidesPerView?: number | string
+  slidesPerView?: number | 'auto'
   spaceBetween?: number
   loop?: boolean
   direction?: 'horizontal' | 'vertical'
