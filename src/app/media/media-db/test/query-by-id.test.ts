@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'bun:test'
+import { clone } from '~/@/clone'
 import { Ok, unwrap } from '~/@/result'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
-import { Fixtures } from './fixture'
 import { MediaDbQueryOutput } from '../interface/query-output'
-import { clone } from '~/@/clone'
+import { Fixtures, ReadOnlyFixtures } from './fixture'
 
-describe('MediaDb Query By Id', () => {
+describe.only('MediaDb Query By Id', () => {
   it('should work', async () => {
     const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
 
-    for (const f of await Fixtures()) {
+    for (const f of await ReadOnlyFixtures()) {
       const expected = await Media.random({
         id: FIGHT_CLUB_ID,
       })
