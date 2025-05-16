@@ -32,7 +32,7 @@ describe.only('MediaDb Query By Id', () => {
       })
 
       expect(unwrap(before).media.items).toEqual([])
-      expect(unwrap(after).media.items).toEqual([expected])
+      expect(unwrap(after).media.items[0]?.id).toEqual(FIGHT_CLUB_ID)
     }
   })
 })

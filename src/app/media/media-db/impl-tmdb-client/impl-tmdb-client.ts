@@ -29,7 +29,7 @@ export const MediaDb = (config: Config): IMediaDb => {
       if (query.where?.op === '=') {
         const result = await queryMovieDetails({
           tmdbClient: config.tmdbClient,
-          tmdbMovieId: Number(query.where.value),
+          tmdbMovieId: MediaId.toTmdbId(query.where.value),
         })
         return result
       }
