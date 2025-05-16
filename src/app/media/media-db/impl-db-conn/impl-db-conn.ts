@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DbConnParam, IDbConn } from '~/@/sql-db/interface'
+import { SqlDbParam, ISqlDb } from '~/@/sql-db/interface'
 import { AppErr } from '~/@/error'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { OrderBy } from '~/@/query/query-input/order-by'
@@ -14,7 +14,7 @@ import { Row } from './row'
 
 export type Config = {
   t: 'db-conn'
-  dbConn: IDbConn
+  sqlDb: ISqlDb
   migrationPolicy: IMigrationPolicy
 }
 
@@ -34,14 +34,14 @@ DROP TABLE IF EXISTS media CASCADE
 `
 
 export const MediaDb = (config: Config): IMediaDb => {
-  const run = config.migrationPolicy.run({ dbConn: config.dbConn, up, down })
+  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up, down })
   return {
     async query(query) {
       await run
 
       const { sql, params } = toSqlQuery(query)
 
-      const queried = await config.dbConn.query({
+      const queried = await config.sqlDb.query({
         sql,
         params: params,
         parser: Row.parser,
@@ -51,7 +51,7 @@ export const MediaDb = (config: Config): IMediaDb => {
     },
     liveQuery(query) {
       const { sql, params } = toSqlQuery(query)
-      return config.dbConn
+      return config.sqlDb
         .liveQuery({ sql, params, parser: Row.parser, waitFor: run })
         .map((queried) => {
           return toQueryOutput({ queried, query })
@@ -91,7 +91,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         release_date = EXCLUDED.release_date
       `
 
-      const queried = await config.dbConn.query({ sql, params, parser: z.unknown() })
+      const queried = await config.sqlDb.query({ sql, params, parser: z.unknown() })
 
       if (isErr(queried)) return mapErr(queried, AppErr.from)
 
@@ -141,7 +141,7 @@ const mediaColumnToSqlColumn = (column: MediaColumn): string => {
 }
 
 const toSqlQuery = (query: MediaDbQueryInput) => {
-  const params: DbConnParam[] = [query.limit, query.offset]
+  const params: SqlDbParam[] = [query.limit, query.offset]
 
   const sql = `
   SELECT

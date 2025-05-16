@@ -1,12 +1,12 @@
 import { z } from 'zod'
-import { IDbConn } from '~/@/sql-db/interface'
+import { ISqlDb } from '~/@/sql-db/interface'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, Ok } from '~/@/result'
 import { IKeyValueDb } from '../interface'
 
 export type Config = {
   t: 'db-conn'
-  dbConn: IDbConn
+  sqlDb: ISqlDb
   migrationPolicy: IMigrationPolicy
 }
 
@@ -24,11 +24,11 @@ DROP TABLE IF EXISTS key_value CASCADE
 `
 
 export const KeyValueDb = (config: Config): IKeyValueDb => {
-  const run = config.migrationPolicy.run({ dbConn: config.dbConn, up, down })
+  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up, down })
   return {
     async get(codec, key) {
       await run
-      const result = await config.dbConn.query({
+      const result = await config.sqlDb.query({
         sql: 'SELECT value FROM key_value WHERE key = $1 AND deleted_at_posix IS NULL',
         params: [key],
         parser: z.object({ value: z.string() }),
@@ -46,7 +46,7 @@ export const KeyValueDb = (config: Config): IKeyValueDb => {
       await run
       const encoded = codec.encode(value)
 
-      const result = await config.dbConn.query({
+      const result = await config.sqlDb.query({
         sql: 'INSERT INTO key_value (key, value, created_at_posix) VALUES ($1, $2, $3) ON CONFLICT(key) DO UPDATE SET value = $2, updated_at_posix = $3, deleted_at_posix = NULL',
         params: [key, encoded, Date.now()],
         parser: z.unknown(),
@@ -58,7 +58,7 @@ export const KeyValueDb = (config: Config): IKeyValueDb => {
     },
     async zap(key) {
       await run
-      const result = await config.dbConn.query({
+      const result = await config.sqlDb.query({
         sql: 'UPDATE key_value SET deleted_at_posix = $1 WHERE key = $2',
         params: [Date.now(), key],
         parser: z.unknown(),

@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
-import { DbConn } from '~/@/sql-db/impl'
-import { IDbConn } from '~/@/sql-db/interface'
+import { SqlDb } from '~/@/sql-db/impl'
+import { ISqlDb } from '~/@/sql-db/interface'
 import { KeyValueDb } from '~/@/key-value-db/impl'
 import { IKeyValueDb } from '~/@/key-value-db/interface'
 import { ILogger, Logger } from '~/@/logger'
@@ -19,7 +19,7 @@ import { TrpcClient } from '../trpc/frontend/trpc-client'
 export type Ctx = {
   isProd: boolean
   mediaDb: IMediaDb
-  dbConn: IDbConn
+  sqlDb: ISqlDb
   logger: ILogger
   keyValueDb: IKeyValueDb
   clientSessionId: ClientSessionId
@@ -33,7 +33,7 @@ const init = (): Ctx => {
 
   const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
 
-  const dbConn = DbConn({ t: 'pglite', pglite, logger })
+  const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 
@@ -41,7 +41,7 @@ const init = (): Ctx => {
 
   const keyValueDb = KeyValueDb({
     t: 'db-conn',
-    dbConn,
+    sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
   })
 
@@ -53,7 +53,7 @@ const init = (): Ctx => {
     t: 'one-way-sync-remote-to-local',
     local: MediaDbFrontend({
       t: 'db-conn',
-      dbConn,
+      sqlDb,
       migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', keyValueDb, logger }),
     }),
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
@@ -64,7 +64,7 @@ const init = (): Ctx => {
 
   const feedDb = FeedDb({
     t: 'db-conn',
-    dbConn,
+    sqlDb,
     logger,
     migrationPolicy: MigrationPolicy({
       t: 'dangerously-wipe-on-new-schema',
@@ -77,7 +77,7 @@ const init = (): Ctx => {
     keyValueDb,
     mediaDb,
     isProd,
-    dbConn,
+    sqlDb,
     logger,
     clientSessionId,
     feedDb,

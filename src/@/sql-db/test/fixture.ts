@@ -1,11 +1,11 @@
 import { Logger } from '~/@/logger'
-import { Config, DbConn } from '../impl'
+import { Config, SqlDb } from '../impl'
 import { createPglite } from '~/@/pglite/create-pglite'
 
 const Fixture = (config: Config) => {
-  const dbConn = DbConn(config)
+  const sqlDb = SqlDb(config)
   return {
-    dbConn,
+    sqlDb,
   }
 }
 
@@ -23,12 +23,12 @@ export const Fixtures = async () => {
   return configs.map(Fixture)
 }
 
-export const DbConnFixture = async () => {
-  const dbConn = DbConn({
+export const SqlDbFixture = async () => {
+  const sqlDb = SqlDb({
     t: 'pglite',
     pglite,
     logger: Logger({ t: 'noop' }),
   })
 
-  return { dbConn }
+  return { sqlDb }
 }

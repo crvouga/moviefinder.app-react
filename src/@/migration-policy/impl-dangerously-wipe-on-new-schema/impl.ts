@@ -50,11 +50,11 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
 
         logger.info('running down migration to ensure the up migration succeeds', logPayload)
 
-        await input.dbConn.query({ sql: input.down, params: [], parser: z.unknown() })
+        await input.sqlDb.query({ sql: input.down, params: [], parser: z.unknown() })
 
         logger.info('running up migration', logPayload)
 
-        await input.dbConn.query({
+        await input.sqlDb.query({
           sql: input.up,
           params: [],
           parser: z.unknown(),
@@ -78,13 +78,13 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       }
 
       logger.info('schema changed. running down migration', logPayload)
-      await input.dbConn.query({
+      await input.sqlDb.query({
         sql: prevSchema.value.down,
         params: [],
         parser: z.unknown(),
       })
       logger.info('down migration complete. running up migration', logPayload)
-      await input.dbConn.query({
+      await input.sqlDb.query({
         sql: input.up,
         params: [],
         parser: z.unknown(),

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DbConnParam, IDbConn } from '~/@/sql-db/interface'
+import { SqlDbParam, ISqlDb } from '~/@/sql-db/interface'
 import { ILogger } from '~/@/logger'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, Ok, Result } from '~/@/result'
@@ -14,7 +14,7 @@ import { OrderBy } from '~/@/query/query-input/order-by'
 
 export type Config = {
   t: 'db-conn'
-  dbConn: IDbConn
+  sqlDb: ISqlDb
   migrationPolicy: IMigrationPolicy
   logger: ILogger
 }
@@ -63,23 +63,23 @@ const feedColumnToSqlColumn = (column: FeedColumn): string => {
 }
 
 export const FeedDb = (config: Config): IFeedDb => {
-  const run = config.migrationPolicy.run({ dbConn: config.dbConn, up, down })
+  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up, down })
 
   return {
     async query(input) {
       await run
-      const { sql, params } = toDbConnInput(input)
-      const queried = await config.dbConn.query({
+      const { sql, params } = toSqlDbInput(input)
+      const queried = await config.sqlDb.query({
         sql,
         params,
         parser: Row,
       })
-      return fromDbConnOutput({ queried, query: input })
+      return fromSqlDbOutput({ queried, query: input })
     },
     liveQuery(query) {
-      const { sql, params } = toDbConnInput(query)
-      return config.dbConn.liveQuery({ sql, params, parser: Row }).map((queried) => {
-        return fromDbConnOutput({ queried, query })
+      const { sql, params } = toSqlDbInput(query)
+      return config.sqlDb.liveQuery({ sql, params, parser: Row }).map((queried) => {
+        return fromSqlDbOutput({ queried, query })
       })
     },
     async upsert(feed) {
@@ -87,7 +87,7 @@ export const FeedDb = (config: Config): IFeedDb => {
       const { params, variables } = toBulkInsertSql({
         params: feed.map((feed) => [feed.id, feed.clientSessionId, feed.activeIndex, Date.now()]),
       })
-      const result = await config.dbConn.query({
+      const result = await config.sqlDb.query({
         sql: `
           INSERT INTO feed (
             id,
@@ -110,7 +110,7 @@ export const FeedDb = (config: Config): IFeedDb => {
   }
 }
 
-const fromDbConnOutput = (input: {
+const fromSqlDbOutput = (input: {
   queried: Result<{ rows: Row[] }, Error>
   query: FeedDbQueryInput
 }): FeedDbQueryOutput => {
@@ -123,7 +123,7 @@ const fromDbConnOutput = (input: {
   })
 }
 
-const toDbConnInput = (input: FeedDbQueryInput) => {
+const toSqlDbInput = (input: FeedDbQueryInput) => {
   const whereStr = input.where ? Where.toSql(input.where, feedColumnToSqlColumn) : ''
   const orderByStr = input.orderBy ? OrderBy.toSql(input.orderBy, feedColumnToSqlColumn) : ''
   const sql = `
@@ -134,7 +134,7 @@ const toDbConnInput = (input: FeedDbQueryInput) => {
     LIMIT $1
     OFFSET $2
   `
-  const params: DbConnParam[] = [input.limit, input.offset]
+  const params: SqlDbParam[] = [input.limit, input.offset]
   return {
     sql,
     params,

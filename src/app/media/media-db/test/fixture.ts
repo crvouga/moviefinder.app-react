@@ -1,4 +1,4 @@
-import { DbConnFixture } from '~/@/sql-db/test/fixture'
+import { SqlDbFixture } from '~/@/sql-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
@@ -28,10 +28,10 @@ export const Fixtures = async (
   }
 
   if (include.includes('db-conn')) {
-    const { dbConn } = await DbConnFixture()
+    const { sqlDb } = await SqlDbFixture()
     configs.push({
       t: 'db-conn',
-      dbConn,
+      sqlDb,
       migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
     })
   }

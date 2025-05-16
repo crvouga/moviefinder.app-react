@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { z } from 'zod'
-import { DbConnFixture } from '~/@/sql-db/test/fixture'
+import { SqlDbFixture } from '~/@/sql-db/test/fixture'
 import { KeyValueDbFixture } from '~/@/key-value-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { unwrap } from '~/@/result'
 import { MigrationPolicy } from './impl'
 
 const Fixture = async () => {
-  const { dbConn } = await DbConnFixture()
+  const { sqlDb } = await SqlDbFixture()
   const { keyValueDb } = await KeyValueDbFixture()
   const migrationPolicy = MigrationPolicy({
     t: 'dangerously-wipe-on-new-schema',
@@ -15,7 +15,7 @@ const Fixture = async () => {
     logger: Logger({ t: 'noop' }),
   })
   return {
-    dbConn,
+    sqlDb,
     keyValueDb,
     migrationPolicy,
   }
@@ -28,12 +28,12 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     const down = 'DROP TABLE test'
 
     await f.migrationPolicy.run({
-      dbConn: f.dbConn,
+      sqlDb: f.sqlDb,
       up,
       down,
     })
 
-    const result = await f.dbConn.query({
+    const result = await f.sqlDb.query({
       sql: 'SELECT * FROM test',
       params: [],
       parser: z.unknown(),
@@ -49,20 +49,20 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
 
     // First run
     await f.migrationPolicy.run({
-      dbConn: f.dbConn,
+      sqlDb: f.sqlDb,
       up,
       down,
     })
 
     // Second run with same schema
     await f.migrationPolicy.run({
-      dbConn: f.dbConn,
+      sqlDb: f.sqlDb,
       up,
       down,
     })
 
     // Verify table still exists
-    const result = await f.dbConn.query({
+    const result = await f.sqlDb.query({
       sql: 'SELECT * FROM test',
       params: [],
       parser: z.unknown(),
@@ -78,7 +78,7 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
 
     // First run
     await f.migrationPolicy.run({
-      dbConn: f.dbConn,
+      sqlDb: f.sqlDb,
       up: initialUp,
       down: initialDown,
     })
@@ -88,13 +88,13 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     const modifiedDown = 'DROP TABLE test'
 
     await f.migrationPolicy.run({
-      dbConn: f.dbConn,
+      sqlDb: f.sqlDb,
       up: modifiedUp,
       down: modifiedDown,
     })
 
     // Verify table exists with new schema
-    const result = await f.dbConn.query({
+    const result = await f.sqlDb.query({
       sql: 'SELECT * FROM test',
       params: [],
       parser: z.unknown(),
@@ -107,7 +107,7 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     const f = await Fixture()
 
     unwrap(
-      await f.dbConn.query({
+      await f.sqlDb.query({
         sql: 'CREATE TABLE my_test_test (id TEXT)',
         params: [],
         parser: z.unknown(),
@@ -118,19 +118,19 @@ describe('MigrationPolicy DangerouslyWipeOnNewSchema', () => {
     const down = 'DROP TABLE IF EXISTS my_test_test'
 
     await f.migrationPolicy.run({
-      dbConn: f.dbConn,
+      sqlDb: f.sqlDb,
       up,
       down,
     })
 
-    await f.dbConn.query({
+    await f.sqlDb.query({
       sql: 'INSERT INTO my_test_test (id, foo) VALUES (?, ?)',
       params: ['1', 'bar'],
       parser: z.unknown(),
     })
 
     unwrap(
-      await f.dbConn.query({
+      await f.sqlDb.query({
         sql: 'SELECT id, foo FROM my_test_test',
         params: [],
         parser: z.unknown(),

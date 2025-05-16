@@ -12,7 +12,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
   return {
     async run(input) {
       logger.info('running migration policy', { input })
-      await input.dbConn.query({
+      await input.sqlDb.query({
         sql: input.up,
         params: [],
         parser: z.unknown(),

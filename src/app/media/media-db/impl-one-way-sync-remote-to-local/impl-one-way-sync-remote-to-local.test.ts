@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { DbConnFixture } from '~/@/sql-db/test/fixture'
+import { SqlDbFixture } from '~/@/sql-db/test/fixture'
 import { intersectionWith } from '~/@/intersection-with'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
@@ -12,11 +12,11 @@ import { MediaDbQueryInput } from '../interface/query-input'
 import { OneWaySyncRemoteToLocalMsg } from './impl-one-way-sync-remote-to-local'
 
 const Fixture = async () => {
-  const { dbConn } = await DbConnFixture()
+  const { sqlDb } = await SqlDbFixture()
   const { tmdbClient } = await TmdbClientFixture()
   const local = MediaDbBackend({
     t: 'db-conn',
-    dbConn,
+    sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })
   const remote = MediaDbBackend({

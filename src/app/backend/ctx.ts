@@ -1,5 +1,5 @@
-import { DbConn } from '~/@/sql-db/impl'
-import { IDbConn } from '~/@/sql-db/interface'
+import { SqlDb } from '~/@/sql-db/impl'
+import { ISqlDb } from '~/@/sql-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { createPglite } from '~/@/pglite/create-pglite'
 import { TmdbClient } from '~/@/tmdb-client'
@@ -11,7 +11,7 @@ export type Ctx = {
   mediaDb: IMediaDb
   logger: ILogger
   isProd: boolean
-  dbConn: IDbConn
+  sqlDb: ISqlDb
 }
 
 const init = (): Ctx => {
@@ -27,13 +27,13 @@ const init = (): Ctx => {
 
   const pglite = createPglite({ t: 'in-memory' })
 
-  const dbConn = DbConn({ t: 'pglite', pglite, logger })
+  const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
 
   return {
     mediaDb,
     logger,
     isProd,
-    dbConn,
+    sqlDb,
   }
 }
 

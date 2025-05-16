@@ -3,11 +3,11 @@ import { z } from 'zod'
 import { unwrap } from '~/@/result'
 import { Fixtures } from './fixture'
 
-describe('DbConn Crud', () => {
+describe('SqlDb Crud', () => {
   it('should be able to select and insert', async () => {
     for (const f of await Fixtures()) {
       unwrap(
-        await f.dbConn.query({
+        await f.sqlDb.query({
           sql: 'CREATE TABLE IF NOT EXISTS test_crud (id TEXT PRIMARY KEY, name TEXT)',
           params: [],
           parser: z.unknown(),
@@ -17,7 +17,7 @@ describe('DbConn Crud', () => {
       const key = crypto.randomUUID()
 
       const before = unwrap(
-        await f.dbConn.query({
+        await f.sqlDb.query({
           sql: 'SELECT id, name FROM test_crud',
           params: [],
           parser: z.unknown(),
@@ -25,7 +25,7 @@ describe('DbConn Crud', () => {
       )
 
       unwrap(
-        await f.dbConn.query({
+        await f.sqlDb.query({
           sql: 'INSERT INTO test_crud (id, name) VALUES ($1, $2)',
           params: [key, 'test'],
           parser: z.unknown(),
@@ -33,7 +33,7 @@ describe('DbConn Crud', () => {
       )
 
       const after = unwrap(
-        await f.dbConn.query({
+        await f.sqlDb.query({
           sql: 'SELECT id, name FROM test_crud',
           params: [],
           parser: z.object({

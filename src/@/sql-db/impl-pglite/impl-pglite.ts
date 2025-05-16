@@ -4,7 +4,7 @@ import { ILogger, Logger } from '~/@/logger'
 import { PgliteInstance, PgliteWorkerInstance } from '~/@/pglite/types'
 import { PubSub, Sub } from '~/@/pub-sub'
 import { Err, Ok, Result } from '~/@/result'
-import { DbConnParam, IDbConn } from '../interface'
+import { SqlDbParam, ISqlDb } from '../interface'
 
 export type Config = {
   t: 'pglite'
@@ -12,7 +12,7 @@ export type Config = {
   logger: ILogger
 }
 
-export const DbConn = (config: Config): IDbConn => {
+export const SqlDb = (config: Config): ISqlDb => {
   const logger = Logger.prefix('pglite', config.logger)
 
   return {
@@ -44,7 +44,7 @@ export const DbConn = (config: Config): IDbConn => {
     liveQuery<TRow>(input: {
       parser: z.ZodType<TRow>
       sql: string
-      params?: DbConnParam[]
+      params?: SqlDbParam[]
       limit?: number
       offset?: number
       waitFor?: Promise<unknown>

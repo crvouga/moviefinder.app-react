@@ -15,7 +15,7 @@ export const Psql = (config: { ctx: Ctx }) => {
     description: 'List all tables',
     match: /dt/,
     handler: async (_strings: TemplateStringsArray, ..._values: any[]) => {
-      const result = await config.ctx.dbConn.query({
+      const result = await config.ctx.sqlDb.query({
         sql: `
           SELECT 
             t.tablename,
@@ -43,7 +43,7 @@ export const Psql = (config: { ctx: Ctx }) => {
         return
       }
 
-      const result = await config.ctx.dbConn.query({
+      const result = await config.ctx.sqlDb.query({
         sql: `SELECT column_name, data_type, is_nullable, column_default 
              FROM information_schema.columns 
              WHERE table_name = $1 
@@ -71,7 +71,7 @@ export const Psql = (config: { ctx: Ctx }) => {
     handler: async (strings: TemplateStringsArray, ...values: any[]) => {
       const sql = strings.reduce((acc, str, i) => acc + str + (values[i] ?? ''), '')
 
-      const result = await config.ctx.dbConn.query({ parser: z.unknown(), sql })
+      const result = await config.ctx.sqlDb.query({ parser: z.unknown(), sql })
       const { rows } = unwrap(result)
 
       if (rows.length === 0) {

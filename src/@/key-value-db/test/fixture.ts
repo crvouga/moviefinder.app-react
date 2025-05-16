@@ -1,4 +1,4 @@
-import { DbConnFixture } from '~/@/sql-db/test/fixture'
+import { SqlDbFixture } from '~/@/sql-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { Config, KeyValueDb } from '../impl'
@@ -13,11 +13,11 @@ const Fixture = (config: Config) => {
 export const Fixtures = async () => {
   const configs: Config[] = []
 
-  const { dbConn } = await DbConnFixture()
+  const { sqlDb } = await SqlDbFixture()
 
   configs.push({
     t: 'db-conn',
-    dbConn,
+    sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })
 
@@ -25,10 +25,10 @@ export const Fixtures = async () => {
 }
 
 export const KeyValueDbFixture = async () => {
-  const { dbConn } = await DbConnFixture()
+  const { sqlDb } = await SqlDbFixture()
   return Fixture({
     t: 'db-conn',
-    dbConn,
+    sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })
 }

@@ -1,1 +1,1 @@
-export * as ImplDbConn from './impl'
+export * as ImplSqlDb from './impl'

@@ -1,6 +1,6 @@
-import { DbConnParam } from '../sql-db/interface'
+import { SqlDbParam } from '../sql-db/interface'
 
-export const toBulkInsertSql = (input: { params: DbConnParam[][] }) => {
+export const toBulkInsertSql = (input: { params: SqlDbParam[][] }) => {
   const variables = input.params
     .map((row, i) => {
       const offset = i * row.length

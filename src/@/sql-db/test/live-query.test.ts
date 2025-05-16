@@ -11,18 +11,18 @@ const Row = z.object({
 
 type Row = z.infer<typeof Row>
 
-describe('DbConn Live Query', () => {
+describe('SqlDb Live Query', () => {
   it('should be able to select and insert', async () => {
     for (const f of await Fixtures()) {
       unwrap(
-        await f.dbConn.query({
+        await f.sqlDb.query({
           sql: 'CREATE TABLE IF NOT EXISTS test_live_query (id TEXT PRIMARY KEY, name TEXT)',
           params: [],
           parser: z.unknown(),
         })
       )
 
-      const liveQuery = f.dbConn.liveQuery({
+      const liveQuery = f.sqlDb.liveQuery({
         sql: 'SELECT id, name FROM test_live_query',
         params: [],
         parser: Row,
@@ -42,7 +42,7 @@ describe('DbConn Live Query', () => {
 
       const key1 = crypto.randomUUID()
       unwrap(
-        await f.dbConn.query({
+        await f.sqlDb.query({
           sql: 'INSERT INTO test_live_query (id, name) VALUES ($1, $2)',
           params: [key1, 'test'],
           parser: z.unknown(),
@@ -55,7 +55,7 @@ describe('DbConn Live Query', () => {
 
       const key2 = crypto.randomUUID()
       unwrap(
-        await f.dbConn.query({
+        await f.sqlDb.query({
           sql: 'INSERT INTO test_live_query (id, name) VALUES ($1, $2)',
           params: [key2, 'test2'],
           parser: z.unknown(),
