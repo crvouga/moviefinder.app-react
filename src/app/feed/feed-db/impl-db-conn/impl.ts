@@ -9,8 +9,8 @@ import { Feed } from '../../feed'
 import { IFeedDb } from '../interface/interface'
 import { FeedColumn, FeedDbQueryInput } from '../interface/query-input'
 import { FeedDbQueryOutput } from '../interface/query-output'
-import { Where } from '~/@/query/query-input/where'
-import { OrderBy } from '~/@/query/query-input/order-by'
+import { Where } from '~/@/db/interface/query-input/where'
+import { OrderBy } from '~/@/db/interface/query-input/order-by'
 
 export type Config = {
   t: 'db-conn'

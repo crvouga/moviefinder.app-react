@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { Result } from '~/@/result'
-import { AppErr } from '~/@/error'
+import { DbErr } from '~/@/db/interface/error'
 
-const parser = Result.parser(z.null(), AppErr.parser)
+const parser = Result.parser(z.null(), DbErr.parser)
 
 export type MediaDbUpsertOutput = z.infer<typeof parser>
 

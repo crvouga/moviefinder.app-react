@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { Paginated } from '~/@/pagination/paginated'
 import { Result } from '~/@/result'
-import { AppErr } from '~/@/error'
+import { DbErr } from '~/@/db/interface/error'
 import { Credit } from '../../credit/credit'
 import { Media } from '../../media'
 import { Person } from '../../person/person'
@@ -23,7 +23,7 @@ const parser = Result.parser(
     related: z.record(MediaId.parser, Media.parser),
     video: z.record(VideoId.parser, Video.parser),
   }),
-  AppErr.parser
+  DbErr.parser
 )
 
 export type MediaDbQueryOutput = z.infer<typeof parser>

@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { OrderBy } from '~/@/query/query-input/order-by'
-import { Where } from '~/@/query/query-input/where'
+import { OrderBy } from '~/@/db/interface/query-input/order-by'
+import { Where } from '~/@/db/interface/query-input/where'
 
 export const MediaColumn = z.enum(['id', 'popularity'])
 

@@ -2,7 +2,7 @@ import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbConfiguration } from '~/@/tmdb-client/configuration/configuration'
-import { AppErr } from '~/@/error'
+import { DbErr } from '~/@/db/interface/error'
 import { Credit } from '../../credit/credit'
 import { CreditId } from '../../credit/credit-id'
 import { Media } from '../../media'
@@ -31,16 +31,16 @@ export const queryMovieDetails = async (input: {
     },
   })
 
-  if (isErr(got)) return mapErr(got, AppErr.from)
+  if (isErr(got)) return mapErr(got, DbErr.from)
 
-  if (got.value.status !== 200) return Err(AppErr.from(got.value.body))
+  if (got.value.status !== 200) return Err(DbErr.from(got.value.body))
 
   const gotConfig = await tmdbClient.configuration.get({
     pathParams: {},
     queryParams: {},
   })
 
-  if (isErr(gotConfig)) return mapErr(gotConfig, AppErr.from)
+  if (isErr(gotConfig)) return mapErr(gotConfig, DbErr.from)
 
   const items: Media[] = [got.value.body].flatMap((result): Media[] => {
     if (!result) return []

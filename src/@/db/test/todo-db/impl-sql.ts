@@ -1,0 +1,79 @@
+
+import { z } from 'zod'
+import { createDbFromSqlDb } from '~/@/db/impl/impl-sql-db'
+import { IKvDb } from '~/@/kv-db/interface'
+import { ILogger } from '~/@/logger'
+import { MigrationPolicy } from '~/@/migration-policy/impl'
+import { ISqlDb } from '~/@/sql-db/interface'
+import { ITodoDb } from './interface'
+
+export type Config = {
+  t: 'sql-db'
+  sqlDb: ISqlDb
+  logger: ILogger
+  kvDb: IKvDb
+}
+
+const up = `
+CREATE TABLE IF NOT EXISTS todo (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    completed BOOLEAN NOT NULL,
+    created_at_utc TIMESTAMPZ NOT NULL,
+    updated_at_utc TIMESTAMPZ NULL
+)
+`
+
+const down = `
+DROP TABLE IF EXISTS todo
+`
+
+export const TodoDb = (config: Config): ITodoDb => {
+  return createDbFromSqlDb({
+    parser: ITodoDb.parser,
+    sqlDb: config.sqlDb,
+    migration: {
+      policy: MigrationPolicy({
+        t: 'dangerously-wipe-on-new-schema',
+        logger: config.logger,
+        kvDb: config.kvDb,
+      }),
+      up,
+      down,
+    },
+    viewName: 'todo',
+    primaryKey: 'id',
+    rowParser: z.object({
+      id: z.string(),
+      title: z.string(),
+      completed: z.boolean(),
+      created_at_utc: z.date(),
+      updated_at_utc: z.date().nullable(),
+    }),
+    fieldToSqlColumn: {
+      id: 'id',
+      title: 'title',
+      completed: 'completed',
+      createdAt: 'created_at_utc',
+      updatedAt: 'updated_at_utc',
+    },
+    rowToEntity(row) {
+      return {
+        id: row.id,
+        title: row.title,
+        completed: row.completed,
+        createdAt: row.created_at_utc,
+        updatedAt: row.updated_at_utc,
+      }
+    },
+    entityToRow(entity) {
+      return {
+        id: entity.id,
+        title: entity.title,
+        completed: entity.completed,
+        created_at_utc: entity.createdAt,
+        updated_at_utc: entity.updatedAt,
+      }
+    },
+  })
+}

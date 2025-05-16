@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { SqlDbParam, ISqlDb } from '~/@/sql-db/interface'
-import { AppErr } from '~/@/error'
+import { DbErr } from '~/@/db/interface/error'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
-import { OrderBy } from '~/@/query/query-input/order-by'
-import { Where } from '~/@/query/query-input/where'
+import { OrderBy } from '~/@/db/interface/query-input/order-by'
+import { Where } from '~/@/db/interface/query-input/where'
 import { isErr, mapErr, Ok, Result } from '~/@/result'
 import { toBulkInsertSql } from '~/@/sql/bulk-insert'
 import { Media } from '../../media'
@@ -93,7 +93,7 @@ export const MediaDb = (config: Config): IMediaDb => {
 
       const queried = await config.sqlDb.query({ sql, params, parser: z.unknown() })
 
-      if (isErr(queried)) return mapErr(queried, AppErr.from)
+      if (isErr(queried)) return mapErr(queried, DbErr.from)
 
       return Ok(null)
     },
@@ -104,7 +104,7 @@ const toQueryOutput = (input: {
   queried: Result<{ rows: Row[] }, Error>
   query: MediaDbQueryInput
 }): MediaDbQueryOutput => {
-  if (isErr(input.queried)) return mapErr(input.queried, AppErr.from)
+  if (isErr(input.queried)) return mapErr(input.queried, DbErr.from)
 
   const media = input.queried.value.rows.map((row): Media => {
     const media = Row.toMedia(row)
