@@ -63,7 +63,7 @@ const init = (): Ctx => {
 
   const personDb = PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
   const relationshipDb = RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb })
-  const creditDb = CreditDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  const creditDb = CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
   const videoDb = VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
 
   const mediaDb = MediaDbFrontend({

@@ -15,7 +15,7 @@ export const ScreenLayout = (props: {
   return (
     <div className="flex w-full flex-1 flex-col items-center justify-center overflow-hidden">
       <TopBar onBack={props.topBar.onBack} title={props.topBar.title} />
-      <div className="flex w-full flex-1 flex-col items-center justify-start overflow-hidden">
+      <div className="flex w-full flex-1 flex-col items-center justify-start overflow-y-scroll">
         {props.children}
       </div>
       {props.actions && props.actions.length > 0 && <BottomButtons buttons={props.actions} />}

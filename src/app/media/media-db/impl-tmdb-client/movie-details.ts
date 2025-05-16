@@ -113,7 +113,7 @@ export const queryMovieDetails = async (input: {
       character: null,
       order: null,
       job: crew.job ?? null,
-      mediaId: MediaId.fromTmdbId(crew.id),
+      mediaId,
       personId: PersonId.fromTmdbId(crew.id),
     }
   }

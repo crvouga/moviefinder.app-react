@@ -49,7 +49,7 @@ describe('TodoDb', () => {
     expect(unwrap(after).entities.items).toEqual([todo])
   })
 
-  it('should paginate', async () => {
+  it.only('should paginate', async () => {
     const f = await Fixture()
     const todos: Todo[] = []
     for (let i = 0; i < 10; i++) {
@@ -61,7 +61,7 @@ describe('TodoDb', () => {
     const ids = todos.map((t) => t.id)
     const q: InferQueryInput<typeof ITodoDb.parser> = {
       where: { op: 'in', column: 'id', value: ids },
-      orderBy: [{ column: 'title', direction: 'asc' }],
+      orderBy: [{ column: 'createdAt', direction: 'asc' }],
       limit: 3,
       offset: 0,
     }

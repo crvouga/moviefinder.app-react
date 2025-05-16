@@ -5,6 +5,7 @@ import { unwrap } from '~/@/result'
 import { Media } from '../../media'
 import { IMediaDb } from '../interface/interface'
 import { Fixtures } from './fixture'
+import { NonEmpty } from '~/@/non-empty'
 
 describe('MediaDb Live Query', () => {
   it('should work', async () => {
@@ -20,7 +21,7 @@ describe('MediaDb Live Query', () => {
         .liveQuery({
           limit: 10,
           offset: 0,
-          where: { op: 'in', column: 'id', value: expected.map((e) => e.id) },
+          where: { op: 'in', column: 'id', value: NonEmpty.map(expected, (e) => e.id) },
         })
         .subscribe((result) => {
           results.push(result)

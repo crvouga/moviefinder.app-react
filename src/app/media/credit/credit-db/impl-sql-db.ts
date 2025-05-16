@@ -3,8 +3,12 @@ import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
+import { NonEmpty } from '~/@/non-empty'
+import { isOk } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { MediaId } from '../../media-id'
+import { Person } from '../../person/person'
+import { IPersonDb } from '../../person/person-db/interface'
 import { PersonId } from '../../person/person-id'
 import { CreditId } from '../credit-id'
 import { ICreditDb } from './interface'
@@ -14,6 +18,7 @@ export type Config = {
   sqlDb: ISqlDb
   logger: ILogger
   kvDb: IKvDb
+  personDb: IPersonDb
 }
 
 const up = [
@@ -54,7 +59,30 @@ const Row = z.object({
 
 export const CreditDb = (config: Config): ICreditDb => {
   return createDbFromSqlDb({
-    getRelated: async () => ({}),
+    getRelated: async (entities) => {
+      if (!NonEmpty.is(entities)) {
+        return { person: {} }
+      }
+      const personQueried = await config.personDb.query({
+        limit: 1000,
+        offset: 0,
+        where: {
+          op: 'in',
+          column: 'id',
+          value: NonEmpty.map(entities, (entity) => entity.personId),
+        },
+      })
+      if (!isOk(personQueried)) return { person: {} }
+
+      const personMap: Record<PersonId, Person> = {}
+      for (const person of personQueried.value.entities.items) {
+        personMap[PersonId.fromString(person.id)] = person
+      }
+
+      return {
+        person: personMap,
+      }
+    },
     parser: ICreditDb.parser,
     sqlDb: config.sqlDb,
     viewName: 'credit',

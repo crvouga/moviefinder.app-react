@@ -35,6 +35,7 @@ const Fixture = async () => {
     sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
   })
+  const personDb = PersonDb({ t: 'sql-db', sqlDb, kvDb, logger })
   const mediaDb = MediaDbBackend({
     t: 'one-way-sync-remote-to-local',
     local,
@@ -43,10 +44,10 @@ const Fixture = async () => {
     pubSub,
     throttle: TimeSpan.seconds(0),
     relatedDbs: {
-      creditDb: CreditDb({ t: 'sql-db', sqlDb, kvDb, logger }),
+      creditDb: CreditDb({ t: 'sql-db', sqlDb, kvDb, logger, personDb }),
       relationshipDb: RelationshipDb({ t: 'sql-db', sqlDb, kvDb, logger }),
       videoDb: VideoDb({ t: 'sql-db', sqlDb, kvDb, logger }),
-      personDb: PersonDb({ t: 'sql-db', sqlDb, kvDb, logger }),
+      personDb,
     },
   })
   return {

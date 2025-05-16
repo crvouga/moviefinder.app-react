@@ -4,6 +4,7 @@ import { Img } from '~/@/ui/img'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
+import { CreditsCardSwiper } from '../credit/frontend/credit-card-swiper'
 import { MediaId } from '../media-id'
 
 export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
@@ -39,6 +40,19 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
         <p className="text-center text-3xl font-bold">{media?.title ?? ' '}</p>
         {media?.description && <p className="text-center">{media?.description}</p>}
       </div>
+      <Section title="Cast & Crew">
+        <CreditsCardSwiper mediaId={media?.id ?? ''} />
+      </Section>
+      <div className="flex h-96 w-full flex-col items-center justify-center gap-4"> </div>
     </ScreenLayout>
+  )
+}
+
+const Section = (props: { title: string; children: React.ReactNode }) => {
+  return (
+    <div className="flex w-full flex-col items-center justify-center gap-4">
+      <p className="w-full px-6 text-left text-3xl font-bold">{props.title}</p>
+      {props.children}
+    </div>
   )
 }
