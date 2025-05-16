@@ -4,7 +4,7 @@ import { Pagination } from '~/@/pagination/pagination'
 import { unwrap } from '~/@/result'
 import { Fixtures } from './fixture'
 
-describe.only('MediaDb Pagination', () => {
+describe('MediaDb Pagination', () => {
   it('should work for limit 20', async () => {
     for (const f of await Fixtures(['db-conn'])) {
       const PAGE_SIZE = 20

@@ -4,7 +4,7 @@ import { TMDB_IDS } from '~/@/tmdb-client/@/ids'
 import { MediaId } from '../../media-id'
 import { Fixtures } from './fixture'
 
-describe.only('MediaDb Query Related Data', () => {
+describe('MediaDb Query Related Data', () => {
   it('should output related data', async () => {
     for (const f of await Fixtures(['tmdb-client'])) {
       const result = unwrap(
@@ -14,8 +14,7 @@ describe.only('MediaDb Query Related Data', () => {
           where: { op: '=', column: 'id', value: MediaId.fromTmdbId(TMDB_IDS.FIGHT_CLUB) },
         })
       )
-
-      expect(result.person.length).toBeGreaterThan(0)
+      expect(result.person).not.toEqual([])
     }
   })
 })

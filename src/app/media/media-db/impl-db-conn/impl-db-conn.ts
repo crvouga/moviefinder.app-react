@@ -118,6 +118,11 @@ const toQueryOutput = (input: {
       limit: input.query.limit,
       offset: input.query.offset,
     },
+    person: [],
+    credit: [],
+    relationship: [],
+    related: [],
+    video: [],
   })
 }
 

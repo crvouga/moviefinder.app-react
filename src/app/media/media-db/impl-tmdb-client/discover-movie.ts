@@ -56,6 +56,11 @@ export const queryDiscoverMovie = async (input: {
 
   return Ok({
     media,
+    person: [],
+    credit: [],
+    relationship: [],
+    related: [],
+    video: [],
   })
 }
 

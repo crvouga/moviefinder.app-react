@@ -62,5 +62,10 @@ export const queryMovieDetails = async (input: {
 
   return Ok({
     media,
+    person: [],
+    credit: [],
+    relationship: [],
+    related: [],
+    video: [],
   })
 }

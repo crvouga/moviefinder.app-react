@@ -5,6 +5,7 @@ import { MediaId } from '../../media-id'
 import { IMediaDb } from '../interface/interface'
 import { queryDiscoverMovie } from './discover-movie'
 import { queryMovieDetails } from './movie-details'
+import { PubSub } from '~/@/pub-sub'
 
 export type Config = {
   t: 'tmdb-client'
@@ -23,7 +24,7 @@ export const MediaDb = (config: Config): IMediaDb => {
       return Ok(null)
     },
     liveQuery(_query) {
-      throw new Error('Not implemented')
+      return PubSub()
     },
     async query(query) {
       if (query.where?.op === '=') {

@@ -10,5 +10,6 @@
         "tmdb",
         "upserted",
         "VITE"
-    ]
+    ],
+    "editor.formatOnSave": true
 }

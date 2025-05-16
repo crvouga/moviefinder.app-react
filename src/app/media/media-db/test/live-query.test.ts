@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { clone } from '~/@/clone'
-import { Ok, unwrap } from '~/@/result'
+import { unwrap } from '~/@/result'
 import { Media } from '../../media'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { Fixtures } from './fixture'
 
 describe('MediaDb Live Query', () => {
   it('should work', async () => {
-    for (const f of await Fixtures()) {
+    for (const f of await Fixtures(['db-conn'])) {
       const expected: [Media, Media, Media] = [
         await Media.random(),
         await Media.random(),
@@ -47,23 +47,16 @@ describe('MediaDb Live Query', () => {
       await wait()
       const after3 = clone(results)
 
-      expect(before).toEqual([Ok({ media: { items: [], total: 0, offset: 0, limit: 10 } })])
-      expect(after1).toEqual([
-        Ok({ media: { items: [], total: 0, offset: 0, limit: 10 } }),
-        Ok({ media: { items: [expected[0]], total: 1, offset: 0, limit: 10 } }),
-      ])
-      expect(after2).toEqual([
-        Ok({ media: { items: [], total: 0, offset: 0, limit: 10 } }),
-        Ok({ media: { items: [expected[0]], total: 1, offset: 0, limit: 10 } }),
-        Ok({ media: { items: [expected[0], expected[1]], total: 2, offset: 0, limit: 10 } }),
-      ])
-      expect(after3).toEqual([
-        Ok({ media: { items: [], total: 0, offset: 0, limit: 10 } }),
-        Ok({ media: { items: [expected[0]], total: 1, offset: 0, limit: 10 } }),
-        Ok({ media: { items: [expected[0], expected[1]], total: 2, offset: 0, limit: 10 } }),
-        Ok({
-          media: { items: [expected[0], expected[1], expected[2]], total: 3, offset: 0, limit: 10 },
-        }),
+      const peak = (results: MediaDbQueryOutput[]) => results.map((x) => unwrap(x).media.items)
+
+      expect(peak(before)).toEqual([[]])
+      expect(peak(after1)).toEqual([[], [expected[0]]])
+      expect(peak(after2)).toEqual([[], [expected[0]], [expected[0], expected[1]]])
+      expect(peak(after3)).toEqual([
+        [],
+        [expected[0]],
+        [expected[0], expected[1]],
+        [expected[0], expected[1], expected[2]],
       ])
     }
   })

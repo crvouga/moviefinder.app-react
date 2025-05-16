@@ -11,7 +11,7 @@ const Fixture = () => {
 }
 
 describe.if(SHOULD_TEST || true)('Tmdb Movie Details', () => {
-  it.only('should work', async () => {
+  it('should work', async () => {
     const f = Fixture()
 
     const result = await f.tmdbClient.movie.details.get({

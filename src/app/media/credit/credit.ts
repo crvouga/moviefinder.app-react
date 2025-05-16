@@ -13,9 +13,9 @@ const parser = z.object({
   order: z.number().nullable(),
 })
 
-export type Person = z.infer<typeof parser>
+export type Credit = z.infer<typeof parser>
 
-const random = async (override?: Partial<Person>): Promise<Person> => {
+const random = async (override?: Partial<Credit>): Promise<Credit> => {
   const faker = await createFaker()
 
   return {

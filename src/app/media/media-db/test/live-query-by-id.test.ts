@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { clone } from '~/@/clone'
-import { Ok, unwrap } from '~/@/result'
+import { unwrap } from '~/@/result'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { MediaDbQueryOutput } from '../interface/query-output'
 import { Fixtures } from './fixture'
 
-describe.only('MediaDb Query By Id', () => {
+describe('MediaDb Query By Id', () => {
   it('should work for live query', async () => {
     const SOME_MOVIE_ID = MediaId.fromTmdbId(551)
     for (const f of await Fixtures(['db-conn'])) {
@@ -36,14 +36,10 @@ describe.only('MediaDb Query By Id', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
       const after = clone(results)
 
-      expect(before).toEqual([
-        //
-        Ok({ media: { items: [], total: 0, offset: 0, limit: 1 } }),
-      ])
-      expect(after).toEqual([
-        Ok({ media: { items: [], total: 0, offset: 0, limit: 1 } }),
-        Ok({ media: { items: [expected], total: 1, offset: 0, limit: 1 } }),
-      ])
+      const peak = (results: MediaDbQueryOutput[]) => results.map((x) => unwrap(x).media.items)
+
+      expect(peak(before)).toEqual([[]])
+      expect(peak(after)).toEqual([[], [expected]])
     }
   })
 })

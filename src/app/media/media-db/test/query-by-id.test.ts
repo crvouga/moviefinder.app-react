@@ -4,7 +4,7 @@ import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { Fixtures } from './fixture'
 
-describe.only('MediaDb Query By Id', () => {
+describe('MediaDb Query By Id', () => {
   it('should work', async () => {
     const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
 
