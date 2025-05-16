@@ -41,17 +41,31 @@ export const PersonDb = (config: Config): IPersonDb => {
     rowParser: z.object({
       id: z.string(),
       name: z.string(),
+      popularity: z.number().nullable(),
+      profile: z.string(),
     }),
     rowToEntity(row) {
       return {
         id: row.id,
         name: row.name,
+        popularity: row.popularity,
+        profile: {
+          lowestToHighestRes: [],
+        },
       }
     },
+    fieldToSqlColumn: {
+      id: 'id',
+      name: 'name',
+      popularity: 'popularity',
+    },
+    primaryKey: 'id',
     entityToRow(entity) {
       return {
         id: entity.id,
-        name: entity.name,
+        name: entity.name ?? '',
+        popularity: entity.popularity,
+        profile: '',
       }
     },
   })
