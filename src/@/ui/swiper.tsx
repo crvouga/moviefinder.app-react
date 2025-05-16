@@ -115,8 +115,16 @@ const Slide = ({
 const encodeData = (data: unknown) => {
   return btoa(JSON.stringify(data))
 }
-const decodeData = (data: string) => {
-  return JSON.parse(atob(data))
+const decodeData = (data: unknown): unknown => {
+  try {
+    if (typeof data === 'string') {
+      const decoded = atob(data)
+      return JSON.parse(decoded)
+    }
+  } catch (_error) {
+    // ignore
+  }
+  return {}
 }
 
 export const Swiper = {

@@ -6,7 +6,7 @@ import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../../media-id'
 import { CreditCard } from './credit-card'
 
-export const CreditsCardSwiper = (props: { mediaId: MediaId }) => {
+export const CreditsCardSwiper = (props: { mediaId: MediaId | null }) => {
   const ctx = useCtx()
 
   const queried = useSubscription(
@@ -15,7 +15,7 @@ export const CreditsCardSwiper = (props: { mediaId: MediaId }) => {
         where: {
           op: '=',
           column: 'mediaId',
-          value: props.mediaId,
+          value: props.mediaId ?? '',
         },
         orderBy: [{ column: 'personId', direction: 'asc' }],
         limit: 25,

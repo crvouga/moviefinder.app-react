@@ -5,6 +5,7 @@ import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
 import { CreditsCardSwiper } from '../credit/frontend/credit-card-swiper'
+import { Media } from '../media'
 import { MediaId } from '../media-id'
 import { RecommendationMediaPosterSwiper } from '../relationship/frontend/recommendation-media-poster-swiper'
 
@@ -33,24 +34,32 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
         title: media?.title ?? ' ',
       }}
     >
-      <Img
-        className="aspect-video w-full object-cover"
-        src={ImageSet.toHighestRes(media?.backdrop)}
-        alt={media?.title ?? ' '}
-      />
-      <div className="flex flex-col items-center justify-center gap-4 p-6">
-        <p className="text-center text-3xl font-bold">{media?.title ?? ' '}</p>
-        {media?.description && <p className="text-center">{media?.description}</p>}
-      </div>
+      <MainSection media={media ?? null} />
 
       <Section title="Cast & Crew">
-        <CreditsCardSwiper mediaId={media?.id ?? ''} />
+        <CreditsCardSwiper mediaId={media?.id ?? null} />
       </Section>
 
       <Section title="Recommendations">
-        <RecommendationMediaPosterSwiper mediaId={media?.id ?? ''} />
+        <RecommendationMediaPosterSwiper mediaId={media?.id ?? null} />
       </Section>
     </ScreenLayout>
+  )
+}
+
+const MainSection = (props: { media: Media | null }) => {
+  return (
+    <div className="flex w-full flex-col items-center justify-center gap-4 pb-12">
+      <Img
+        className="aspect-video w-full object-cover"
+        src={ImageSet.toHighestRes(props.media?.backdrop)}
+        alt={props.media?.title ?? ' '}
+      />
+      <div className="flex flex-col items-center justify-center gap-4 p-6">
+        <p className="text-center text-3xl font-bold">{props.media?.title ?? '...'}</p>
+        {props.media?.description && <p className="text-center">{props.media.description}</p>}
+      </div>
+    </div>
   )
 }
 

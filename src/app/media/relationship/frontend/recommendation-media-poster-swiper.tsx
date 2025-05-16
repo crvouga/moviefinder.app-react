@@ -5,14 +5,14 @@ import { MediaPosterSwiper } from '../../frontend/media-poster-swiper'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 
-export const RecommendationMediaPosterSwiper = (props: { mediaId: MediaId }) => {
+export const RecommendationMediaPosterSwiper = (props: { mediaId: MediaId | null }) => {
   const ctx = useCtx()
   const queried = useSubscription(
     () =>
       ctx.relationshipDb.liveQuery({
         limit: 10,
         offset: 0,
-        where: { column: 'from', op: '=', value: props.mediaId },
+        where: { column: 'from', op: '=', value: props.mediaId ?? '' },
         orderBy: [{ column: 'id', direction: 'asc' }],
       }),
     [ctx, props.mediaId]
