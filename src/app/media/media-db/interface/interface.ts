@@ -22,7 +22,7 @@ const parser = Db.parser({
     person: z.record(PersonId.parser, Person.parser),
     credit: z.record(CreditId.parser, Credit.parser),
     relationship: z.record(RelationshipId.parser, Relationship.parser),
-    related: z.record(MediaId.parser, Media.parser),
+    media: z.record(MediaId.parser, Media.parser),
     video: z.record(VideoId.parser, Video.parser),
   }),
 })

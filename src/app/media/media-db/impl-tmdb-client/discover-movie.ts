@@ -60,7 +60,7 @@ export const queryDiscoverMovie = async (input: {
       person: {},
       credit: {},
       relationship: {},
-      related: {},
+      media: {},
       video: {},
     },
   })

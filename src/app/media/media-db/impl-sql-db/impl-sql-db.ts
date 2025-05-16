@@ -46,7 +46,7 @@ export const MediaDb = (config: Config): IMediaDb => {
       person: {},
       credit: {},
       relationship: {},
-      related: {},
+      media: {},
       video: {},
     }),
     rowParser: Row,

@@ -17,7 +17,7 @@ describe('MediaDb Query Related Data', () => {
       expect(result.related.person).not.toEqual({})
       expect(result.related.credit).not.toEqual({})
       expect(result.related.relationship).not.toEqual({})
-      expect(result.related.related).not.toEqual({})
+      expect(result.related.media).not.toEqual({})
       expect(result.related.video).not.toEqual({})
     }
   })

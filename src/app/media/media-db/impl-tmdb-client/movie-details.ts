@@ -95,6 +95,7 @@ export const queryMovieDetails = async (input: {
     if (!cast.id) continue
     const creditId = CreditId.fromTmdbId(cast.id)
     credit[creditId] = {
+      type: 'cast',
       id: creditId,
       character: cast.character ?? null,
       order: cast.order ?? null,
@@ -107,6 +108,7 @@ export const queryMovieDetails = async (input: {
     if (!crew.id) continue
     const creditId = CreditId.fromTmdbId(crew.id)
     credit[creditId] = {
+      type: 'crew',
       id: creditId,
       character: null,
       order: null,
@@ -116,7 +118,7 @@ export const queryMovieDetails = async (input: {
     }
   }
 
-  const related: Record<MediaId, Media> = {}
+  const relatedMedia: Record<MediaId, Media> = {}
   const relationship: Record<RelationshipId, Relationship> = {}
   for (const movie of got.value.body.recommendations?.results ?? []) {
     if (!movie.id) continue
@@ -132,7 +134,7 @@ export const queryMovieDetails = async (input: {
       to: relatedMediaId,
       type: relationshipType,
     }
-    related[relatedMediaId] = {
+    relatedMedia[relatedMediaId] = {
       id: relatedMediaId,
       title: movie.title ?? null,
       description: movie.overview ?? null,
@@ -159,7 +161,7 @@ export const queryMovieDetails = async (input: {
       to: relatedMediaId,
       type: relationshipType,
     }
-    related[relatedMediaId] = {
+    relatedMedia[relatedMediaId] = {
       id: relatedMediaId,
       title: movie.title ?? null,
       description: movie.overview ?? null,
@@ -197,7 +199,7 @@ export const queryMovieDetails = async (input: {
       person,
       credit,
       relationship,
-      related,
+      media: relatedMedia,
       video,
     },
   })
