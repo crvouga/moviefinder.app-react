@@ -1,5 +1,5 @@
 import { Clickable } from '~/@/ui/clickable'
-import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
+import { WithPreload } from '~/@/ui/preload'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { useCtx } from '~/app/frontend/ctx'
@@ -19,8 +19,9 @@ export const MediaPosterSwiper = (props: Partial<SwiperContainerProps> & { media
               currentScreen.push({ t: 'media-details', mediaId: m.id })
             }}
           >
-            <WrapIntersectionObserver
-              onVisible={() => {
+            <WithPreload
+              preloadKey={m.id}
+              onPreload={() => {
                 ctx.mediaDb.query({
                   where: { op: '=', column: 'id', value: m.id },
                   limit: 1,
@@ -29,7 +30,7 @@ export const MediaPosterSwiper = (props: Partial<SwiperContainerProps> & { media
               }}
             >
               <MediaPoster media={m} />
-            </WrapIntersectionObserver>
+            </WithPreload>
           </Clickable>
         </Swiper.Slide>
       ))}
