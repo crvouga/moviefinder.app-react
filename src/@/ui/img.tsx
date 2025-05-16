@@ -3,7 +3,7 @@ import { cn } from './cn'
 
 export const Img = forwardRef<
   HTMLDivElement | HTMLImageElement,
-  { src?: string | undefined; className?: string; alt?: string }
+  { src?: string | undefined; className?: string; alt?: string; style?: React.CSSProperties }
 >((props, ref) => {
   const [state, setState] = useState<'loading' | 'error' | 'loaded'>('loading')
 
@@ -24,6 +24,7 @@ export const Img = forwardRef<
         <div
           ref={ref as React.Ref<HTMLDivElement>}
           className={cn(props.className, 'animate-pulse bg-neutral-700')}
+          style={props.style}
         />
       )
     }
@@ -34,6 +35,7 @@ export const Img = forwardRef<
           src={props.src}
           className={props.className}
           alt={props.alt}
+          style={props.style}
         />
       )
     }

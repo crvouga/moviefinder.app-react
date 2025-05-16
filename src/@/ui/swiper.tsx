@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-interface SwiperProps {
+export type SwiperContainerProps = {
   children: React.ReactNode
   className?: string
   navigation?: boolean
@@ -35,9 +35,11 @@ interface SwiperProps {
   grabCursor?: boolean
   effect?: 'slide' | 'fade' | 'cube' | 'coverflow' | 'flip'
   onSlideChange?: (input: { activeSlideIndex: number; data: unknown }) => void
+  slidesOffsetAfter?: number
+  slidesOffsetBefore?: number
 }
 
-const Container = (props: SwiperProps) => {
+const Container = (props: SwiperContainerProps) => {
   const ref = useRef<HTMLElement>()
 
   useLayoutEffect(() => {
@@ -65,6 +67,12 @@ const Container = (props: SwiperProps) => {
     }
     if (props.initialSlide) {
       ref.current.setAttribute('initial-slide', props.initialSlide)
+    }
+    if (typeof props.slidesOffsetAfter === 'number') {
+      ref.current.setAttribute('slides-offset-after', props.slidesOffsetAfter)
+    }
+    if (typeof props.slidesOffsetBefore === 'number') {
+      ref.current.setAttribute('slides-offset-before', props.slidesOffsetBefore)
     }
     const onSlideChange = (event: CustomEvent) => {
       const [swiper] = event.detail
@@ -97,22 +105,17 @@ const Container = (props: SwiperProps) => {
   )
 }
 
-const Slide = ({
-  children,
-  className = '',
-  data,
-}: {
-  children: React.ReactNode
-  className?: string
-  data?: unknown
-}) => {
+const Slide = (props: { children: React.ReactNode; className?: string; data?: unknown }) => {
   return (
-    <swiper-slide className={className} data={encodeData(data)}>
-      {children}
+    <swiper-slide className={props.className} data={encodeData(props.data)}>
+      {props.children}
     </swiper-slide>
   )
 }
 const encodeData = (data: unknown) => {
+  if (!data) {
+    return ''
+  }
   return btoa(JSON.stringify(data))
 }
 const decodeData = (data: unknown): unknown => {

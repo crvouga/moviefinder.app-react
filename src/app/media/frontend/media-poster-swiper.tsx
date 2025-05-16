@@ -1,18 +1,18 @@
 import { Clickable } from '~/@/ui/clickable'
 import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
-import { Swiper } from '~/@/ui/swiper'
+import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { useCtx } from '~/app/frontend/ctx'
 import { Media } from '../media'
 import { MediaPoster } from './media-poster'
 
-export const MediaPosterSwiper = (props: { media: Media[] }) => {
+export const MediaPosterSwiper = (props: Partial<SwiperContainerProps> & { media: Media[] }) => {
   const currentScreen = useCurrentScreen()
   const ctx = useCtx()
   return (
-    <Swiper.Container slidesPerView="auto" spaceBetween={10} className="w-full">
+    <Swiper.Container {...props} slidesPerView="auto" spaceBetween={12} className="w-full">
       {props.media.map((m) => (
-        <Swiper.Slide key={m.id} className="w-40">
+        <Swiper.Slide key={m.id} className="w-42">
           <Clickable
             className="w-full"
             onClick={() => {

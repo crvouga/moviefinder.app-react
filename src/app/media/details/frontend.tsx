@@ -9,6 +9,9 @@ import { Media } from '../media'
 import { MediaId } from '../media-id'
 import { RecommendationMediaPosterSwiper } from '../relationship/frontend/recommendation-media-poster-swiper'
 
+const SLIDES_OFFSET_BEFORE = 24
+const SLIDES_OFFSET_AFTER = 24
+
 export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   const ctx = useCtx()
 
@@ -37,11 +40,27 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
       <MainSection media={media ?? null} />
 
       <Section title="Cast & Crew">
-        <CreditsCardSwiper mediaId={media?.id ?? null} />
+        <CreditsCardSwiper
+          slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
+          slidesOffsetAfter={SLIDES_OFFSET_AFTER}
+          mediaId={media?.id ?? null}
+        />
       </Section>
 
       <Section title="Recommendations">
-        <RecommendationMediaPosterSwiper mediaId={media?.id ?? null} />
+        <RecommendationMediaPosterSwiper
+          slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
+          slidesOffsetAfter={SLIDES_OFFSET_AFTER}
+          mediaId={media?.id ?? null}
+        />
+      </Section>
+
+      <Section title="Similar">
+        <RecommendationMediaPosterSwiper
+          slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
+          slidesOffsetAfter={SLIDES_OFFSET_AFTER}
+          mediaId={media?.id ?? null}
+        />
       </Section>
     </ScreenLayout>
   )

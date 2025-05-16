@@ -1,12 +1,14 @@
 import { useSubscription } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
 import { cn } from '~/@/ui/cn'
-import { Swiper } from '~/@/ui/swiper'
+import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../../media-id'
 import { CreditCard } from './credit-card'
 
-export const CreditsCardSwiper = (props: { mediaId: MediaId | null }) => {
+export const CreditsCardSwiper = (
+  props: Partial<SwiperContainerProps> & { mediaId: MediaId | null }
+) => {
   const ctx = useCtx()
 
   const queried = useSubscription(
@@ -28,7 +30,7 @@ export const CreditsCardSwiper = (props: { mediaId: MediaId | null }) => {
   if (!isOk(queried)) return null
 
   return (
-    <Swiper.Container direction="horizontal" className="w-full px-2" slidesPerView="auto">
+    <Swiper.Container {...props} direction="horizontal" className="w-full" slidesPerView="auto">
       {queried.value.entities.items.map((credit, index) => (
         <Swiper.Slide key={credit.id} className="w-fit">
           <div

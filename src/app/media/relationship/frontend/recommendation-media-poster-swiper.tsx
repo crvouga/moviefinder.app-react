@@ -4,8 +4,10 @@ import { useCtx } from '~/app/frontend/ctx'
 import { MediaPosterSwiper } from '../../frontend/media-poster-swiper'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
-
-export const RecommendationMediaPosterSwiper = (props: { mediaId: MediaId | null }) => {
+import { SwiperContainerProps } from '~/@/ui/swiper'
+export const RecommendationMediaPosterSwiper = (
+  props: Partial<SwiperContainerProps> & { mediaId: MediaId | null }
+) => {
   const ctx = useCtx()
   const queried = useSubscription(
     () =>
@@ -13,7 +15,7 @@ export const RecommendationMediaPosterSwiper = (props: { mediaId: MediaId | null
         limit: 10,
         offset: 0,
         where: { column: 'from', op: '=', value: props.mediaId ?? '' },
-        orderBy: [{ column: 'id', direction: 'asc' }],
+        orderBy: [{ column: 'to', direction: 'asc' }],
       }),
     [ctx, props.mediaId]
   )
@@ -29,5 +31,5 @@ export const RecommendationMediaPosterSwiper = (props: { mediaId: MediaId | null
       return [media]
     })
 
-  return <MediaPosterSwiper media={media} />
+  return <MediaPosterSwiper {...props} media={media} />
 }
