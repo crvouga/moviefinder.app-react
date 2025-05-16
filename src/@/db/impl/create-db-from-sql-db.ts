@@ -3,7 +3,7 @@ import { DbErr } from '~/@/db/interface/error'
 import { OrderBy } from '~/@/db/interface/query-input/order-by'
 import { Where } from '~/@/db/interface/query-input/where'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
-import { isErr, mapErr, Ok, Result } from '~/@/result' // Removed 'Result' as it's a namespace for types here
+import { isErr, mapErr, Ok, Result, unwrapOr } from '~/@/result'
 import { ascend } from '~/@/sort'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { SqlDbParam } from '~/@/sql-db/sql-db-param'
@@ -28,16 +28,18 @@ export type Config<
     policy: IMigrationPolicy
   }
   fieldToSqlColumn: (field: TField) => string
+  entityKeyToSqlColumn: (key: keyof TEntity) => string
   rowParser: z.ZodType<TRow>
   rowToEntity: (row: TRow) => TEntity
   entityToRow: (entity: TEntity) => TRow
+  getRelated: (entities: TEntity[]) => Promise<TRelated>
 }
 
 export const createDbFromSqlDb = <
   TField extends string,
   TEntity extends Record<string, unknown>,
   TRelated,
-  TRow,
+  TRow extends Record<string, unknown>,
 >(
   config: Config<TField, TEntity, TRelated, TRow>
 ): Db.Db<TField, TEntity, TRelated> => {
@@ -46,10 +48,12 @@ export const createDbFromSqlDb = <
     up: config.migration.up,
     down: config.migration.down,
   })
-  const mapOutput = (
-    queryInput: QueryInput<TField>,
+  const mapOutput = (input: {
+    queryInput: QueryInput<TField>
+    related: TRelated
     dbOutput: Result<{ rows: TRow[] }, Error>
-  ): QueryOutput<TEntity, TRelated> => {
+  }): QueryOutput<TEntity, TRelated> => {
+    const { queryInput, related, dbOutput } = input
     if (isErr(dbOutput)) return mapErr(dbOutput, DbErr.from)
 
     const entities = dbOutput.value.rows.map(config.rowToEntity)
@@ -60,7 +64,7 @@ export const createDbFromSqlDb = <
         limit: queryInput.limit ?? 0,
         offset: queryInput.offset ?? 0,
       },
-      related: config.parser.Related.parse({}),
+      related,
     })
 
     return output
@@ -77,13 +81,13 @@ export const createDbFromSqlDb = <
       : ''
 
     const sql = `
-      SELECT *
-      FROM ${config.viewName}
-      ${whereClause}
-      ${orderByClause}
-      LIMIT $1
-      OFFSET $2
-    `
+SELECT *
+FROM ${config.viewName}
+${whereClause}
+${orderByClause}
+LIMIT $1
+OFFSET $2
+`
 
     return {
       sql,
@@ -95,9 +99,10 @@ export const createDbFromSqlDb = <
     async query(queryInput) {
       await run
       const { sql, params } = toSql(queryInput)
-      console.log(sql)
-      const queryResult = await config.sqlDb.query({ sql, params, parser: config.rowParser })
-      const output = mapOutput(queryInput, queryResult)
+      const dbOutput = await config.sqlDb.query({ sql, params, parser: config.rowParser })
+      const entities = unwrapOr(dbOutput, (_) => ({ rows: [] })).rows.map(config.rowToEntity)
+      const related = await config.getRelated(entities)
+      const output = mapOutput({ queryInput, related, dbOutput })
       return output
     },
 
@@ -105,19 +110,24 @@ export const createDbFromSqlDb = <
       const { sql, params } = toSql(queryInput)
       return config.sqlDb
         .liveQuery({ sql, params, parser: config.rowParser, waitFor: run })
-        .map((queryResult) => mapOutput(queryInput, queryResult))
+        .mapAsync(async (dbOutput) => {
+          const entities = unwrapOr(dbOutput, (_) => ({ rows: [] })).rows.map(config.rowToEntity)
+          const related = await config.getRelated(entities)
+          return mapOutput({ queryInput, related, dbOutput })
+        })
     },
 
     async upsert(input) {
       await run
       const params = input.entities.map((entity) => {
-        const entries = Object.entries(entity)
-        const sortedEntries = entries.sort(ascend(([key]) => key))
-        const values = sortedEntries
+        const row = config.entityToRow(entity)
+        const rowEntries = Object.entries(row)
+        const sortedRowEntries = rowEntries.sort(ascend(([key]) => key))
+        const columnValues = sortedRowEntries
           .map(([_key, value]) => value)
           .map((value) => SqlDbParam.to(value))
 
-        return values
+        return columnValues
       })
       const { params: flatParams, variables } = toBulkInsertSql({
         params,
@@ -129,24 +139,24 @@ export const createDbFromSqlDb = <
         return Ok({ entities: [] })
       }
 
-      const sqlColumns = [entity].flatMap((entity) => {
-        const entries = Object.entries(entity)
-        const sortedEntries = entries.sort(ascend(([key]) => key))
-        const fields = sortedEntries.map(([key]) => key)
-        return fields.map((field) => config.fieldToSqlColumn(field as TField))
-      })
+      const entries = Object.entries(entity)
+      const sortedEntries = entries.sort(ascend(([key]) => key))
+      const entityKeys = sortedEntries.map(([key]): keyof TEntity => key)
+      const sqlColumns = entityKeys.map((key) => config.entityKeyToSqlColumn(key))
 
       const sql = `
 INSERT INTO ${config.viewName} (
-  ${sqlColumns.map((column) => `\t${column}`).join(',\n')}
+${sqlColumns.map((column) => `\t${column}`).join(',\n')}
 )
 VALUES
 ${variables}
-ON CONFLICT (${config.primaryKey}) DO UPDATE SET
-  ${sqlColumns.map((column) => `\t${column} = EXCLUDED.${column}`).join(',\n')}
+ON CONFLICT (${config.primaryKey}) 
+DO UPDATE SET
+${sqlColumns.map((column) => `\t${column} = EXCLUDED.${column}`).join(',\n')}
 `
 
       console.log(sql)
+      console.log(flatParams)
 
       const queried = await config.sqlDb.query({ sql, params: flatParams, parser: z.unknown() })
 

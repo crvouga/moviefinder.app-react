@@ -20,7 +20,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   )
 
   const currentScreen = useCurrentScreen()
-  const media = queried?.t === 'ok' ? queried.value.media.items[0] : null
+  const media = queried?.t === 'ok' ? queried.value.entities.items[0] : null
 
   return (
     <ScreenLayout

@@ -8,7 +8,7 @@ describe('MediaDb Query Upsert', () => {
     for (const f of await Fixtures(['db-conn'])) {
       const expected = [await Media.random(), await Media.random(), await Media.random()]
       unwrap(await f.mediaDb.query({ limit: 10, offset: 0 }))
-      unwrap(await f.mediaDb.upsert({ media: expected }))
+      unwrap(await f.mediaDb.upsert({ entities: expected }))
       unwrap(await f.mediaDb.query({ limit: 10, offset: 0 }))
     }
   })

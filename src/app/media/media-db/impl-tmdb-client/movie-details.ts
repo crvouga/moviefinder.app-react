@@ -1,8 +1,9 @@
+import { Db } from '~/@/db/interface'
+import { DbErr } from '~/@/db/interface/error'
 import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbConfiguration } from '~/@/tmdb-client/configuration/configuration'
-import { DbErr } from '~/@/db/interface/error'
 import { Credit } from '../../credit/credit'
 import { CreditId } from '../../credit/credit-id'
 import { Media } from '../../media'
@@ -14,12 +15,12 @@ import { RelationshipId } from '../../relationship/relationship-id'
 import { RelationshipType } from '../../relationship/relationship-type'
 import { Video } from '../../video/video'
 import { VideoId } from '../../video/video-id'
-import { MediaDbQueryOutput } from '../interface/query-output'
+import { IMediaDb } from '../interface/interface'
 
 export const queryMovieDetails = async (input: {
   tmdbClient: TmdbClient
   tmdbMovieId: number
-}): Promise<MediaDbQueryOutput> => {
+}): Promise<Db.InferQueryOutput<typeof IMediaDb.parser>> => {
   const { tmdbClient, tmdbMovieId } = input
 
   const got = await tmdbClient.movie.details.get({
@@ -50,7 +51,10 @@ export const queryMovieDetails = async (input: {
         id: MediaId.fromTmdbId(result.id),
         title: result.title ?? null,
         description: result.overview ?? null,
-        poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, result.poster_path ?? null),
+        poster: TmdbConfiguration.toPosterImageSet(
+          gotConfig.value.body,
+          result.poster_path ?? null
+        ),
         backdrop: TmdbConfiguration.toBackdropImageSet(
           gotConfig.value.body,
           result.backdrop_path ?? null
@@ -112,7 +116,6 @@ export const queryMovieDetails = async (input: {
     }
   }
 
-
   const related: Record<MediaId, Media> = {}
   const relationship: Record<RelationshipId, Relationship> = {}
   for (const movie of got.value.body.recommendations?.results ?? []) {
@@ -134,7 +137,10 @@ export const queryMovieDetails = async (input: {
       title: movie.title ?? null,
       description: movie.overview ?? null,
       poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, movie.poster_path ?? null),
-      backdrop: TmdbConfiguration.toBackdropImageSet(gotConfig.value.body, movie.backdrop_path ?? null),
+      backdrop: TmdbConfiguration.toBackdropImageSet(
+        gotConfig.value.body,
+        movie.backdrop_path ?? null
+      ),
       popularity: movie.popularity ?? null,
       releaseDate: movie.release_date ?? null,
     }
@@ -158,7 +164,10 @@ export const queryMovieDetails = async (input: {
       title: movie.title ?? null,
       description: movie.overview ?? null,
       poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, movie.poster_path ?? null),
-      backdrop: TmdbConfiguration.toBackdropImageSet(gotConfig.value.body, movie.backdrop_path ?? null),
+      backdrop: TmdbConfiguration.toBackdropImageSet(
+        gotConfig.value.body,
+        movie.backdrop_path ?? null
+      ),
       popularity: movie.popularity ?? null,
       releaseDate: movie.release_date ?? null,
     }
@@ -183,13 +192,13 @@ export const queryMovieDetails = async (input: {
   }
 
   return Ok({
-    media,
-    person,
-    credit,
-    relationship,
-    related,
-    video,
+    entities: media,
+    related: {
+      person,
+      credit,
+      relationship,
+      related,
+      video,
+    },
   })
 }
-
-

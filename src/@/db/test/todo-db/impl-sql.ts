@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createDbFromSqlDb } from '~/@/db/impl/impl-sql-db'
+import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
@@ -40,6 +40,7 @@ export const TodoDb = (config: Config): ITodoDb => {
       up,
       down,
     },
+    getRelated: async () => ({}),
     viewName: 'todo',
     primaryKey: 'id',
     rowParser: z.object({
@@ -49,6 +50,20 @@ export const TodoDb = (config: Config): ITodoDb => {
       created_at_utc: z.date(),
       updated_at_utc: z.date().nullable(),
     }),
+    entityKeyToSqlColumn: (key) => {
+      switch (key) {
+        case 'id':
+          return 'id'
+        case 'title':
+          return 'title'
+        case 'completed':
+          return 'completed'
+        case 'createdAt':
+          return 'created_at_utc'
+        case 'updatedAt':
+          return 'updated_at_utc'
+      }
+    },
     fieldToSqlColumn: (field) => {
       switch (field) {
         case 'id':

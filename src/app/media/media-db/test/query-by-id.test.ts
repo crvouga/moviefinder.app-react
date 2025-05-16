@@ -14,7 +14,7 @@ describe('MediaDb Query By Id', () => {
       })
 
       for (let i = 0; i < 10; i++) {
-        unwrap(await f.mediaDb.upsert({ media: [await Media.random()] }))
+        unwrap(await f.mediaDb.upsert({ entities: [await Media.random()] }))
       }
 
       const before = await f.mediaDb.query({
@@ -23,7 +23,7 @@ describe('MediaDb Query By Id', () => {
         offset: 0,
       })
 
-      unwrap(await f.mediaDb.upsert({ media: [expected] }))
+      unwrap(await f.mediaDb.upsert({ entities: [expected] }))
 
       const after = await f.mediaDb.query({
         where: { op: '=', column: 'id', value: FIGHT_CLUB_ID },
@@ -31,8 +31,8 @@ describe('MediaDb Query By Id', () => {
         offset: 0,
       })
 
-      expect(unwrap(before).media.items).toEqual([])
-      expect(unwrap(after).media.items[0]?.id).toEqual(FIGHT_CLUB_ID)
+      expect(unwrap(before).entities.items).toEqual([])
+      expect(unwrap(after).entities.items[0]?.id).toEqual(FIGHT_CLUB_ID)
     }
   })
 })

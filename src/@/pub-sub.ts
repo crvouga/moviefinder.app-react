@@ -6,6 +6,7 @@ export type Sub<T> = {
   subscribe: (callback: (value: T) => void) => () => void
   next: (filter: (value: T) => boolean) => Promise<T>
   map: <U>(mapper: (value: T) => U) => Sub<U>
+  mapAsync: <U>(mapper: (value: T) => Promise<U>) => Sub<U>
 }
 
 export type Pub<T> = {
@@ -44,6 +45,15 @@ export const PubSub = <T>(): PubSub<T> => {
 
       this.subscribe((value) => {
         pubSub.publish(mapper(value))
+      })
+
+      return pubSub
+    },
+    mapAsync(mapper) {
+      const pubSub = PubSub<Awaited<ReturnType<typeof mapper>>>()
+
+      this.subscribe(async (value) => {
+        pubSub.publish(await mapper(value))
       })
 
       return pubSub

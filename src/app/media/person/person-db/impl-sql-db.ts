@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createDbFromSqlDb } from '~/@/db/impl/impl-sql-db'
+import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS person
 
 export const PersonDb = (config: Config): IPersonDb => {
   return createDbFromSqlDb({
+    getRelated: async () => ({}),
     parser: IPersonDb.parser,
     sqlDb: config.sqlDb,
     viewName: 'person',
@@ -37,6 +38,20 @@ export const PersonDb = (config: Config): IPersonDb => {
       }),
       up,
       down,
+    },
+    entityKeyToSqlColumn: (key) => {
+      switch (key) {
+        case 'id':
+          return 'id'
+        case 'name':
+          return 'name'
+        case 'popularity':
+          return 'popularity'
+        case 'profile':
+          return 'profile'
+        default:
+          throw new Error(`Unreachable: ${key}`)
+      }
     },
     rowParser: z.object({
       id: z.string(),

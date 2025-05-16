@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'bun:test'
 import { clone } from '~/@/clone'
+import { Db } from '~/@/db/interface'
 import { unwrap } from '~/@/result'
 import { Media } from '../../media'
-import { MediaDbQueryOutput } from '../interface/query-output'
+import { IMediaDb } from '../interface/interface'
 import { Fixtures } from './fixture'
 
 describe('MediaDb Live Query', () => {
@@ -14,7 +15,7 @@ describe('MediaDb Live Query', () => {
         await Media.random(),
       ]
 
-      const results: MediaDbQueryOutput[] = []
+      const results: Db.InferQueryOutput<typeof IMediaDb.parser>[] = []
       f.mediaDb
         .liveQuery({
           limit: 10,
@@ -32,22 +33,23 @@ describe('MediaDb Live Query', () => {
       await wait()
       const before = clone(results)
 
-      unwrap(await f.mediaDb.upsert({ media: [expected[0]] }))
+      unwrap(await f.mediaDb.upsert({ entities: [expected[0]] }))
 
       await wait()
       const after1 = clone(results)
 
-      unwrap(await f.mediaDb.upsert({ media: [expected[1]] }))
+      unwrap(await f.mediaDb.upsert({ entities: [expected[1]] }))
 
       await wait()
       const after2 = clone(results)
 
-      unwrap(await f.mediaDb.upsert({ media: [expected[2]] }))
+      unwrap(await f.mediaDb.upsert({ entities: [expected[2]] }))
 
       await wait()
       const after3 = clone(results)
 
-      const peak = (results: MediaDbQueryOutput[]) => results.map((x) => unwrap(x).media.items)
+      const peak = (results: Db.InferQueryOutput<typeof IMediaDb.parser>[]) =>
+        results.map((x) => unwrap(x).entities.items)
 
       expect(peak(before)).toEqual([[]])
       expect(peak(after1)).toEqual([[], [expected[0]]])

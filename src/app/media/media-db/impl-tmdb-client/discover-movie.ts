@@ -1,19 +1,19 @@
+import { Db } from '~/@/db/interface'
+import { DbErr } from '~/@/db/interface/error'
 import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
 import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbConfiguration } from '~/@/tmdb-client/configuration/configuration'
 import { TmdbDiscoverMovieSortBy } from '~/@/tmdb-client/discover/movie'
-import { DbErr } from '~/@/db/interface/error'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
-import { MediaDbQueryInput } from '../interface/query-input'
-import { MediaDbQueryOutput } from '../interface/query-output'
+import { IMediaDb } from '../interface/interface'
 
 export const queryDiscoverMovie = async (input: {
   tmdbClient: TmdbClient
-  query: MediaDbQueryInput
-}): Promise<MediaDbQueryOutput> => {
+  query: Db.InferQueryInput<typeof IMediaDb.parser>
+}): Promise<Db.InferQueryOutput<typeof IMediaDb.parser>> => {
   const { tmdbClient, query } = input
 
   const got = await tmdbClient.discover.movie.get({
@@ -55,16 +55,20 @@ export const queryDiscoverMovie = async (input: {
   }
 
   return Ok({
-    media,
-    person: {},
-    credit: {},
-    relationship: {},
-    related: {},
-    video: {},
+    entities: media,
+    related: {
+      person: {},
+      credit: {},
+      relationship: {},
+      related: {},
+      video: {},
+    },
   })
 }
 
-const toTmdbDiscoverMovieSortBy = (query: MediaDbQueryInput): TmdbDiscoverMovieSortBy => {
+const toTmdbDiscoverMovieSortBy = (
+  query: Db.InferQueryInput<typeof IMediaDb.parser>
+): TmdbDiscoverMovieSortBy => {
   const { column, direction } = query.orderBy?.[0] ?? { column: 'popularity', direction: 'desc' }
   switch (column) {
     case 'popularity':

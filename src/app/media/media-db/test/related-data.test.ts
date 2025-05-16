@@ -14,11 +14,11 @@ describe('MediaDb Query Related Data', () => {
           where: { op: '=', column: 'id', value: MediaId.fromTmdbId(TMDB_IDS.FIGHT_CLUB) },
         })
       )
-      expect(result.person).not.toEqual({})
-      expect(result.credit).not.toEqual({})
-      expect(result.relationship).not.toEqual({})
-      expect(result.related).not.toEqual({})
-      expect(result.video).not.toEqual({})
+      expect(result.related.person).not.toEqual({})
+      expect(result.related.credit).not.toEqual({})
+      expect(result.related.relationship).not.toEqual({})
+      expect(result.related.related).not.toEqual({})
+      expect(result.related.video).not.toEqual({})
     }
   })
 })

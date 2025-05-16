@@ -2,13 +2,12 @@ import { describe, expect, it } from 'bun:test'
 import { KvDbFixture } from '~/@/kv-db/test/fixture'
 import { Logger } from '~/@/logger'
 import { unwrap } from '~/@/result'
+import { ascend } from '~/@/sort'
 import { SqlDbFixture } from '~/@/sql-db/test/fixture'
+import { InferQueryInput } from '../interface/db'
 import { Todo } from './todo'
 import { TodoDb } from './todo-db/impl-sql'
-import { ascend } from '~/@/sort'
-import { QueryInput } from '../interface/query-input/query-input'
 import { ITodoDb } from './todo-db/interface'
-import { InferQueryInput } from '../interface/db'
 
 const Fixture = async () => {
   const { sqlDb } = await SqlDbFixture()
@@ -50,7 +49,7 @@ describe('TodoDb', () => {
     expect(unwrap(after).entities.items).toEqual([todo])
   })
 
-  it.only('should paginate', async () => {
+  it('should paginate', async () => {
     const f = await Fixture()
     const todos: Todo[] = []
     for (let i = 0; i < 10; i++) {

@@ -1,4 +1,4 @@
-import { ImplSqlDb } from '../impl-db-conn'
+import { ImplSqlDb } from '../impl-sql-db'
 import { ImplOneWaySyncRemoteToLocal } from '../impl-one-way-sync-remote-to-local'
 import { ImplTrpcClient } from '../impl-trpc-client'
 import { IMediaDb } from '../interface/interface'

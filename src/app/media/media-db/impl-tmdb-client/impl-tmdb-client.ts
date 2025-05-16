@@ -17,11 +17,13 @@ export const MediaDb = (config: Config): IMediaDb => {
 
   return {
     async upsert(input) {
-      for (const media of input.media) {
+      for (const media of input.entities) {
         upserted.set(media.id, media)
       }
 
-      return Ok(null)
+      return Ok({
+        entities: input.entities,
+      })
     },
     liveQuery(_query) {
       return PubSub()

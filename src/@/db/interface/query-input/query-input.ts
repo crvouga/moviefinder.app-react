@@ -4,10 +4,10 @@ import { Where } from './where'
 
 const parser = <T>(column: z.ZodType<T>) => {
   return z.object({
-    where: Where.parser(column),
-    orderBy: OrderBy.parser(column),
-    limit: z.number().optional(),
-    offset: z.number().optional(),
+    where: Where.parser(column).optional(),
+    orderBy: OrderBy.parser(column).optional(),
+    limit: z.number(),
+    offset: z.number(),
   })
 }
 

@@ -37,7 +37,18 @@ export type Infer<T> =
     : never
 
 export type InferQueryInput<T> =
-  T extends Parser<infer TField, infer TEntity, infer TRelated> ? QueryInput<TField> : never
+  T extends Parser<infer TField, infer _TEntity, infer _TRelated> ? QueryInput<TField> : never
+
+export type InferQueryOutput<T> =
+  T extends Parser<infer _TField, infer TEntity, infer TRelated>
+    ? QueryOutput<TEntity, TRelated>
+    : never
+
+export type InferUpsertInput<T> =
+  T extends Parser<infer _TField, infer TEntity, infer _TRelated> ? UpsertInput<TEntity> : never
+
+export type InferUpsertOutput<T> =
+  T extends Parser<infer _TField, infer TEntity, infer _TRelated> ? UpsertOutput<TEntity> : never
 
 export type Db<TField, TEntity, TRelated> = {
   query: (query: QueryInput<TField>) => Promise<QueryOutput<TEntity, TRelated>>

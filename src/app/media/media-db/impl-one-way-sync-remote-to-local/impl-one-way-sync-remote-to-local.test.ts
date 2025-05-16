@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'bun:test'
-import { SqlDbFixture } from '~/@/sql-db/test/fixture'
+import { Db } from '~/@/db/interface'
 import { intersectionWith } from '~/@/intersection-with'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { PubSub } from '~/@/pub-sub'
 import { unwrap } from '~/@/result'
+import { SqlDbFixture } from '~/@/sql-db/test/fixture'
 import { TimeSpan } from '~/@/time-span'
 import { TmdbClientFixture } from '~/@/tmdb-client/@/fixture'
 import { MediaDbBackend } from '../impl/backend'
-import { MediaDbQueryInput } from '../interface/query-input'
+import { IMediaDb } from '../interface/interface'
 import { OneWaySyncRemoteToLocalMsg } from './impl-one-way-sync-remote-to-local'
 
 const Fixture = async () => {
@@ -44,7 +45,7 @@ describe('MediaDb One Way Sync Remote To Local', () => {
   it('should sync data from remote to local', async () => {
     const f = await Fixture()
 
-    const queryInput: MediaDbQueryInput = {
+    const queryInput: Db.InferQueryInput<typeof IMediaDb.parser> = {
       limit: 10,
       offset: 0,
       orderBy: [{ column: 'popularity', direction: 'desc' }],
@@ -61,11 +62,13 @@ describe('MediaDb One Way Sync Remote To Local', () => {
     const after = unwrap(await f.local.query(queryInput))
 
     expect(
-      intersectionWith(before.media.items, expected.media.items, (a, b) => a.id === b.id).length
+      intersectionWith(before.entities.items, expected.entities.items, (a, b) => a.id === b.id)
+        .length
     ).toBe(0)
 
     expect(
-      intersectionWith(after.media.items, expected.media.items, (a, b) => a.id === b.id).length
+      intersectionWith(after.entities.items, expected.entities.items, (a, b) => a.id === b.id)
+        .length
     ).toBeGreaterThan(0)
   })
 })

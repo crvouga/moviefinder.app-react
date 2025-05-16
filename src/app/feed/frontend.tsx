@@ -90,9 +90,9 @@ const ViewFeed = (props: { feed: Feed }) => {
       return <ImgLoading />
     }
     case 'ok': {
-      if (media.value.media.items.length === 0) return <ImgLoading />
+      if (media.value.entities.items.length === 0) return <ImgLoading />
 
-      const feedItems = FeedItem.fromPaginatedMedia(media.value.media)
+      const feedItems = FeedItem.fromPaginatedMedia(media.value.entities)
 
       const hasFirstSlideLoader = state.offset > 0
 

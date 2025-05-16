@@ -3,20 +3,21 @@ import { clone } from '~/@/clone'
 import { unwrap } from '~/@/result'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
-import { MediaDbQueryOutput } from '../interface/query-output'
+import { IMediaDb } from '../interface/interface'
 import { Fixtures } from './fixture'
+import { Db } from '~/@/db/interface'
 
 describe('MediaDb Query By Id', () => {
-  it('should work for live query', async () => {
+  it.only('should work for live query', async () => {
     const SOME_MOVIE_ID = MediaId.fromTmdbId(551)
     for (const f of await Fixtures(['db-conn'])) {
       const expected = await Media.random({ id: SOME_MOVIE_ID })
 
       for (let i = 0; i < 10; i++) {
-        unwrap(await f.mediaDb.upsert({ media: [await Media.random()] }))
+        unwrap(await f.mediaDb.upsert({ entities: [await Media.random()] }))
       }
 
-      const results: MediaDbQueryOutput[] = []
+      const results: Db.InferQueryOutput<typeof IMediaDb.parser>[] = []
 
       f.mediaDb
         .liveQuery({
@@ -31,12 +32,13 @@ describe('MediaDb Query By Id', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
       const before = clone(results)
 
-      unwrap(await f.mediaDb.upsert({ media: [expected] }))
+      unwrap(await f.mediaDb.upsert({ entities: [expected] }))
 
       await new Promise((resolve) => setTimeout(resolve, 10))
       const after = clone(results)
 
-      const peak = (results: MediaDbQueryOutput[]) => results.map((x) => unwrap(x).media.items)
+      const peak = (results: Db.InferQueryOutput<typeof IMediaDb.parser>[]) =>
+        results.map((x) => unwrap(x).entities.items)
 
       expect(peak(before)).toEqual([[]])
       expect(peak(after)).toEqual([[], [expected]])
