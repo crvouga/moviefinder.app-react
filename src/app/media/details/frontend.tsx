@@ -27,21 +27,20 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   return (
     <ScreenLayout
       includeGutter
+      key={media?.id}
       topBar={{
         onBack: () => currentScreen.push({ t: 'feed' }),
         title: media?.title ?? ' ',
       }}
     >
-      <div>
-        <Img
-          className="aspect-video w-full object-cover"
-          src={ImageSet.toHighestRes(media?.backdrop)}
-          alt={media?.title ?? ' '}
-        />
-        <div className="flex flex-col items-center justify-center gap-4 p-6">
-          <p className="text-center text-3xl font-bold">{media?.title ?? ' '}</p>
-          {media?.description && <p className="text-center">{media?.description}</p>}
-        </div>
+      <Img
+        className="aspect-video w-full object-cover"
+        src={ImageSet.toHighestRes(media?.backdrop)}
+        alt={media?.title ?? ' '}
+      />
+      <div className="flex flex-col items-center justify-center gap-4 p-6">
+        <p className="text-center text-3xl font-bold">{media?.title ?? ' '}</p>
+        {media?.description && <p className="text-center">{media?.description}</p>}
       </div>
 
       <Section title="Cast & Crew">
