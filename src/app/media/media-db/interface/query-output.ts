@@ -7,17 +7,21 @@ import { Media } from '../../media'
 import { Person } from '../../person/person'
 import { Relationship } from '../../relationship/relationship'
 import { Video } from '../../video/video'
-
+import { PersonId } from '../../person/person-id'
+import { CreditId } from '../../credit/credit-id'
+import { MediaId } from '../../media-id'
+import { RelationshipId } from '../../relationship/relationship-id'
+import { VideoId } from '../../video/video-id'
 
 
 const parser = Result.parser(
   z.object({
     media: Paginated.parser(Media.parser),
-    person: z.array(Person.parser),
-    credit: z.array(Credit.parser),
-    relationship: z.array(Relationship.parser),
-    related: z.array(Media.parser),
-    video: z.array(Video.parser),
+    person: z.record(PersonId.parser, Person.parser),
+    credit: z.record(CreditId.parser, Credit.parser),
+    relationship: z.record(RelationshipId.parser, Relationship.parser),
+    related: z.record(MediaId.parser, Media.parser),
+    video: z.record(VideoId.parser, Video.parser),
   }),
   AppErr.parser
 )

@@ -41,8 +41,20 @@ const toBackdropImageSet = (
   return imageSet
 }
 
+
+const toProfileImageSet = (configuration: Configuration, profilePath: string | null): ImageSet => {
+  if (!profilePath) return ImageSet.empty()
+
+  const profileSizes = configuration.images?.profile_sizes ?? []
+  const baseUrl = configuration.images?.secure_base_url ?? ''
+  const lowestToHighestRes = profileSizes.map((size) => `${baseUrl}${size}${profilePath}`)
+  const imageSet = ImageSet.init({ lowestToHighestRes })
+  return imageSet
+}
+
 export const Configuration = {
   parser,
   toPosterImageSet,
   toBackdropImageSet,
+  toProfileImageSet,
 }

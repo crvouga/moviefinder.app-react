@@ -1,6 +1,7 @@
 import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
 import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
+import { TmdbClient } from '~/@/tmdb-client'
 import { Configuration } from '~/@/tmdb-client/configuration/configuration'
 import { TmdbDiscoverMovieSortBy } from '~/@/tmdb-client/discover/movie'
 import { AppErr } from '~/app/@/error'
@@ -8,7 +9,6 @@ import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { MediaDbQueryInput } from '../interface/query-input'
 import { MediaDbQueryOutput } from '../interface/query-output'
-import { TmdbClient } from '~/@/tmdb-client'
 
 export const queryDiscoverMovie = async (input: {
   tmdbClient: TmdbClient
@@ -56,11 +56,11 @@ export const queryDiscoverMovie = async (input: {
 
   return Ok({
     media,
-    person: [],
-    credit: [],
-    relationship: [],
-    related: [],
-    video: [],
+    person: {},
+    credit: {},
+    relationship: {},
+    related: {},
+    video: {},
   })
 }
 

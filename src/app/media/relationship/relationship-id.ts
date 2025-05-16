@@ -1,15 +1,12 @@
-import { z } from 'zod'
+import { z } from 'zod';
+import { RelationshipType } from './relationship-type';
 
 const parser = z.string()
 
 export type RelationshipId = z.infer<typeof parser>
 
-const fromTmdbId = (id: number): RelationshipId => {
-  return RelationshipId.parser.parse(`relationship-tmdb-${id}`)
-}
-
-const toTmdbId = (id: RelationshipId): number => {
-  return parseInt(id.replace('relationship-tmdb-', ''))
+const fromTmdbId = (input: { tmdbId: number; type: RelationshipType }): RelationshipId => {
+  return RelationshipId.parser.parse(`relationship-${input.type}-${input.tmdbId}`)
 }
 
 const fromString = (id: string): RelationshipId => {
@@ -20,5 +17,4 @@ export const RelationshipId = {
   parser,
   fromTmdbId,
   fromString,
-  toTmdbId,
 }
