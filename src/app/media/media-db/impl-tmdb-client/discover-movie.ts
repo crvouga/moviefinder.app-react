@@ -40,8 +40,8 @@ export const queryDiscoverMovie = async (input: {
       id: MediaId.fromTmdbId(result.id),
       title: result.title,
       description: result.overview,
-      poster: Configuration.toPosterImageSet(gotConfig.value.body, result.poster_path),
-      backdrop: Configuration.toBackdropImageSet(gotConfig.value.body, result.backdrop_path),
+      poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, result.poster_path),
+      backdrop: TmdbConfiguration.toBackdropImageSet(gotConfig.value.body, result.backdrop_path),
       popularity: result.popularity,
       releaseDate: result.release_date ?? null,
     }
