@@ -1,6 +1,6 @@
 import { useSubscription } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
-import { cn } from '~/@/ui/cn'
+import { Clickable } from '~/@/ui/clickable'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../../media-id'
@@ -13,16 +13,18 @@ export const CreditsCardSwiper = (
 
   const queried = useSubscription(
     () =>
-      ctx.creditDb.liveQuery({
-        where: {
-          op: '=',
-          column: 'mediaId',
-          value: props.mediaId ?? '',
-        },
-        orderBy: [{ column: 'personId', direction: 'asc' }],
-        limit: 25,
-        offset: 0,
-      }),
+      props.mediaId
+        ? ctx.creditDb.liveQuery({
+            where: {
+              op: '=',
+              column: 'mediaId',
+              value: props.mediaId,
+            },
+            orderBy: [{ column: 'personId', direction: 'asc' }],
+            limit: 25,
+            offset: 0,
+          })
+        : null,
     [ctx, props.mediaId]
   )
 
@@ -37,16 +39,14 @@ export const CreditsCardSwiper = (
       slidesPerView="auto"
       initialSlide={0}
     >
-      {queried.value.entities.items.flatMap((credit, index) => {
+      {queried.value.entities.items.flatMap((credit) => {
         const person = queried.value.related.person[credit.personId]
         if (!person) return []
         return [
           <Swiper.Slide key={credit.id} className="w-fit">
-            <div
-              className={cn('flex h-full items-center justify-center', index === 0 ? 'pl-4' : '')}
-            >
+            <Clickable onClick={() => {}}>
               <CreditCard credit={credit} person={person} />
-            </div>
+            </Clickable>
           </Swiper.Slide>,
         ]
       })}

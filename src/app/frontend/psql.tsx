@@ -68,6 +68,28 @@ export const Psql = (config: { ctx: Ctx }) => {
     })
 
   commands.push({
+    description: 'Summarize',
+    match: /summary/,
+    handler: async (_strings: TemplateStringsArray, ..._values: any[]) => {
+      const result = await config.ctx.sqlDb.query({
+        sql: `
+SELECT
+    schemaname AS schema,
+    relname AS table_name,
+    n_live_tup AS row_count,
+    pg_size_pretty(pg_total_relation_size(relid)) AS total_size
+FROM
+    pg_stat_user_tables
+ORDER BY
+            pg_total_relation_size(relid) DESC;`,
+        parser: z.unknown(),
+      })
+      const { rows } = unwrap(result)
+      console.table(rows)
+    },
+  })
+
+  commands.push({
     description: 'Execute a raw SQL query',
     match: /.*/,
     handler: async (strings: TemplateStringsArray, ...values: any[]) => {

@@ -61,11 +61,12 @@ export const PubSub = <T>(): PubSub<T> => {
   }
 }
 
-export const useSubscription = <T>(createSub: () => Sub<T>, deps: unknown[]): T | null => {
+export const useSubscription = <T>(createSub: () => Sub<T> | null, deps: unknown[]): T | null => {
   const subCallback = useCallback(() => createSub(), deps)
   const [value, setValue] = useState<T | null>(null)
   useLayoutEffect(() => {
     const sub = subCallback()
+    if (!sub) return
     return sub.subscribe((value) => {
       setValue(value)
     })
