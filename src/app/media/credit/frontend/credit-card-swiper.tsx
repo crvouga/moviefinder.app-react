@@ -30,12 +30,9 @@ export const CreditsCardSwiper = (props: { mediaId: MediaId }) => {
   return (
     <Swiper.Container direction="horizontal" className="w-full px-2" slidesPerView="auto">
       {queried.value.entities.items.map((credit, index) => (
-        <Swiper.Slide key={credit.id}>
+        <Swiper.Slide key={credit.id} className="w-fit">
           <div
-            className={cn(
-              'flex h-full w-full items-center justify-center p-1',
-              index === 0 ? 'pl-4' : ''
-            )}
+            className={cn('flex h-full items-center justify-center p-1', index === 0 ? 'pl-4' : '')}
           >
             <CreditCard credit={credit} person={queried.value.related.person} />
           </div>

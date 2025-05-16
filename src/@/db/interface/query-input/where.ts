@@ -14,6 +14,7 @@ export const toSql = <T>(where: Where<T>, columnToSqlColumn: (column: T) => stri
   const sqlColumn = columnToSqlColumn(where.column as T)
   switch (where.op) {
     case 'in': {
+      if (where.value.length === 0) return ''
       return `WHERE ${sqlColumn} IN (${(where.value as string[]).map((v) => `'${v}'`).join(',')})`
     }
     case '=': {

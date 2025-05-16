@@ -3,7 +3,9 @@ import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
+import { isErr } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
+import { IMediaDb } from '../../media-db/interface/interface'
 import { IRelationshipDb } from './interface'
 
 export type Config = {
@@ -11,6 +13,7 @@ export type Config = {
   sqlDb: ISqlDb
   logger: ILogger
   kvDb: IKvDb
+  mediaDb: IMediaDb
 }
 
 const up = [
@@ -47,7 +50,25 @@ const Row = z.object({
 
 export const RelationshipDb = (config: Config): IRelationshipDb => {
   return createDbFromSqlDb({
-    getRelated: async () => ({}),
+    getRelated: async (entities) => {
+      const media = await config.mediaDb.query({
+        limit: Math.max(entities.length, 1),
+        offset: 0,
+        where: {
+          op: 'in',
+          column: 'id',
+          value: entities.map((e) => e.to),
+        },
+        orderBy: [{ column: 'id', direction: 'asc' }],
+      })
+      if (isErr(media)) return { media: {} }
+
+      const mediaMap = Object.fromEntries(media.value.entities.items.map((m) => [m.id, m]))
+
+      return {
+        media: mediaMap,
+      }
+    },
     parser: IRelationshipDb.parser,
     sqlDb: config.sqlDb,
     viewName: 'relationship',

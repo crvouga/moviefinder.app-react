@@ -45,7 +45,7 @@ const Fixture = async () => {
     throttle: TimeSpan.seconds(0),
     relatedDbs: {
       creditDb: CreditDb({ t: 'sql-db', sqlDb, kvDb, logger, personDb }),
-      relationshipDb: RelationshipDb({ t: 'sql-db', sqlDb, kvDb, logger }),
+      relationshipDb: RelationshipDb({ t: 'sql-db', sqlDb, kvDb, logger, mediaDb: local }),
       videoDb: VideoDb({ t: 'sql-db', sqlDb, kvDb, logger }),
       personDb,
     },

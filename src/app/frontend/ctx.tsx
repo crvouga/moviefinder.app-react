@@ -61,18 +61,26 @@ const init = (): Ctx => {
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
   clientSessionIdStorage.set(clientSessionId)
 
+  const localMediaDb = MediaDbFrontend({
+    t: 'db-conn',
+    sqlDb,
+    migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger }),
+  })
+
   const personDb = PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
-  const relationshipDb = RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  const relationshipDb = RelationshipDb({
+    t: 'sql-db',
+    sqlDb,
+    logger,
+    kvDb,
+    mediaDb: localMediaDb,
+  })
   const creditDb = CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
   const videoDb = VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
-    local: MediaDbFrontend({
-      t: 'db-conn',
-      sqlDb,
-      migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger }),
-    }),
+    local: localMediaDb,
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
     pubSub: PubSub(),
