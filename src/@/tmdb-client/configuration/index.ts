@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { HttpClientGet } from '../@/http-client-get'
 import { TmdbClientConfig } from '../@/tmdb-client-config'
-import { Configuration } from './configuration'
+import { TmdbConfiguration } from './configuration'
 
 export const ApiResponse = z.discriminatedUnion('status', [
-  z.object({ status: z.literal(200), body: Configuration.parser }),
+  z.object({ status: z.literal(200), body: TmdbConfiguration.parser }),
 ])
 
 export const ConfigurationClient = (config: TmdbClientConfig) => {

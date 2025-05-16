@@ -1,7 +1,7 @@
 import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
 import { TmdbClient } from '~/@/tmdb-client'
-import { Configuration } from '~/@/tmdb-client/configuration/configuration'
+import { TmdbConfiguration } from '~/@/tmdb-client/configuration/configuration'
 import { AppErr } from '~/app/@/error'
 import { Credit } from '../../credit/credit'
 import { CreditId } from '../../credit/credit-id'
@@ -45,14 +45,13 @@ export const queryMovieDetails = async (input: {
   const items: Media[] = [got.value.body].flatMap((result): Media[] => {
     if (!result) return []
     if (!result.id) return []
-
     return [
       {
         id: MediaId.fromTmdbId(result.id),
         title: result.title ?? null,
         description: result.overview ?? null,
-        poster: Configuration.toPosterImageSet(gotConfig.value.body, result.poster_path ?? null),
-        backdrop: Configuration.toBackdropImageSet(
+        poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, result.poster_path ?? null),
+        backdrop: TmdbConfiguration.toBackdropImageSet(
           gotConfig.value.body,
           result.backdrop_path ?? null
         ),
@@ -69,18 +68,21 @@ export const queryMovieDetails = async (input: {
     items,
   }
 
+  const mediaId = MediaId.fromTmdbId(tmdbMovieId)
+
   const person: Record<PersonId, Person> = {}
-  for (const cast of [
+  const personList = [
     ...(got.value.body.credits?.cast ?? []),
     ...(got.value.body.credits?.crew ?? []),
-  ]) {
-    if (!cast.id) continue
-    const personId = PersonId.fromTmdbId(cast.id)
+  ]
+  for (const p of personList) {
+    if (!p.id) continue
+    const personId = PersonId.fromTmdbId(p.id)
     person[personId] = {
       id: personId,
-      name: cast.name ?? null,
-      profile: Configuration.toProfileImageSet(gotConfig.value.body, cast.profile_path ?? null),
-      popularity: cast.popularity ?? null,
+      name: p.name ?? null,
+      profile: TmdbConfiguration.toProfileImageSet(gotConfig.value.body, p.profile_path ?? null),
+      popularity: p.popularity ?? null,
     }
   }
 
@@ -110,7 +112,6 @@ export const queryMovieDetails = async (input: {
     }
   }
 
-  const mediaId = MediaId.fromTmdbId(tmdbMovieId)
 
   const related: Record<MediaId, Media> = {}
   const relationship: Record<RelationshipId, Relationship> = {}
@@ -132,8 +133,32 @@ export const queryMovieDetails = async (input: {
       id: relatedMediaId,
       title: movie.title ?? null,
       description: movie.overview ?? null,
-      poster: Configuration.toPosterImageSet(gotConfig.value.body, movie.poster_path ?? null),
-      backdrop: Configuration.toBackdropImageSet(gotConfig.value.body, movie.backdrop_path ?? null),
+      poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, movie.poster_path ?? null),
+      backdrop: TmdbConfiguration.toBackdropImageSet(gotConfig.value.body, movie.backdrop_path ?? null),
+      popularity: movie.popularity ?? null,
+      releaseDate: movie.release_date ?? null,
+    }
+  }
+  for (const movie of got.value.body.similar?.results ?? []) {
+    if (!movie.id) continue
+    const relationshipType: RelationshipType = 'similar'
+    const relationshipId = RelationshipId.fromTmdbId({
+      tmdbId: movie.id,
+      type: relationshipType,
+    })
+    const relatedMediaId = MediaId.fromTmdbId(movie.id)
+    relationship[relationshipId] = {
+      id: relationshipId,
+      from: mediaId,
+      to: relatedMediaId,
+      type: relationshipType,
+    }
+    related[relatedMediaId] = {
+      id: relatedMediaId,
+      title: movie.title ?? null,
+      description: movie.overview ?? null,
+      poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, movie.poster_path ?? null),
+      backdrop: TmdbConfiguration.toBackdropImageSet(gotConfig.value.body, movie.backdrop_path ?? null),
       popularity: movie.popularity ?? null,
       releaseDate: movie.release_date ?? null,
     }
@@ -166,3 +191,5 @@ export const queryMovieDetails = async (input: {
     video,
   })
 }
+
+

@@ -28,6 +28,8 @@ export const TmdbMovieCast = z.object({
   order: z.number().optional(),
 })
 
+export type TmdbMovieCast = z.infer<typeof TmdbMovieCast>
+
 export const TmdbMovieCrew = z.object({
   adult: z.boolean().optional(),
   gender: z.number().optional(),
@@ -42,19 +44,18 @@ export const TmdbMovieCrew = z.object({
   job: z.string().optional(),
 })
 
-export type TmdbMovieCast = z.infer<typeof TmdbMovieCast>
 export type TmdbMovieCrew = z.infer<typeof TmdbMovieCrew>
 
-const OkResponse = z.object({
+const TmdbMovieCreditsOkResponse = z.object({
   id: z.number().optional(),
   cast: z.array(TmdbMovieCast).optional(),
   crew: z.array(TmdbMovieCrew).optional(),
 })
 
-export type OkResponseType = z.infer<typeof OkResponse>
+export type TmdbMovieCreditsOkResponse = z.infer<typeof TmdbMovieCreditsOkResponse>
 
 const ApiResponse = z.discriminatedUnion('status', [
-  z.object({ status: z.literal(200), body: OkResponse }),
+  z.object({ status: z.literal(200), body: TmdbMovieCreditsOkResponse }),
   z.object({ status: z.literal(401), body: ErrResponse }),
   z.object({ status: z.literal(404), body: ErrResponse }),
 ])
@@ -71,6 +72,6 @@ export const MovieCreditsClient = (config: TmdbClientConfig) => {
   }
 }
 
-MovieCreditsClient.OkResponse = OkResponse
+MovieCreditsClient.OkResponse = TmdbMovieCreditsOkResponse
 MovieCreditsClient.TmdbMovieCast = TmdbMovieCast
 MovieCreditsClient.TmdbMovieCrew = TmdbMovieCrew

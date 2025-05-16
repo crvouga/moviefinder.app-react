@@ -16,9 +16,9 @@ export const parser = z.object({
   images: ImagesConfigurationSchema.optional(),
   change_keys: z.array(z.string()).optional(),
 })
-export type Configuration = z.infer<typeof parser>
+export type TmdbConfiguration = z.infer<typeof parser>
 
-const toPosterImageSet = (configuration: Configuration, posterPath: string | null): ImageSet => {
+const toPosterImageSet = (configuration: TmdbConfiguration, posterPath: string | null): ImageSet => {
   if (!posterPath) return ImageSet.empty()
 
   const posterSizes = configuration.images?.poster_sizes ?? []
@@ -29,7 +29,7 @@ const toPosterImageSet = (configuration: Configuration, posterPath: string | nul
 }
 
 const toBackdropImageSet = (
-  configuration: Configuration,
+  configuration: TmdbConfiguration,
   backdropPath: string | null
 ): ImageSet => {
   if (!backdropPath) return ImageSet.empty()
@@ -42,7 +42,7 @@ const toBackdropImageSet = (
 }
 
 
-const toProfileImageSet = (configuration: Configuration, profilePath: string | null): ImageSet => {
+const toProfileImageSet = (configuration: TmdbConfiguration, profilePath: string | null): ImageSet => {
   if (!profilePath) return ImageSet.empty()
 
   const profileSizes = configuration.images?.profile_sizes ?? []
@@ -52,7 +52,7 @@ const toProfileImageSet = (configuration: Configuration, profilePath: string | n
   return imageSet
 }
 
-export const Configuration = {
+export const TmdbConfiguration = {
   parser,
   toPosterImageSet,
   toBackdropImageSet,

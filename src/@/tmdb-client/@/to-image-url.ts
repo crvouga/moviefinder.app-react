@@ -1,7 +1,7 @@
-import { Configuration } from '../configuration/configuration'
+import { TmdbConfiguration } from '../configuration/configuration'
 
 export const toTmdbImageUrl = (
-  config: Configuration,
+  config: TmdbConfiguration,
   posterPath: string | undefined | null
 ): string | null => {
   if (!posterPath) return null
