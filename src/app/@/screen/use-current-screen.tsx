@@ -1,14 +1,8 @@
-import { useQueryParam } from '~/@/use-query-param'
+import { usePath } from '~/@/use-path'
 import { Screen } from './screen'
 
 export const useCurrentScreen = () => {
-  const queryParam = useQueryParam({
-    param: 'screen',
-    codec: Screen,
-    defaultValue: {
-      t: 'feed',
-    },
-  })
+  const queryParam = usePath({ codec: Screen, defaultValue: { t: 'feed' } })
 
   return queryParam
 }

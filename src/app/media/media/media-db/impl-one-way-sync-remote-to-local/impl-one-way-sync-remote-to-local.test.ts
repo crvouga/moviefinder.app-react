@@ -16,6 +16,7 @@ import { VideoDb } from '../../../video/video-db/impl-sql-db'
 import { MediaDbBackend } from '../impl/backend'
 import { IMediaDb } from '../interface/interface'
 import { OneWaySyncRemoteToLocalMsg } from './impl-one-way-sync-remote-to-local'
+
 const Fixture = async () => {
   const { sqlDb } = await SqlDbFixture()
   const { tmdbClient } = await TmdbClientFixture()
@@ -38,6 +39,7 @@ const Fixture = async () => {
   const personDb = PersonDb({ t: 'sql-db', sqlDb, kvDb, logger })
   const mediaDb = MediaDbBackend({
     t: 'one-way-sync-remote-to-local',
+    kvDb,
     local,
     remote,
     logger: Logger({ t: 'noop' }),

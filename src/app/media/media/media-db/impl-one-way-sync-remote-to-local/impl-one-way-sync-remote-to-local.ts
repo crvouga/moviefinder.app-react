@@ -1,14 +1,15 @@
 import { IDb } from '~/@/db/interface'
 import { toDeterministicHash } from '~/@/deterministic-hash'
+import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { PubSub } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
-import { throttleByKey } from '~/@/throttle'
+import { throttleByKeyDurable } from '~/@/throttle-by-key-durable'
 import { TimeSpan } from '~/@/time-span'
-import { ICreditDb } from '../../../credit/credit-db/interface'
-import { IPersonDb } from '../../../person/person-db/interface'
-import { IRelationshipDb } from '../../../relationship/relationship-db/interface'
-import { IVideoDb } from '../../../video/video-db/interface'
+import { ICreditDb } from '~/app/media/credit/credit-db/interface'
+import { IPersonDb } from '~/app/media/person/person-db/interface'
+import { IRelationshipDb } from '~/app/media/relationship/relationship-db/interface'
+import { IVideoDb } from '~/app/media/video/video-db/interface'
 import { IMediaDb } from '../interface/interface'
 
 export type OneWaySyncRemoteToLocalMsg = {
@@ -20,6 +21,7 @@ export type OneWaySyncRemoteToLocalMsg = {
 export type Config = {
   t: 'one-way-sync-remote-to-local'
   logger: ILogger
+  kvDb: IKvDb
   local: IMediaDb
   remote: IMediaDb
   pubSub: PubSub<OneWaySyncRemoteToLocalMsg>
@@ -33,7 +35,8 @@ export type Config = {
 }
 
 export const MediaDb = (config: Config): IMediaDb => {
-  const remoteToLocalSync = throttleByKey(
+  const remoteToLocalSync = throttleByKeyDurable(
+    config.kvDb,
     config.throttle,
     (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => {
       return toDeterministicHash(query)

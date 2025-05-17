@@ -95,11 +95,12 @@ const init = (): Ctx => {
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
+    kvDb,
     local: mediaDbLocal,
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
     pubSub: PubSub(),
-    throttle: TimeSpan.seconds(10),
+    throttle: TimeSpan.minutes(1),
     relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
   })
 
