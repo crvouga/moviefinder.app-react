@@ -33,7 +33,7 @@ export const Img = forwardRef<
         <img
           ref={ref as React.Ref<HTMLImageElement>}
           src={props.src}
-          className={props.className}
+          className={cn(props.className, 'bg-neutral-700')}
           alt={props.alt}
           style={props.style}
         />

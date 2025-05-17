@@ -5,7 +5,7 @@ import { Credit } from '../credit'
 
 export const CreditCard = (props: { credit: Credit; person: Person }) => {
   return (
-    <div className="flex h-full w-36 flex-col items-center justify-start gap-2 rounded-lg p-2">
+    <div className="flex h-full w-32 flex-col items-center justify-start gap-2 rounded-lg">
       <Avatar
         className="size-24 rounded-full border"
         src={ImageSet.toHighestRes(props.person.profile)}

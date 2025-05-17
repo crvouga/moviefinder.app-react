@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Codec } from '~/@/codec'
 import { MediaId } from '~/app/media/media-id'
+import { PersonId } from '~/app/media/person/person-id'
 import { LoginScreen } from '~/app/user/login/login-screen'
 
 const parser = z.discriminatedUnion('t', [
@@ -17,6 +18,16 @@ const parser = z.discriminatedUnion('t', [
   z.object({
     t: z.literal('login'),
     c: LoginScreen.parser,
+  }),
+  z.object({
+    t: z.literal('person-details'),
+    personId: PersonId.parser,
+    from: z.discriminatedUnion('t', [
+      z.object({
+        t: z.literal('media-details'),
+        mediaId: MediaId.parser,
+      }),
+    ]),
   }),
 ])
 

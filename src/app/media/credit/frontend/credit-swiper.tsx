@@ -1,15 +1,18 @@
 import { useSubscription } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
 import { Clickable } from '~/@/ui/clickable'
+import { WithPreload } from '~/@/ui/preload'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
+import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../../media-id'
-import { CreditCard } from './credit-card'
+import { CreditCard } from './credit'
 
 export const CreditsCardSwiper = (
   props: Partial<SwiperContainerProps> & { mediaId: MediaId | null }
 ) => {
   const ctx = useCtx()
+  const currentScreen = useCurrentScreen()
 
   const queried = useSubscription(
     () =>
@@ -44,8 +47,29 @@ export const CreditsCardSwiper = (
         if (!person) return []
         return [
           <Swiper.Slide key={credit.id} className="w-fit">
-            <Clickable onClick={() => {}}>
-              <CreditCard credit={credit} person={person} />
+            <Clickable
+              onClick={() => {
+                const { mediaId } = props
+                if (!mediaId) return
+                currentScreen.push({
+                  t: 'person-details',
+                  personId: credit.personId,
+                  from: { t: 'media-details', mediaId },
+                })
+              }}
+            >
+              <WithPreload
+                preloadKey={credit.personId}
+                onPreload={() => {
+                  ctx.personDb.query({
+                    where: { op: '=', column: 'id', value: credit.personId },
+                    limit: 1,
+                    offset: 0,
+                  })
+                }}
+              >
+                <CreditCard credit={credit} person={person} />
+              </WithPreload>
             </Clickable>
           </Swiper.Slide>,
         ]
