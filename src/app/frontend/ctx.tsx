@@ -12,7 +12,7 @@ import { TimeSpan } from '~/@/time-span'
 import { ClientSessionId } from '../@/client-session-id/client-session-id'
 import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id-storage'
 import { FeedDb } from '../feed/feed-db/impl'
-import { IFeedDb } from '../feed/feed-db/interface/interface'
+import { IFeedDb } from '../feed/feed-db/interface'
 import { CreditDb } from '../media/credit/credit-db/impl'
 import { ICreditDb } from '../media/credit/credit-db/interface'
 import { MediaDbFrontend } from '../media/media/media-db/impl/frontend'
@@ -69,24 +69,24 @@ const init = (): Ctx => {
   clientSessionIdStorage.set(clientSessionId)
 
   let mediaDbLocal: IMediaDb
-  mediaDbLocal = MediaDbFrontend({ t: 'db-conn', sqlDb, migrationPolicy })
-  mediaDbLocal = MediaDbFrontend({ t: 'hash-map' })
+  mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
+  mediaDbLocal ??= MediaDbFrontend({ t: 'db-conn', sqlDb, migrationPolicy })
 
   let personDb: IPersonDb
-  personDb = PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
-  personDb = PersonDb({ t: 'hash-map' })
+  personDb ??= PersonDb({ t: 'hash-map' })
+  personDb ??= PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
 
   let relationshipDb: IRelationshipDb
-  relationshipDb = RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
-  relationshipDb = RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
+  relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
+  relationshipDb ??= RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
 
   let creditDb: ICreditDb
-  creditDb = CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
-  creditDb = CreditDb({ t: 'hash-map', personDb })
+  creditDb ??= CreditDb({ t: 'hash-map', personDb })
+  creditDb ??= CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
 
   let videoDb: IVideoDb
-  videoDb = VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
-  videoDb = VideoDb({ t: 'hash-map' })
+  videoDb ??= VideoDb({ t: 'hash-map' })
+  videoDb ??= VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
@@ -99,8 +99,8 @@ const init = (): Ctx => {
   })
 
   let feedDb: IFeedDb
-  feedDb = FeedDb({ t: 'db-conn', sqlDb, logger, migrationPolicy })
-  feedDb = FeedDb({ t: 'hash-map' })
+  feedDb ??= FeedDb({ t: 'hash-map', logger })
+  feedDb ??= FeedDb({ t: 'db-conn', sqlDb, logger, migrationPolicy })
   return {
     kvDb,
     mediaDb,

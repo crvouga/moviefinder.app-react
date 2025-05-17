@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Db } from '~/@/db/interface'
-import { Feed } from '../../feed'
+import { Feed } from '../feed'
 
 const parser = Db.parser({
   Entity: Feed.parser,

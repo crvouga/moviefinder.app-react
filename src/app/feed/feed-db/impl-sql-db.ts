@@ -4,9 +4,9 @@ import { ILogger } from '~/@/logger'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { ClientSessionId } from '~/app/@/client-session-id/client-session-id'
-import { IFeedDb } from '../interface/interface'
-import { Feed } from '../../feed'
-import { FeedId } from '../../feed-id'
+import { IFeedDb } from './interface'
+import { Feed } from '../feed'
+import { FeedId } from '../feed-id'
 
 export type Config = {
   t: 'db-conn'
