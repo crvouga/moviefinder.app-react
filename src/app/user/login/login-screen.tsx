@@ -4,7 +4,7 @@ import { VerifyCodeScreen } from './frontend/verify-code-screen'
 
 export const LoginScreen = () => {
   const currentScreen = useCurrentScreen()
-  if (currentScreen.value.t !== 'login') throw new Error('invalid screen')
+  if (currentScreen.value.t !== 'login') return null
 
   switch (currentScreen.value.c.t) {
     case 'send-code':

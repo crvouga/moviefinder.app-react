@@ -36,6 +36,9 @@ export const Img = forwardRef<
           className={cn(props.className, 'bg-neutral-700')}
           alt={props.alt}
           style={props.style}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none'
+          }}
         />
       )
     }

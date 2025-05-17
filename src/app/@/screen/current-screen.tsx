@@ -43,24 +43,24 @@ const parser = z.discriminatedUnion('t', [
   }),
 ])
 
-type Screen = z.infer<typeof parser>
+export type ICurrentScreen = z.infer<typeof parser>
 
-const encode = (screen: Screen) => {
+const encode = (screen: ICurrentScreen) => {
   return btoa(JSON.stringify(screen))
 }
 
-const decode = (screen: string): Screen | null => {
+const decode = (screen: string): ICurrentScreen | null => {
   const parsed = parser.safeParse(JSON.parse(atob(screen)))
   if (!parsed.success) return null
   return parsed.data
 }
 
-const codec: Codec<Screen> = {
+const codec: Codec<ICurrentScreen> = {
   encode,
   decode,
 }
 
-export const Screen = {
+export const ICurrentScreen = {
   ...parser,
   ...codec,
 }

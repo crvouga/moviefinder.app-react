@@ -3,7 +3,7 @@ import { CollapsibleArea } from '~/@/ui/collapsible-area'
 import { Img } from '~/@/ui/img'
 import { SwiperContainerProps } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
-import { ScreenFrom } from '~/app/@/screen/screen'
+import { ScreenFrom } from '~/app/@/screen/current-screen'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
@@ -17,16 +17,19 @@ const SWIPER_PROPS: Partial<SwiperContainerProps> = {
   slidesOffsetAfter: 24,
 }
 
-export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }) => {
+export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
+  if (props.mediaId === null) return null
   const currentScreen = useCurrentScreen()
   const ctx = useCtx()
 
   const queried = useSubscription(['media-query', props.mediaId], () =>
-    ctx.mediaDb.liveQuery({
-      where: { op: '=', column: 'id', value: props.mediaId },
-      limit: 1,
-      offset: 0,
-    })
+    props.mediaId
+      ? ctx.mediaDb.liveQuery({
+          where: { op: '=', column: 'id', value: props.mediaId },
+          limit: 1,
+          offset: 0,
+        })
+      : null
   )
 
   const media = queried?.t === 'ok' ? queried.value.entities.items[0] : null
