@@ -11,14 +11,18 @@ export const useSubscription = <T>(
 
   const createSubCallback = useCallback(createSub, [keyString])
 
-  const [value, setValue] = useState<T | null>(() => {
+  const init = (): T | null => {
     const cached = valueCache.get(keyString)
     if (cached) return cached as T
     return null
-  })
+  }
+
+  const [value, setValue] = useState<T | null>(init)
 
   useLayoutEffect(() => {
     const sub = createSubCallback()
+
+    setValue(init)
 
     const unsub = sub?.subscribe((value) => {
       setValue(value)
