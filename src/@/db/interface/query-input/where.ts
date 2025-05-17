@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { quoteIfPostgresKeyword } from '../postgres-keywords'
 
 export type Where<T> =
   | {
@@ -41,10 +42,10 @@ export const toSql = <T>(where: Where<T>, columnToSqlColumn: (column: T) => stri
   switch (where.op) {
     case 'in': {
       if (where.value.length === 0) return ''
-      return `WHERE ${columnToSqlColumn(where.column)} IN (${where.value.map((v) => `'${v}'`).join(',')})`
+      return `WHERE ${quoteIfPostgresKeyword(columnToSqlColumn(where.column))} IN (${where.value.map((v) => `'${v}'`).join(',')})`
     }
     case '=': {
-      return `WHERE ${columnToSqlColumn(where.column)} = '${where.value}'`
+      return `WHERE ${quoteIfPostgresKeyword(columnToSqlColumn(where.column))} = '${where.value}'`
     }
     case 'and': {
       if (where.clauses.length === 0) return ''

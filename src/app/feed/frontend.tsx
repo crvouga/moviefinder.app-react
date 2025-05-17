@@ -1,9 +1,8 @@
-import { forwardRef, useEffect, useReducer } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { z } from 'zod'
 import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
-import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
@@ -51,33 +50,27 @@ export const FeedScreen = () => {
 
 const PAGE_SIZE = 5
 
-type State = { limit: number; offset: number }
-
-const initialState = (feed: Feed): State => {
-  return { limit: PAGE_SIZE + 1, offset: Math.max(0, feed.activeIndex - PAGE_SIZE) }
-}
-
-type Action = { t: 'observed-first-slide' } | { t: 'observed-last-slide' }
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.t) {
-    case 'observed-first-slide':
-      return { ...state, offset: Math.max(0, state.offset - PAGE_SIZE) }
-    case 'observed-last-slide':
-      return { ...state, limit: state.limit + PAGE_SIZE }
-  }
-}
+const SlideData = z.object({
+  feedIndex: z.number().int().min(0),
+  mediaId: MediaId.parser.nullable(),
+  slideIndex: z.number().int().min(0),
+})
 
 const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
-  const [state, dispatch] = useReducer(reducer, initialState(props.feed))
+  const [state, setState] = useState({
+    limit: PAGE_SIZE + 1,
+    offset: Math.max(0, props.feed.activeIndex - PAGE_SIZE),
+  })
 
-  const mediaQuery = useSubscription(['media-query', state.offset, state.limit], () =>
-    ctx.mediaDb.liveQuery({
-      limit: state.limit,
-      offset: state.offset,
-      orderBy: [{ column: 'popularity', direction: 'desc' }],
-    })
+  const mediaQuery = useSubscription(
+    ['media-query', 'offset', state.offset, 'limit', state.limit],
+    () =>
+      ctx.mediaDb.liveQuery({
+        limit: state.limit,
+        offset: state.offset,
+        orderBy: [{ column: 'popularity', direction: 'desc' }],
+      })
   )
 
   const media = mediaQuery ?? Loading
@@ -92,11 +85,34 @@ const ViewFeed = (props: { feed: Feed }) => {
 
       const feedItems = FeedItem.fromPaginatedMedia(media.value.entities)
 
-      const hasFirstSlideLoader = state.offset > 0
+      const initialSlideIndex = feedItems.findIndex(
+        (item) => item.feedIndex === props.feed.activeIndex
+      )
 
-      const initialSlideIndex =
-        feedItems.findIndex((item) => item.feedIndex === props.feed.activeIndex) +
-        (hasFirstSlideLoader ? 1 : 0)
+      const onSlideChange = (event: { data: unknown }) => {
+        const parsed = SlideData.safeParse(event.data)
+        if (!parsed.success) return
+
+        ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.data.feedIndex }])
+
+        const mediaId = parsed.data.mediaId
+        if (mediaId) {
+          ctx.mediaDb.query({
+            where: { op: '=', column: 'id', value: mediaId },
+            limit: 1,
+            offset: 0,
+          })
+        }
+
+        if (parsed.data.slideIndex >= feedItems.length - 1) {
+          setState((prev) => ({
+            ...prev,
+            limit: prev.limit + PAGE_SIZE,
+          }))
+        } else if (parsed.data.slideIndex <= 0) {
+          setState((prev) => ({ ...prev, offset: prev.offset - PAGE_SIZE }))
+        }
+      }
 
       return (
         <Swiper.Container
@@ -104,44 +120,28 @@ const ViewFeed = (props: { feed: Feed }) => {
           slidesPerView={1}
           className="h-full w-full"
           direction="vertical"
-          onSlideChange={(event) => {
-            const parsed = z
-              .object({
-                feedIndex: z.number().int().min(0),
-                mediaId: MediaId.parser,
-              })
-              .safeParse(event.data)
-
-            if (parsed.success) {
-              ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.data.feedIndex }])
-              const mediaId = parsed.data.mediaId
-              ctx.mediaDb.query({
-                where: { op: '=', column: 'id', value: mediaId },
-                limit: 1,
-                offset: 0,
-              })
-            }
-          }}
+          onSlideChange={onSlideChange}
         >
-          {hasFirstSlideLoader && (
-            <Swiper.Slide>
-              <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-first-slide' })}>
-                <ImgLoading />
-              </WrapIntersectionObserver>
-            </Swiper.Slide>
-          )}
-          {feedItems.map((item) => (
+          {feedItems.map((item, slideIndex) => (
             <Swiper.Slide
               key={item.media.id}
-              data={{ feedIndex: item.feedIndex, mediaId: item.media.id }}
+              data={{
+                slideIndex: slideIndex,
+                feedIndex: item.feedIndex,
+                mediaId: item.media.id,
+              }}
             >
               <SlideContent item={item.media} />
             </Swiper.Slide>
           ))}
-          <Swiper.Slide>
-            <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-last-slide' })}>
-              <ImgLoading />
-            </WrapIntersectionObserver>
+          <Swiper.Slide
+            data={{
+              slideIndex: feedItems.length,
+              feedIndex: feedItems[feedItems.length - 1]?.feedIndex ?? 0,
+              mediaId: null,
+            }}
+          >
+            <ImgLoading />
           </Swiper.Slide>
         </Swiper.Container>
       )

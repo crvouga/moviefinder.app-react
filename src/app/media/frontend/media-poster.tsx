@@ -14,3 +14,13 @@ export const MediaPoster = (props: { media: Media }) => {
     />
   )
 }
+export const MediaPosterSkeleton = () => {
+  return (
+    <Img
+      className="w-full overflow-hidden rounded-lg border object-cover"
+      style={{ aspectRatio: ASPECT_RATIO }}
+      src=" "
+      alt=" "
+    />
+  )
+}

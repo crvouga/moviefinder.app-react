@@ -9,7 +9,7 @@ export const useSubscription = <T>(
 ): T | null => {
   const keyString = key.join('-')
 
-  const createSubCallback = useCallback(() => createSub(), [keyString])
+  const createSubCallback = useCallback(createSub, [keyString])
 
   const [value, setValue] = useState<T | null>(() => {
     const cached = valueCache.get(keyString)
@@ -19,10 +19,15 @@ export const useSubscription = <T>(
 
   useLayoutEffect(() => {
     const sub = createSubCallback()
-    return sub?.subscribe((value) => {
+
+    const unsub = sub?.subscribe((value) => {
       setValue(value)
       valueCache.set(keyString, value)
     })
+
+    return () => {
+      unsub?.()
+    }
   }, [keyString, createSubCallback])
 
   return value

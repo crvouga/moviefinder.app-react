@@ -23,3 +23,15 @@ export const CreditCard = (props: { credit: Credit; person: Person }) => {
     </div>
   )
 }
+
+export const CreditCardSkeleton = () => {
+  return (
+    <div className="flex h-full w-32 flex-col items-center justify-start gap-2 rounded-lg">
+      <Avatar className="size-24 rounded-full border" skeleton />
+
+      <p className="h-4 w-24 animate-pulse rounded-full bg-neutral-700 text-center text-sm font-bold" />
+
+      <p className="h-4 w-24 animate-pulse rounded-full bg-neutral-700 text-center text-xs text-neutral-400" />
+    </div>
+  )
+}

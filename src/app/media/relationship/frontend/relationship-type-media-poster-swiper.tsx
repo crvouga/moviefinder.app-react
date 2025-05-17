@@ -3,7 +3,7 @@ import { SwiperContainerProps } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { ScreenFrom } from '~/app/@/screen/screen'
 import { useCtx } from '~/app/frontend/ctx'
-import { MediaPosterSwiper } from '../../frontend/media-poster-swiper'
+import { MediaPosterSwiper, MediaPosterSwiperSkeleton } from '../../frontend/media-poster-swiper'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 import { RelationshipType } from '../relationship-type'
@@ -47,9 +47,9 @@ export const RelationshipTypeMediaPosterSwiper = (
       })
   )
 
-  if (!queried) return null
+  if (!queried) return <MediaPosterSwiperSkeleton {...props} />
 
-  if (!isOk(queried)) return null
+  if (!isOk(queried)) return <MediaPosterSwiperSkeleton {...props} />
 
   const media: Media[] = []
   for (const item of queried.value.entities.items) {

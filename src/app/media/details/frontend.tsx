@@ -5,7 +5,7 @@ import { ScreenFrom } from '~/app/@/screen/screen'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
-import { CreditsCardSwiper } from '../credit/frontend/credit-swiper'
+import { MediaCreditsSwiper } from '../credit/frontend/media-credit-swiper'
 import { Media } from '../media'
 import { MediaId } from '../media-id'
 import { RelationshipTypeMediaPosterSwiper } from '../relationship/frontend/relationship-type-media-poster-swiper'
@@ -27,6 +27,8 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
   const currentScreen = useCurrentScreen()
   const media = queried?.t === 'ok' ? queried.value.entities.items[0] : null
 
+  console.log({ media })
+
   return (
     <ScreenLayout
       includeGutter
@@ -34,12 +36,13 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
         onBack: () => currentScreen.push(props.from),
         title: media?.title ?? ' ',
       }}
+      key={props.mediaId.toString()}
       scrollKey={props.mediaId.toString()}
     >
       <MainSection media={media ?? null} />
 
       <Section title="Cast & Crew">
-        <CreditsCardSwiper
+        <MediaCreditsSwiper
           slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
           slidesOffsetAfter={SLIDES_OFFSET_AFTER}
           mediaId={media?.id ?? null}
@@ -77,9 +80,18 @@ const MainSection = (props: { media: Media | null }) => {
         src={ImageSet.toHighestRes(props.media?.backdrop)}
         alt={props.media?.title ?? ' '}
       />
-      <div className="flex flex-col items-center justify-center gap-4 p-6">
-        <p className="text-center text-3xl font-bold">{props.media?.title ?? '...'}</p>
-        {props.media?.description && <p className="text-center">{props.media.description}</p>}
+      <div className="flex w-full flex-col items-center justify-start gap-4 p-6">
+        {props.media ? (
+          <>
+            <p className="text-center text-3xl font-bold">{props.media.title}</p>
+            <p className="text-center text-sm">{props.media.description}</p>
+          </>
+        ) : (
+          <>
+            <div className="h-10 w-3/4 animate-pulse rounded bg-neutral-700" />
+            <div className="h-26 w-full animate-pulse rounded bg-neutral-700" />
+          </>
+        )}
       </div>
     </div>
   )

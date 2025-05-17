@@ -1,37 +1,18 @@
-import { isOk } from '~/@/result'
 import { Clickable } from '~/@/ui/clickable'
-import { WithPreload } from '~/@/ui/preload'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
-import { useSubscription } from '~/@/ui/use-subscription'
-import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
-import { useCtx } from '~/app/frontend/ctx'
-import { MediaId } from '../../media-id'
-import { CreditCard } from './credit'
+import { Person } from '../../person/person'
+import { PersonId } from '../../person/person-id'
+import { Credit } from '../credit'
+import { CreditCard, CreditCardSkeleton } from './credit'
 
-export const CreditsCardSwiper = (
-  props: Partial<SwiperContainerProps> & { mediaId: MediaId | null }
+export const CreditsSwiper = (
+  props: Partial<SwiperContainerProps> & {
+    credits?: Credit[]
+    person?: { [personId: PersonId]: Person }
+    onClick?: (input: { personId: PersonId }) => void
+    skeleton?: boolean
+  }
 ) => {
-  const ctx = useCtx()
-  const currentScreen = useCurrentScreen()
-
-  const queried = useSubscription(['credit-query', props.mediaId], () =>
-    props.mediaId
-      ? ctx.creditDb.liveQuery({
-          where: {
-            op: '=',
-            column: 'mediaId',
-            value: props.mediaId,
-          },
-          orderBy: [{ column: 'personId', direction: 'asc' }],
-          limit: 25,
-          offset: 0,
-        })
-      : null
-  )
-
-  if (!queried) return null
-  if (!isOk(queried)) return null
-
   return (
     <Swiper.Container
       {...props}
@@ -40,38 +21,30 @@ export const CreditsCardSwiper = (
       slidesPerView="auto"
       initialSlide={0}
     >
-      {queried.value.entities.items.flatMap((credit) => {
-        const person = queried.value.related.person[credit.personId]
+      {props.credits?.flatMap((credit) => {
+        const person = props.person?.[credit.personId]
         if (!person) return []
         return [
           <Swiper.Slide key={credit.id} className="w-fit">
             <Clickable
               onClick={() => {
-                const { mediaId } = props
-                if (!mediaId) return
-                currentScreen.push({
-                  t: 'person-details',
-                  personId: credit.personId,
-                  from: { t: 'media-details', mediaId },
-                })
+                props.onClick?.({ personId: credit.personId })
               }}
             >
-              <WithPreload
-                preloadKey={credit.personId}
-                onPreload={() => {
-                  ctx.personDb.query({
-                    where: { op: '=', column: 'id', value: credit.personId },
-                    limit: 1,
-                    offset: 0,
-                  })
-                }}
-              >
-                <CreditCard credit={credit} person={person} />
-              </WithPreload>
+              <CreditCard credit={credit} person={person} />
             </Clickable>
           </Swiper.Slide>,
         ]
       })}
+      {props.skeleton && (
+        <>
+          {[...Array(4)].map((_, i) => (
+            <Swiper.Slide key={i} className="w-fit">
+              <CreditCardSkeleton />
+            </Swiper.Slide>
+          ))}
+        </>
+      )}
     </Swiper.Container>
   )
 }

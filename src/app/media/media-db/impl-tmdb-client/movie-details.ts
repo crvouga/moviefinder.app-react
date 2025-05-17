@@ -1,5 +1,6 @@
 import { Db } from '~/@/db/interface'
 import { DbErr } from '~/@/db/interface/error'
+import { enumerate } from '~/@/enumerate'
 import { Paginated } from '~/@/pagination/paginated'
 import { Err, isErr, mapErr, Ok } from '~/@/result'
 import { TmdbClient } from '~/@/tmdb-client'
@@ -120,7 +121,7 @@ export const queryMovieDetails = async (input: {
 
   const relatedMedia: Record<MediaId, Media> = {}
   const relationship: Record<RelationshipId, Relationship> = {}
-  for (const movie of got.value.body.recommendations?.results ?? []) {
+  for (const [i, movie] of enumerate(got.value.body.recommendations?.results ?? [])) {
     if (!movie.id) continue
     const relationshipType: RelationshipType = 'recommendation'
     const relationshipId = RelationshipId.fromTmdbId({
@@ -133,6 +134,7 @@ export const queryMovieDetails = async (input: {
       from: mediaId,
       to: relatedMediaId,
       type: relationshipType,
+      order: i * (got.value.body.recommendations?.page ?? 1),
     }
     relatedMedia[relatedMediaId] = {
       id: relatedMediaId,
@@ -147,7 +149,7 @@ export const queryMovieDetails = async (input: {
       releaseDate: movie.release_date ?? null,
     }
   }
-  for (const movie of got.value.body.similar?.results ?? []) {
+  for (const [i, movie] of enumerate(got.value.body.similar?.results ?? [])) {
     if (!movie.id) continue
     const relationshipType: RelationshipType = 'similar'
     const relationshipId = RelationshipId.fromTmdbId({
@@ -160,6 +162,7 @@ export const queryMovieDetails = async (input: {
       from: mediaId,
       to: relatedMediaId,
       type: relationshipType,
+      order: i * (got.value.body.similar?.page ?? 1),
     }
     relatedMedia[relatedMediaId] = {
       id: relatedMediaId,

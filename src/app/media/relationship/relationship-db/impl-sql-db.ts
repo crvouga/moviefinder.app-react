@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS relationship (
     id TEXT PRIMARY KEY,
     "from" TEXT,
     "to" TEXT,
-    type relationship_type
+    type relationship_type,
+    "order" INTEGER
 );
 `,
 ]
@@ -46,6 +47,7 @@ const Row = z.object({
   from: z.string(),
   to: z.string(),
   type: RelationshipTypePostgres,
+  order: z.number().nullable(),
 })
 
 export const RelationshipDb = (config: Config): IRelationshipDb => {
@@ -91,6 +93,8 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
           return '"to"'
         case 'type':
           return 'type'
+        case 'order':
+          return '"order"'
         default:
           throw new Error(`Unreachable: ${key}`)
       }
@@ -102,6 +106,7 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
         from: row.from,
         to: row.to,
         type: row.type,
+        order: row.order,
       }
     },
     fieldToSqlColumn: (field) => {
@@ -114,6 +119,8 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
           return '"to"'
         case 'type':
           return 'type'
+        case 'order':
+          return '"order"'
         default:
           throw new Error(`Unreachable: ${field}`)
       }
@@ -125,6 +132,7 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
         from: entity.from,
         to: entity.to,
         type: entity.type,
+        order: entity.order,
       }
     },
   })

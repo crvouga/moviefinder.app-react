@@ -8,19 +8,21 @@ const parser = z.object({
   from: MediaId.parser,
   to: MediaId.parser,
   type: RelationshipType.parser,
+  order: z.number().nullable(),
 })
 
 export type Relationship = z.infer<typeof parser>
 
 const random = async (override?: Partial<Relationship>): Promise<Relationship> => {
   return {
-    id: RelationshipId.fromTmdbId({ 
+    id: RelationshipId.fromTmdbId({
       tmdbId: Math.floor(Math.random() * 1000000),
-      type: 'recommendation'
+      type: 'recommendation',
     }),
     from: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
     to: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
     type: await RelationshipType.random(),
+    order: Math.floor(Math.random() * 1000000),
     ...override,
   }
 }

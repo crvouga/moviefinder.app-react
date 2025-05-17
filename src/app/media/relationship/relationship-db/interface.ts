@@ -5,7 +5,7 @@ import { MediaId } from '../../media-id'
 import { Relationship } from '../relationship'
 
 const parser = Db.parser({
-  Field: z.enum(['id', 'from', 'to', 'type']),
+  Field: z.enum(['id', 'from', 'to', 'type', 'order']),
   Entity: Relationship.parser,
   Related: z.object({
     media: z.record(MediaId.parser, Media.parser),

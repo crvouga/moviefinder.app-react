@@ -3,7 +3,7 @@ import { KvDb } from '~/@/kv-db/impl'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
-import { createPglite } from '~/@/pglite/create-pglite'
+import { createPgliteWorker } from '~/@/pglite/pglite-worker/create-pglite-worker'
 import { PubSub } from '~/@/pub-sub'
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
@@ -41,11 +41,19 @@ export type Ctx = {
 const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
-  const logger = Logger.prefix('app', Logger({ t: 'console' }))
+  // const logger = Logger.prefix('app', Logger({ t: 'console' }))
+  const logger = Logger({ t: 'noop' })
 
-  const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
+  // const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
+  const pglite = createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
+  // const pglite = createPgliteWorker({ t: 'in-memory' })
 
-  const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
+  const sqlDb = SqlDb({
+    t: 'pglite',
+    // @ts-ignore
+    pglite,
+    logger,
+  })
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 

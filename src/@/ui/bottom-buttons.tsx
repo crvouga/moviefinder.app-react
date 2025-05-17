@@ -14,7 +14,7 @@ export type BottomButtonsProps = {
 
 export const BottomButtons = (props: BottomButtonsProps) => {
   return (
-    <div className="flex w-full justify-around border-t">
+    <div className="flex w-full justify-around">
       {props.buttons.map((button) => (
         <BottomButton key={button.label} button={button} />
       ))}
