@@ -8,7 +8,7 @@ export const KvDb = (config: Config): IKvDb => {
   switch (config.t) {
     case 'browser-storage':
       return ImplBrowserStorage.KvDb(config)
-    case 'db-conn':
+    case 'sql-db':
       return ImplSqlDb.KvDb(config)
   }
 }

@@ -8,7 +8,7 @@ export type Config = ImplSqlDb.Config | ImplHashMap.Config
 export const FeedDb = (config: Config): IFeedDb => {
   const logger = Logger.prefix('feed-db', config.logger)
   switch (config.t) {
-    case 'db-conn':
+    case 'sql-db':
       return ImplSqlDb.FeedDb({ ...config, logger })
     case 'hash-map':
       return ImplHashMap.FeedDb({ ...config, logger })

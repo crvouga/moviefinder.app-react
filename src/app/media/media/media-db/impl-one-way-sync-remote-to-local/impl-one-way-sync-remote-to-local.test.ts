@@ -20,7 +20,7 @@ const Fixture = async () => {
   const { sqlDb } = await SqlDbFixture()
   const { tmdbClient } = await TmdbClientFixture()
   const local = MediaDbBackend({
-    t: 'db-conn',
+    t: 'sql-db',
     sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })
@@ -31,7 +31,7 @@ const Fixture = async () => {
   const pubSub = PubSub<OneWaySyncRemoteToLocalMsg>()
   const logger = Logger({ t: 'noop' })
   const kvDb = KvDb({
-    t: 'db-conn',
+    t: 'sql-db',
     sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
   })

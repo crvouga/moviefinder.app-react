@@ -7,7 +7,7 @@ import { MediaId } from '../../media-id'
 import { IMediaDb } from '../interface/interface'
 
 export type Config = {
-  t: 'db-conn'
+  t: 'sql-db'
   sqlDb: ISqlDb
   migrationPolicy: IMigrationPolicy
 }

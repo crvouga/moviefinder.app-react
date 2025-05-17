@@ -8,7 +8,7 @@ describe('MediaDb Query By Id', () => {
   it('should work', async () => {
     const FIGHT_CLUB_ID = MediaId.fromTmdbId(550)
 
-    for (const f of await Fixtures(['db-conn'])) {
+    for (const f of await Fixtures(['sql-db'])) {
       const expected = await Media.random({
         id: FIGHT_CLUB_ID,
       })

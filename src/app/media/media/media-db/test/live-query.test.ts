@@ -9,7 +9,7 @@ import { NonEmpty } from '~/@/non-empty'
 
 describe('MediaDb Live Query', () => {
   it('should work', async () => {
-    for (const f of await Fixtures(['db-conn'])) {
+    for (const f of await Fixtures(['sql-db'])) {
       const expected: [Media, Media, Media] = [
         await Media.random(),
         await Media.random(),

@@ -10,7 +10,7 @@ import { Db } from '~/@/db/interface'
 describe('MediaDb Query By Id', () => {
   it.only('should work for live query', async () => {
     const SOME_MOVIE_ID = MediaId.fromTmdbId(551)
-    for (const f of await Fixtures(['db-conn'])) {
+    for (const f of await Fixtures(['sql-db'])) {
       const expected = await Media.random({ id: SOME_MOVIE_ID })
 
       for (let i = 0; i < 10; i++) {

@@ -7,7 +7,7 @@ export const Fixture = async () => {
   const logger = Logger({ t: 'noop' })
   const { sqlDb } = await SqlDbFixture()
   const feedDb = FeedDb({
-    t: 'db-conn',
+    t: 'sql-db',
     sqlDb,
     logger,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),

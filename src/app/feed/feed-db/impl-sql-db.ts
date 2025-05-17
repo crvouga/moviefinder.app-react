@@ -9,7 +9,7 @@ import { Feed } from '../feed'
 import { FeedId } from '../feed-id'
 
 export type Config = {
-  t: 'db-conn'
+  t: 'sql-db'
   sqlDb: ISqlDb
   migrationPolicy: IMigrationPolicy
   logger: ILogger

@@ -5,7 +5,7 @@ import { isErr, Ok } from '~/@/result'
 import { IKvDb } from '../interface'
 
 export type Config = {
-  t: 'db-conn'
+  t: 'sql-db'
   sqlDb: ISqlDb
   migrationPolicy: IMigrationPolicy
 }

@@ -6,7 +6,7 @@ import { Fixtures } from './fixture'
 
 describe('MediaDb Pagination', () => {
   it('should work for limit 20', async () => {
-    for (const f of await Fixtures(['db-conn'])) {
+    for (const f of await Fixtures(['sql-db'])) {
       const PAGE_SIZE = 20
       const page1 = unwrap(await f.mediaDb.query({ limit: PAGE_SIZE, offset: 0 }))
       const page2 = unwrap(await f.mediaDb.query(Pagination.nextPage(page1.entities)))
@@ -23,7 +23,7 @@ describe('MediaDb Pagination', () => {
   })
 
   it('should work for limit 3', async () => {
-    for (const f of await Fixtures(['db-conn'])) {
+    for (const f of await Fixtures(['sql-db'])) {
       const page1 = unwrap(await f.mediaDb.query({ limit: 3, offset: 0 }))
       const page2 = unwrap(await f.mediaDb.query(Pagination.nextPage(page1.entities)))
 

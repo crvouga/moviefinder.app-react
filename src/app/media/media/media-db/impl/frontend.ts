@@ -14,7 +14,7 @@ export const MediaDbFrontend = (config: Config): IMediaDb => {
   switch (config.t) {
     case 'trpc-client':
       return ImplTrpcClient.MediaDb(config)
-    case 'db-conn':
+    case 'sql-db':
       return ImplSqlDb.MediaDb(config)
     case 'one-way-sync-remote-to-local':
       return ImplOneWaySyncRemoteToLocal.MediaDb(config)

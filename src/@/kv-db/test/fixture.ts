@@ -16,7 +16,7 @@ export const Fixtures = async () => {
   const { sqlDb } = await SqlDbFixture()
 
   configs.push({
-    t: 'db-conn',
+    t: 'sql-db',
     sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })
@@ -27,7 +27,7 @@ export const Fixtures = async () => {
 export const KvDbFixture = async () => {
   const { sqlDb } = await SqlDbFixture()
   return Fixture({
-    t: 'db-conn',
+    t: 'sql-db',
     sqlDb,
     migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
   })

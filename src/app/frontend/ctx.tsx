@@ -5,6 +5,8 @@ import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { createPglite } from '~/@/pglite/create-pglite'
+import { createPgliteWorker } from '~/@/pglite/pglite-worker/create-pglite-worker'
+import { PgliteInstance } from '~/@/pglite/types'
 import { PubSub } from '~/@/pub-sub'
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
@@ -43,13 +45,14 @@ const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
   let logger: ILogger
-  logger = Logger({ t: 'noop' })
-  logger = Logger.prefix('app', Logger({ t: 'console' }))
+  logger ??= Logger({ t: 'noop' })
+  logger ??= Logger.prefix('app', Logger({ t: 'console' }))
 
-  const pglite = createPglite({ t: 'in-memory' })
-  // const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
-  // const pglite = createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
-  // const pglite = createPgliteWorker({ t: 'in-memory' })
+  let pglite: Promise<PgliteInstance>
+  pglite ??= createPglite({ t: 'in-memory' })
+  pglite ??= createPglite({ t: 'indexed-db', databaseName: 'db' })
+  pglite ??= createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
+  pglite ??= createPgliteWorker({ t: 'in-memory' })
 
   const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
 
@@ -60,7 +63,9 @@ const init = (): Ctx => {
   let migrationPolicy: IMigrationPolicy
   migrationPolicy = MigrationPolicy({ t: 'always-run', logger })
 
-  const kvDb = KvDb({ t: 'db-conn', sqlDb, migrationPolicy })
+  let kvDb: IKvDb
+  kvDb ??= KvDb({ t: 'browser-storage', storage: localStorage })
+  kvDb ??= KvDb({ t: 'sql-db', sqlDb, migrationPolicy })
 
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
@@ -68,11 +73,9 @@ const init = (): Ctx => {
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
   clientSessionIdStorage.set(clientSessionId)
 
-  const hashMap = new Map<string, any>()
-
   let mediaDbLocal: IMediaDb
   mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
-  mediaDbLocal ??= MediaDbFrontend({ t: 'db-conn', sqlDb, migrationPolicy })
+  mediaDbLocal ??= MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy })
 
   let personDb: IPersonDb
   personDb ??= PersonDb({ t: 'hash-map' })
@@ -102,7 +105,8 @@ const init = (): Ctx => {
 
   let feedDb: IFeedDb
   feedDb ??= FeedDb({ t: 'hash-map', logger })
-  feedDb ??= FeedDb({ t: 'db-conn', sqlDb, logger, migrationPolicy })
+  feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
+
   return {
     kvDb,
     mediaDb,

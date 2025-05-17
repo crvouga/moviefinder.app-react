@@ -5,7 +5,7 @@ import { Fixtures } from './fixture'
 
 describe('MediaDb Query Upsert', () => {
   it('should work', async () => {
-    for (const f of await Fixtures(['db-conn'])) {
+    for (const f of await Fixtures(['sql-db'])) {
       const expected = [await Media.random(), await Media.random(), await Media.random()]
       unwrap(await f.mediaDb.query({ limit: 10, offset: 0 }))
       unwrap(await f.mediaDb.upsert({ entities: expected }))

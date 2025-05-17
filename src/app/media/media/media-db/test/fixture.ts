@@ -15,7 +15,7 @@ const Fixture = async (config: Config) => {
 export const ReadOnlyFixtures = async () => {}
 
 export const Fixtures = async (
-  include: ('tmdb-client' | 'db-conn')[] = ['tmdb-client', 'db-conn']
+  include: ('tmdb-client' | 'sql-db')[] = ['tmdb-client', 'sql-db']
 ) => {
   const configs: Config[] = []
 
@@ -27,10 +27,10 @@ export const Fixtures = async (
     })
   }
 
-  if (include.includes('db-conn')) {
+  if (include.includes('sql-db')) {
     const { sqlDb } = await SqlDbFixture()
     configs.push({
-      t: 'db-conn',
+      t: 'sql-db',
       sqlDb,
       migrationPolicy: MigrationPolicy({ t: 'always-run', logger: Logger({ t: 'noop' }) }),
     })

@@ -10,7 +10,7 @@ export const MediaDbBackend = (config: Config): IMediaDb => {
     case 'tmdb-client': {
       return ImplTmdbClient.MediaDb(config)
     }
-    case 'db-conn': {
+    case 'sql-db': {
       return ImplSqlDb.MediaDb(config)
     }
     case 'one-way-sync-remote-to-local': {
