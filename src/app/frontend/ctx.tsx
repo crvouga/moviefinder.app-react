@@ -3,6 +3,7 @@ import { KvDb } from '~/@/kv-db/impl'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
+import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { createPglite } from '~/@/pglite/create-pglite'
 import { PubSub } from '~/@/pub-sub'
 import { SqlDb } from '~/@/sql-db/impl'
@@ -12,15 +13,15 @@ import { ClientSessionId } from '../@/client-session-id/client-session-id'
 import { ClientSessionIdStorage } from '../@/client-session-id/client-session-id-storage'
 import { FeedDb } from '../feed/feed-db/impl'
 import { IFeedDb } from '../feed/feed-db/interface/interface'
-import { CreditDb } from '../media/credit/credit-db/impl-sql-db'
+import { CreditDb } from '../media/credit/credit-db/impl'
 import { ICreditDb } from '../media/credit/credit-db/interface'
 import { MediaDbFrontend } from '../media/media/media-db/impl/frontend'
 import { IMediaDb } from '../media/media/media-db/interface/interface'
-import { PersonDb } from '../media/person/person-db/impl-sql-db'
+import { PersonDb } from '../media/person/person-db/impl'
 import { IPersonDb } from '../media/person/person-db/interface'
-import { RelationshipDb } from '../media/relationship/relationship-db/impl-sql-db'
+import { RelationshipDb } from '../media/relationship/relationship-db/impl'
 import { IRelationshipDb } from '../media/relationship/relationship-db/interface'
-import { VideoDb } from '../media/video/video-db/impl-sql-db'
+import { VideoDb } from '../media/video/video-db/impl'
 import { IVideoDb } from '../media/video/video-db/interface'
 import { TrpcClient } from '../trpc/frontend/trpc-client'
 
@@ -41,8 +42,9 @@ export type Ctx = {
 const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
-  const logger = Logger.prefix('app', Logger({ t: 'console' }))
-  // const logger = Logger({ t: 'noop' })
+  let logger: ILogger
+  logger = Logger({ t: 'noop' })
+  logger = Logger.prefix('app', Logger({ t: 'console' }))
 
   const pglite = createPglite({ t: 'in-memory' })
   // const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
@@ -55,55 +57,50 @@ const init = (): Ctx => {
 
   const trpcClient = TrpcClient({ backendUrl })
 
-  const kvDb = KvDb({
-    t: 'db-conn',
-    sqlDb,
-    migrationPolicy: MigrationPolicy({ t: 'always-run', logger }),
-  })
+  let migrationPolicy: IMigrationPolicy
+  migrationPolicy = MigrationPolicy({ t: 'always-run', logger })
+
+  const kvDb = KvDb({ t: 'db-conn', sqlDb, migrationPolicy })
+
+  migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
   const clientSessionIdStorage = ClientSessionIdStorage({ storage: localStorage })
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
   clientSessionIdStorage.set(clientSessionId)
 
-  const localMediaDb = MediaDbFrontend({
-    t: 'db-conn',
-    sqlDb,
-    migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger }),
-  })
+  let mediaDbLocal: IMediaDb
+  mediaDbLocal = MediaDbFrontend({ t: 'db-conn', sqlDb, migrationPolicy })
+  mediaDbLocal = MediaDbFrontend({ t: 'hash-map' })
 
-  const personDb = PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
-  const relationshipDb = RelationshipDb({
-    t: 'sql-db',
-    sqlDb,
-    logger,
-    kvDb,
-    mediaDb: localMediaDb,
-  })
-  const creditDb = CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
-  const videoDb = VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  let personDb: IPersonDb
+  personDb = PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  personDb = PersonDb({ t: 'hash-map' })
+
+  let relationshipDb: IRelationshipDb
+  relationshipDb = RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
+  relationshipDb = RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
+
+  let creditDb: ICreditDb
+  creditDb = CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
+  creditDb = CreditDb({ t: 'hash-map', personDb })
+
+  let videoDb: IVideoDb
+  videoDb = VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  videoDb = VideoDb({ t: 'hash-map' })
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
-    local: localMediaDb,
+    local: mediaDbLocal,
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
     pubSub: PubSub(),
     throttle: TimeSpan.seconds(10),
-    relatedDbs: {
-      personDb,
-      relationshipDb,
-      creditDb,
-      videoDb,
-    },
+    relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
   })
 
-  const feedDb = FeedDb({
-    t: 'db-conn',
-    sqlDb,
-    logger,
-    migrationPolicy: MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger }),
-  })
-
+  let feedDb: IFeedDb
+  feedDb = FeedDb({ t: 'db-conn', sqlDb, logger, migrationPolicy })
+  feedDb = FeedDb({ t: 'hash-map' })
   return {
     kvDb,
     mediaDb,

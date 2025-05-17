@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { quoteIfPostgresKeyword } from '../postgres-keywords'
 import { keyOf } from '~/@/zod/key-of'
+import { quoteIfPostgresKeyword } from '../postgres-keywords'
 
 export type Where<T extends Record<string, unknown>> =
   | {
@@ -39,6 +39,23 @@ const parser = <TEntity extends Record<string, unknown>>(
   ])
   // @ts-ignore
   return schema
+}
+
+const filter = <TEntity extends Record<string, unknown>>(
+  entities: TEntity[],
+  where: Where<TEntity>
+): TEntity[] => {
+  switch (where.op) {
+    case 'in': {
+      return entities.filter((entity) => where.value.includes(String(entity[where.column])))
+    }
+    case '=': {
+      return entities.filter((entity) => String(entity[where.column]) === where.value)
+    }
+    case 'and': {
+      return where.clauses.reduce((acc, clause) => filter(acc, clause), entities)
+    }
+  }
 }
 
 export const toSql = <TEntity extends Record<string, unknown>>(
@@ -92,4 +109,5 @@ export const Where = {
   parser,
   toSql,
   mapColumn,
+  filter,
 }

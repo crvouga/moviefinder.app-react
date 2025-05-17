@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { quoteIfPostgresKeyword } from '../postgres-keywords'
 import { OrderDirection } from './order-by/direction'
 import { keyOf } from '~/@/zod/key-of'
+import { ascend, Comparator, descend } from '~/@/sort'
 
 export type OrderBy<TEntity extends Record<string, unknown>> = {
   column: keyof TEntity
@@ -21,6 +22,32 @@ const parser = <TEntity extends Record<string, unknown>>(
   return schema
 }
 
+const sort = <TEntity extends Record<string, unknown>>(
+  entities: TEntity[],
+  orderBy: OrderBy<TEntity>
+): TEntity[] => {
+  return entities.sort(
+    Comparator.combine(
+      orderBy.map((o) => {
+        switch (o.direction) {
+          case 'asc':
+            return ascend(
+              (entity) =>
+                // @ts-ignore
+                entity[o.column]
+            )
+          case 'desc':
+            return descend(
+              (entity) =>
+                // @ts-ignore
+                entity[o.column]
+            )
+        }
+      })
+    )
+  )
+}
+
 const toSql = <TEntity extends Record<string, unknown>>(
   orderBy: OrderBy<TEntity>,
   fieldToSqlColumn: (field: keyof TEntity) => string | number | symbol
@@ -35,5 +62,6 @@ const toSql = <TEntity extends Record<string, unknown>>(
 
 export const OrderBy = {
   parser,
+  sort,
   toSql,
 }

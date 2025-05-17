@@ -17,7 +17,12 @@ const prevPage = (pagination: Pagination): Pagination => {
   }
 }
 
+const paginate = <T>(entities: T[], pagination: Pagination): T[] => {
+  return entities.slice(pagination.offset, pagination.offset + pagination.limit)
+}
+
 export const Pagination = {
   nextPage,
   prevPage,
+  paginate,
 }

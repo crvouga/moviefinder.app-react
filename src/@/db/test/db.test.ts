@@ -25,7 +25,7 @@ const Fixture = async () => {
   }
 }
 
-describe('TodoDb', () => {
+describe('Db', () => {
   it('should work', async () => {
     const f = await Fixture()
     const todo = await Todo.random()
