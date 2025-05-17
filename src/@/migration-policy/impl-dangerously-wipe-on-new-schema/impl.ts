@@ -46,12 +46,13 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       }
       logger.info('running migration policy', logPayload)
       const key = toDeterministicHash(input.up)
-      const prevSchema = await config.kvDb.get(EntryCodec, key)
-      if (isErr(prevSchema)) {
-        logger.error('failed to get previous schema', { error: prevSchema.error })
+      const prevSchemaResult = await config.kvDb.get(EntryCodec, [key])
+      if (isErr(prevSchemaResult)) {
+        logger.error('failed to get previous schema', { error: prevSchemaResult.error })
         return
       }
-      if (!prevSchema.value) {
+      const prevSchema = prevSchemaResult.value[0]
+      if (!prevSchema) {
         logger.info('no previous schema. running up migration', logPayload)
 
         logger.info('running down migration to ensure the up migration succeeds', logPayload)
@@ -88,12 +89,12 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
           down: input.down,
         }
         logger.info('up migration complete. writing new schema', { input, entryNew })
-        await config.kvDb.set(EntryCodec, key, entryNew)
+        await config.kvDb.set(EntryCodec, [key, entryNew])
         logger.info('new schema written', { input, entryNew })
         return
       }
 
-      const prevHash = toDeterministicHash(prevSchema.value?.up ?? [])
+      const prevHash = toDeterministicHash(prevSchema.up)
       const newHash = toDeterministicHash(input.up)
       const didChange = prevHash !== newHash
       if (!didChange) {
@@ -102,7 +103,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       }
 
       logger.info('schema changed. running down migration', logPayload)
-      for (const down of prevSchema.value.down) {
+      for (const down of prevSchema.down) {
         const downResult = await input.sqlDb.query({
           sql: down,
           params: [],
@@ -132,7 +133,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         up: input.up,
         down: input.down,
       }
-      await config.kvDb.set(EntryCodec, key, entryNew)
+      await config.kvDb.set(EntryCodec, [key, entryNew])
       logger.info('new schema written', { input, entryNew })
     },
   }

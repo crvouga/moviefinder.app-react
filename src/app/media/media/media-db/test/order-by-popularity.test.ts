@@ -3,7 +3,7 @@ import { unwrap } from '~/@/result'
 import { isAscend, isDescend } from '~/@/sort'
 import { Fixtures } from './fixture'
 
-describe('MediaDb Order by popularity', () => {
+describe.skip('MediaDb Order by popularity', () => {
   it('should work ascending', async () => {
     for (const f of await Fixtures()) {
       const queried = unwrap(

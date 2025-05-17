@@ -79,14 +79,16 @@ export const createDbFromSqlDb = <
       ? OrderBy.toSql(queryInput.orderBy, config.fieldToSqlColumn)
       : ''
 
-    const sql = `
-SELECT *
-FROM ${config.viewName}
-${whereClause}
-${orderByClause}
-LIMIT $1
-OFFSET $2
-`
+    const sql = [
+      'SELECT *',
+      `FROM ${config.viewName}`,
+      whereClause,
+      orderByClause,
+      'LIMIT $1',
+      'OFFSET $2',
+    ]
+      .filter(Boolean)
+      .join('\n')
 
     return {
       sql,

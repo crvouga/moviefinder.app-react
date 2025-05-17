@@ -6,6 +6,7 @@ import { PubSub, Sub } from '~/@/pub-sub'
 import { Err, Ok, Result } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { SqlDbParam } from '~/@/sql-db/sql-db-param'
+import { compileSql } from '~/@/sql/compile'
 
 export type Config = {
   t: 'pglite'
@@ -38,7 +39,7 @@ export const SqlDb = (config: Config): ISqlDb => {
 
         const duration = end - start
         const durationStr = `${duration.toFixed(2)}ms`
-        logger.info('query', durationStr, input.sql, input.params, parsedRows)
+        logger.info('query', durationStr, compileSql(input.sql, input.params), parsedRows)
 
         return Ok({ rows: parsedRows })
       } catch (error) {
@@ -54,7 +55,6 @@ export const SqlDb = (config: Config): ISqlDb => {
       offset?: number
       waitFor?: Promise<unknown>
     }): Sub<Result<{ rows: TRow[] }, Error>> {
-      logger.info('liveQuery', input.sql, input.params)
       const pubSub = PubSub<Result<{ rows: TRow[] }, Error>>()
 
       try {
@@ -77,6 +77,11 @@ export const SqlDb = (config: Config): ISqlDb => {
                 return []
               })
               const result = Ok({ rows: parsedRows })
+              logger.info(
+                'liveQuery',
+                compileSql(input.sql, [...(input.params ?? [])]),
+                result.value.rows
+              )
               return pubSub.publish(result)
             },
           })

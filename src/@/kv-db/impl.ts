@@ -1,8 +1,9 @@
-import { ImplBrowserStorage } from './impl-browser-storage'
-import { ImplSqlDb } from './impl-sql-db'
+import * as ImplBrowserStorage from './impl-browser-storage'
+import * as ImplNamespaced from './impl-namespaced'
+import * as ImplSqlDb from './impl-sql-db'
 import { IKvDb } from './interface'
 
-export type Config = ImplBrowserStorage.Config | ImplSqlDb.Config
+export type Config = ImplBrowserStorage.Config | ImplSqlDb.Config | ImplNamespaced.Config
 
 export const KvDb = (config: Config): IKvDb => {
   switch (config.t) {
@@ -10,5 +11,7 @@ export const KvDb = (config: Config): IKvDb => {
       return ImplBrowserStorage.KvDb(config)
     case 'sql-db':
       return ImplSqlDb.KvDb(config)
+    case 'namespaced':
+      return ImplNamespaced.KvDb(config)
   }
 }

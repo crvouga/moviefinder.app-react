@@ -45,12 +45,12 @@ const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
   let logger: ILogger
-  logger ??= Logger({ t: 'noop' })
   logger ??= Logger.prefix('app', Logger({ t: 'console' }))
+  logger ??= Logger({ t: 'noop' })
 
   let pglite: Promise<PgliteInstance>
-  pglite ??= createPglite({ t: 'in-memory' })
   pglite ??= createPglite({ t: 'indexed-db', databaseName: 'db' })
+  pglite ??= createPglite({ t: 'in-memory' })
   pglite ??= createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
   pglite ??= createPgliteWorker({ t: 'in-memory' })
 
