@@ -14,21 +14,19 @@ export const CreditsCardSwiper = (
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
 
-  const queried = useSubscription(
-    () =>
-      props.mediaId
-        ? ctx.creditDb.liveQuery({
-            where: {
-              op: '=',
-              column: 'mediaId',
-              value: props.mediaId,
-            },
-            orderBy: [{ column: 'personId', direction: 'asc' }],
-            limit: 25,
-            offset: 0,
-          })
-        : null,
-    [ctx, props.mediaId]
+  const queried = useSubscription(['credit-query', ctx.clientSessionId, props.mediaId], () =>
+    props.mediaId
+      ? ctx.creditDb.liveQuery({
+          where: {
+            op: '=',
+            column: 'mediaId',
+            value: props.mediaId,
+          },
+          orderBy: [{ column: 'personId', direction: 'asc' }],
+          limit: 25,
+          offset: 0,
+        })
+      : null
   )
 
   if (!queried) return null

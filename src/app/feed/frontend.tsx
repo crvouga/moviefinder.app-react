@@ -20,14 +20,12 @@ import { MediaId } from '../media/media-id'
 export const FeedScreen = () => {
   const ctx = useCtx()
 
-  const feedQuery = useSubscription(
-    () =>
-      ctx.feedDb.liveQuery({
-        limit: 1,
-        offset: 0,
-        where: { op: '=', column: 'client-session-id', value: ctx.clientSessionId },
-      }),
-    [ctx]
+  const feedQuery = useSubscription(['feed-query', ctx.clientSessionId], () =>
+    ctx.feedDb.liveQuery({
+      limit: 1,
+      offset: 0,
+      where: { op: '=', column: 'client-session-id', value: ctx.clientSessionId },
+    })
   )
 
   const feed = FeedDbQueryOutput.first(feedQuery)
@@ -74,13 +72,12 @@ const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
   const [state, dispatch] = useReducer(reducer, initialState(props.feed))
 
-  const mediaQuery = useSubscription(
-    () =>
-      ctx.mediaDb.liveQuery({
-        ...state,
-        orderBy: [{ column: 'popularity', direction: 'desc' }],
-      }),
-    [ctx, state]
+  const mediaQuery = useSubscription(['media-query', state.offset, state.limit], () =>
+    ctx.mediaDb.liveQuery({
+      limit: state.limit,
+      offset: state.offset,
+      orderBy: [{ column: 'popularity', direction: 'desc' }],
+    })
   )
 
   const media = mediaQuery ?? Loading

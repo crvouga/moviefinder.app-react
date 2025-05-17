@@ -16,6 +16,7 @@ export const RelationshipTypeMediaPosterSwiper = (
   const ctx = useCtx()
 
   const queried = useSubscription(
+    ['relationship-query', ctx.clientSessionId, props.relationshipType, props.mediaId],
     () =>
       ctx.relationshipDb.liveQuery({
         limit: 10,
@@ -41,8 +42,7 @@ export const RelationshipTypeMediaPosterSwiper = (
             direction: 'asc',
           },
         ],
-      }),
-    [ctx, props.mediaId]
+      })
   )
 
   if (!queried) return null

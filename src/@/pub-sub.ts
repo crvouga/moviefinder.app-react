@@ -1,6 +1,4 @@
-import { useCallback, useLayoutEffect } from 'react'
-
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export type Sub<T> = {
   subscribe: (callback: (value: T) => void) => () => void
@@ -61,16 +59,29 @@ export const PubSub = <T>(): PubSub<T> => {
   }
 }
 
-export const useSubscription = <T>(createSub: () => Sub<T> | null, deps: unknown[]): T | null => {
-  const subCallback = useCallback(() => createSub(), deps)
-  const [value, setValue] = useState<T | null>(null)
-  useLayoutEffect(() => {
-    const sub = subCallback()
-    if (!sub) return
-    return sub.subscribe((value) => {
+const valueCache = new Map<string, unknown>()
+
+export const useSubscription = <T>(
+  key: (string | number | symbol | undefined | null | boolean)[],
+  createSub: () => Sub<T> | null
+): T | null => {
+  const keyString = key.join('-')
+
+  const createSubCallback = useCallback(() => createSub(), [keyString])
+
+  const [value, setValue] = useState<T | null>(() => {
+    const cached = valueCache.get(keyString)
+    if (cached) return cached as T
+    return null
+  })
+
+  useEffect(() => {
+    const sub = createSubCallback()
+    return sub?.subscribe((value) => {
       setValue(value)
+      valueCache.set(keyString, value)
     })
-  }, [subCallback])
+  }, [keyString, createSubCallback])
 
   return value
 }

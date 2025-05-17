@@ -15,14 +15,12 @@ const SLIDES_OFFSET_AFTER = 24
 export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   const ctx = useCtx()
 
-  const queried = useSubscription(
-    () =>
-      ctx.mediaDb.liveQuery({
-        where: { op: '=', column: 'id', value: props.mediaId },
-        limit: 1,
-        offset: 0,
-      }),
-    [ctx, props.mediaId]
+  const queried = useSubscription(['media-query', ctx.clientSessionId, props.mediaId], () =>
+    ctx.mediaDb.liveQuery({
+      where: { op: '=', column: 'id', value: props.mediaId },
+      limit: 1,
+      offset: 0,
+    })
   )
 
   const currentScreen = useCurrentScreen()
@@ -31,11 +29,11 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
   return (
     <ScreenLayout
       includeGutter
-      // key={media?.id}
       topBar={{
         onBack: () => currentScreen.push({ t: 'feed' }),
         title: media?.title ?? ' ',
       }}
+      scrollKey={props.mediaId.toString()}
     >
       <MainSection media={media ?? null} />
 

@@ -17,14 +17,12 @@ export const PersonDetailsScreen = (props: {
 }) => {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
-  const queried = useSubscription(
-    () =>
-      ctx.personDb.liveQuery({
-        where: { op: '=', column: 'id', value: props.personId },
-        limit: 1,
-        offset: 0,
-      }),
-    [ctx, props.personId]
+  const queried = useSubscription(['person-query', ctx.clientSessionId, props.personId], () =>
+    ctx.personDb.liveQuery({
+      where: { op: '=', column: 'id', value: props.personId },
+      limit: 1,
+      offset: 0,
+    })
   )
 
   const person = queried?.t === 'ok' ? queried.value.entities.items[0] : null
