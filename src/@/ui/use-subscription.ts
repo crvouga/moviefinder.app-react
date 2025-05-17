@@ -1,9 +1,13 @@
+import { LRUCache } from 'lru-cache'
 import { useCallback, useLayoutEffect, useState } from 'react'
 import { Sub } from '../pub-sub'
 
-const valueCache = new Map<string, unknown>()
+const valueCache = new LRUCache<string, Record<string, unknown>>({
+  max: 1000,
+  ttl: 1000 * 60 * 60 * 24,
+})
 
-export const useSubscription = <T>(
+export const useSubscription = <T extends Record<string, unknown>>(
   key: (string | number | symbol | undefined | null | boolean)[],
   createSub: () => Sub<T> | null
 ): T | null => {
@@ -20,9 +24,9 @@ export const useSubscription = <T>(
   const [value, setValue] = useState<T | null>(init)
 
   useLayoutEffect(() => {
-    const sub = createSubCallback()
-
     setValue(init)
+
+    const sub = createSubCallback()
 
     const unsub = sub?.subscribe((value) => {
       setValue(value)
