@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { Db } from '~/@/db/interface'
+import { IDb } from '~/@/db/interface'
 import { intersectionWith } from '~/@/intersection-with'
 import { KvDb } from '~/@/kv-db/impl'
 import { Logger } from '~/@/logger'
@@ -62,7 +62,7 @@ describe('MediaDb One Way Sync Remote To Local', () => {
   it('should sync data from remote to local', async () => {
     const f = await Fixture()
 
-    const queryInput: Db.InferQueryInput<typeof IMediaDb.parser> = {
+    const queryInput: IDb.InferQueryInput<typeof IMediaDb.parser> = {
       limit: 10,
       offset: 0,
       orderBy: [{ column: 'popularity', direction: 'desc' }],

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
+import { Db } from '~/@/db/impl/impl'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
@@ -28,7 +28,8 @@ DROP TABLE IF EXISTS todo
 `
 
 export const TodoDb = (config: Config): ITodoDb => {
-  return createDbFromSqlDb({
+  return Db({
+    t: 'sql-db',
     parser: ITodoDb.parser,
     sqlDb: config.sqlDb,
     migration: {

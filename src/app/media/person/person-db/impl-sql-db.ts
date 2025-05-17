@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
+import { Db } from '~/@/db/impl/impl'
 import { ImageSet } from '~/@/image-set'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
@@ -35,7 +35,8 @@ const Row = z.object({
 })
 
 export const PersonDb = (config: Config): IPersonDb => {
-  return createDbFromSqlDb({
+  return Db({
+    t: 'sql-db',
     getRelated: async () => ({}),
     parser: IPersonDb.parser,
     sqlDb: config.sqlDb,

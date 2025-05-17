@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Db } from '~/@/db/interface'
+import { IDb } from '~/@/db/interface'
 import { Credit } from '~/app/media/credit/credit'
 import { CreditId } from '~/app/media/credit/credit-id'
 import { Person } from '~/app/media/person/person'
@@ -11,7 +11,7 @@ import { VideoId } from '../../../video/video-id'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 
-const parser = Db.parser({
+const parser = IDb.parser({
   Entity: Media.parser,
   Related: z.object({
     person: z.record(PersonId.parser, Person.parser),
@@ -22,7 +22,7 @@ const parser = Db.parser({
   }),
 })
 
-export type IMediaDb = Db.Infer<typeof parser>
+export type IMediaDb = IDb.Infer<typeof parser>
 
 export const IMediaDb = {
   parser,

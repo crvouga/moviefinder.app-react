@@ -8,7 +8,7 @@ import { ascend } from '~/@/sort'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { SqlDbParam } from '~/@/sql-db/sql-db-param'
 import { toBulkInsertSql } from '~/@/sql/bulk-insert'
-import { Db } from '../interface'
+import { IDb } from '../interface'
 import { QueryInput } from '../interface/query-input/query-input'
 import { QueryOutput } from '../interface/query-output/query-output'
 import { quoteIfPostgresKeyword } from '../interface/postgres-keywords'
@@ -18,7 +18,8 @@ export type Config<
   TRelated extends Record<string, unknown>,
   TRow extends Record<string, unknown>,
 > = {
-  parser: Db.Parser<TEntity, TRelated>
+  t: 'sql-db'
+  parser: IDb.Parser<TEntity, TRelated>
   sqlDb: ISqlDb
   viewName: string
   primaryKey: string
@@ -35,13 +36,13 @@ export type Config<
   getRelated: (entities: TEntity[]) => Promise<TRelated>
 }
 
-export const createDbFromSqlDb = <
+export const Db = <
   TEntity extends Record<string, unknown>,
   TRelated extends Record<string, unknown>,
   TRow extends Record<string, unknown>,
 >(
   config: Config<TEntity, TRelated, TRow>
-): Db.Db<TEntity, TRelated> => {
+): IDb.IDb<TEntity, TRelated> => {
   const run = config.migration?.policy.run({
     sqlDb: config.sqlDb,
     up: config.migration.up,

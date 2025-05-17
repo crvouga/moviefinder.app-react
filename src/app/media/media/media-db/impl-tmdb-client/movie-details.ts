@@ -1,4 +1,4 @@
-import { Db } from '~/@/db/interface'
+import { IDb } from '~/@/db/interface'
 import { DbErr } from '~/@/db/interface/error'
 import { enumerate } from '~/@/enumerate'
 import { Paginated } from '~/@/pagination/paginated'
@@ -21,7 +21,7 @@ import { IMediaDb } from '../interface/interface'
 export const queryMovieDetails = async (input: {
   tmdbClient: TmdbClient
   tmdbMovieId: number
-}): Promise<Db.InferQueryOutput<typeof IMediaDb.parser>> => {
+}): Promise<IDb.InferQueryOutput<typeof IMediaDb.parser>> => {
   const { tmdbClient, tmdbMovieId } = input
 
   const got = await tmdbClient.movie.details.get({

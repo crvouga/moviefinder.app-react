@@ -1,13 +1,13 @@
 import { z } from 'zod'
-import { Db } from '~/@/db/interface'
+import { IDb } from '~/@/db/interface'
 import { Video } from '../video'
 
-const parser = Db.parser({
+const parser = IDb.parser({
   Entity: Video.parser,
   Related: z.object({}),
 })
 
-export type IVideoDb = Db.Infer<typeof parser>
+export type IVideoDb = IDb.Infer<typeof parser>
 
 export const IVideoDb = {
   parser,

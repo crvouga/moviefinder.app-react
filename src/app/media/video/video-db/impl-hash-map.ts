@@ -1,4 +1,4 @@
-import { createDbFromHashMap } from '~/@/db/impl/create-db-from-hash-map'
+import { Db } from '~/@/db/impl/impl'
 import { IVideoDb } from './interface'
 
 export type Config = {
@@ -6,7 +6,8 @@ export type Config = {
 }
 
 export const VideoDb = (_config: Config): IVideoDb => {
-  return createDbFromHashMap({
+  return Db({
+    t: 'hash-map',
     parser: IVideoDb.parser,
     entities: new Map(),
     indexes: new Map(),

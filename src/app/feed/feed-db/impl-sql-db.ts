@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
+import { Db } from '~/@/db/impl/impl'
 import { ILogger } from '~/@/logger'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { ISqlDb } from '~/@/sql-db/interface'
@@ -35,7 +35,8 @@ const Row = z.object({
 type Row = z.infer<typeof Row>
 
 export const FeedDb = (config: Config): IFeedDb => {
-  return createDbFromSqlDb({
+  return Db({
+    t: 'sql-db',
     sqlDb: config.sqlDb,
     parser: IFeedDb.parser,
     rowParser: Row,

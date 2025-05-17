@@ -1,4 +1,4 @@
-import { createDbFromHashMap } from '~/@/db/impl/create-db-from-hash-map'
+import { Db } from '~/@/db/impl/impl'
 import { ILogger } from '~/@/logger'
 import { IFeedDb } from './interface'
 
@@ -8,7 +8,8 @@ export type Config = {
 }
 
 export const FeedDb = (_config: Config): IFeedDb => {
-  return createDbFromHashMap({
+  return Db({
+    t: 'hash-map',
     entities: new Map(),
     indexes: new Map(),
     toPrimaryKey: (entity) => entity.id,

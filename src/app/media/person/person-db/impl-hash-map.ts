@@ -1,4 +1,4 @@
-import { createDbFromHashMap } from '~/@/db/impl/create-db-from-hash-map'
+import { Db } from '~/@/db/impl/impl'
 import { IPersonDb } from './interface'
 
 export type Config = {
@@ -6,7 +6,8 @@ export type Config = {
 }
 
 export const PersonDb = (_config: Config): IPersonDb => {
-  return createDbFromHashMap({
+  return Db({
+    t: 'hash-map',
     parser: IPersonDb.parser,
     entities: new Map(),
     indexes: new Map(),

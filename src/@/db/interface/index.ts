@@ -1,3 +1,1 @@
-
-export * as Db from './db'
-
+export * as IDb from './db'

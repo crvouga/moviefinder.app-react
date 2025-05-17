@@ -1,4 +1,4 @@
-import { createDbFromHashMap } from '~/@/db/impl/create-db-from-hash-map'
+import { Db } from '~/@/db/impl/impl'
 import { IMediaDb } from '../interface/interface'
 
 export type Config = {
@@ -6,7 +6,8 @@ export type Config = {
 }
 
 export const MediaDb = (_config: Config): IMediaDb => {
-  return createDbFromHashMap({
+  return Db({
+    t: 'hash-map',
     parser: IMediaDb.parser,
     entities: new Map(),
     indexes: new Map(),

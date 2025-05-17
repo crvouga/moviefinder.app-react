@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
+import { Db } from '~/@/db/impl/impl'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
@@ -51,7 +51,8 @@ const Row = z.object({
 })
 
 export const RelationshipDb = (config: Config): IRelationshipDb => {
-  return createDbFromSqlDb({
+  return Db({
+    t: 'sql-db',
     getRelated: async (entities) => {
       const media = await config.mediaDb.query({
         limit: Math.max(entities.length, 1),

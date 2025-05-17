@@ -1,4 +1,4 @@
-import { createDbFromHashMap } from '~/@/db/impl/create-db-from-hash-map'
+import { Db } from '~/@/db/impl/impl'
 import { isErr } from '~/@/result'
 import { IMediaDb } from '../../media/media-db/interface/interface'
 import { IRelationshipDb } from './interface'
@@ -9,7 +9,8 @@ export type Config = {
 }
 
 export const RelationshipDb = (config: Config): IRelationshipDb => {
-  return createDbFromHashMap({
+  return Db({
+    t: 'hash-map',
     parser: IRelationshipDb.parser,
     entities: new Map(),
     indexes: new Map(),

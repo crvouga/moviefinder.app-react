@@ -1,4 +1,4 @@
-import { Db } from '~/@/db/interface'
+import { IDb } from '~/@/db/interface'
 import { toDeterministicHash } from '~/@/deterministic-hash'
 import { ILogger } from '~/@/logger'
 import { PubSub } from '~/@/pub-sub'
@@ -13,8 +13,8 @@ import { IMediaDb } from '../interface/interface'
 
 export type OneWaySyncRemoteToLocalMsg = {
   t: 'synced-remote-to-local'
-  remoteQuery: Db.InferQueryOutput<typeof IMediaDb.parser>
-  localUpsert: Db.InferUpsertOutput<typeof IMediaDb.parser>
+  remoteQuery: IDb.InferQueryOutput<typeof IMediaDb.parser>
+  localUpsert: IDb.InferUpsertOutput<typeof IMediaDb.parser>
 }
 
 export type Config = {
@@ -35,10 +35,10 @@ export type Config = {
 export const MediaDb = (config: Config): IMediaDb => {
   const remoteToLocalSync = throttleByKey(
     config.throttle,
-    (query: Db.InferQueryInput<typeof IMediaDb.parser>) => {
+    (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => {
       return toDeterministicHash(query)
     },
-    async (query: Db.InferQueryInput<typeof IMediaDb.parser>) => {
+    async (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => {
       const remoteQueried = await config.remote.query(query)
       const media = isOk(remoteQueried) ? remoteQueried.value.entities.items : []
       const localUpsert = await config.local.upsert({ entities: media })

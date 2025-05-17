@@ -1,13 +1,13 @@
 import { z } from 'zod'
-import { Db } from '~/@/db/interface'
+import { IDb } from '~/@/db/interface'
 import { Todo } from '../todo'
 
-const parser = Db.parser({
+const parser = IDb.parser({
   Entity: Todo.parser,
   Related: z.object({}),
 })
 
-export type ITodoDb = Db.Infer<typeof parser>
+export type ITodoDb = IDb.Infer<typeof parser>
 
 export const ITodoDb = {
   parser,

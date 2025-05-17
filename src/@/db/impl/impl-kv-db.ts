@@ -1,7 +1,11 @@
+import { z } from 'zod'
+import { Codec } from '~/@/codec'
+import { KvDb } from '~/@/kv-db/impl'
+import { IKvDb } from '~/@/kv-db/interface'
 import { Pagination } from '~/@/pagination/pagination'
 import { PubSub } from '~/@/pub-sub'
-import { Ok } from '~/@/result'
-import { Db } from '../interface'
+import { Ok, unwrapOr } from '~/@/result'
+import { IDb } from '../interface'
 import { OrderBy } from '../interface/query-input/order-by'
 import { QueryInput } from '../interface/query-input/query-input'
 import { Where } from '../interface/query-input/where'
@@ -11,21 +15,40 @@ export type Config<
   TEntity extends Record<string, unknown>,
   TRelated extends Record<string, unknown>,
 > = {
-  parser: Db.Parser<TEntity, TRelated>
-  entities: Map<string, TEntity>
-  indexes: Map<string, string[]>
+  t: 'kv-db'
+  parser: IDb.Parser<TEntity, TRelated>
+  kvDb: IKvDb
+  namespace: string[]
   toPrimaryKey: (entity: TEntity) => string
   getRelated: (entities: TEntity[]) => Promise<TRelated>
 }
 
-export const createDbFromHashMap = <
+export const Db = <
   TEntity extends Record<string, unknown>,
   TRelated extends Record<string, unknown>,
 >(
   config: Config<TEntity, TRelated>
-): Db.Db<TEntity, TRelated> => {
+): IDb.IDb<TEntity, TRelated> => {
   const pubSubsByQueryKey = new Map<string, PubSub<QueryOutput<TEntity, TRelated>>>()
   const liveQueriesByQueryKey = new Map<string, QueryInput<TEntity>>()
+
+  const entitiesKv = KvDb({
+    t: 'namespaced',
+    kvDb: config.kvDb,
+    namespace: [...config.namespace, 'entities'],
+  })
+
+  const allIdsKv = KvDb({
+    t: 'namespaced',
+    kvDb: config.kvDb,
+    namespace: [...config.namespace, 'allIds'],
+  })
+
+  const getAllIds = async (): Promise<string[]> => {
+    return (
+      unwrapOr(await allIdsKv.get(Codec.fromZod(z.array(z.string())), ['all']), () => [])[0] ?? []
+    )
+  }
 
   const publish = async () => {
     for (const [key, queryInput] of liveQueriesByQueryKey.entries()) {
@@ -38,8 +61,13 @@ export const createDbFromHashMap = <
   const query = async (
     queryInput: QueryInput<TEntity>
   ): Promise<QueryOutput<TEntity, TRelated>> => {
-    const all = Array.from(config.entities.values())
-    const filtered = queryInput.where ? Where.filter(all, queryInput.where) : all
+    const allIds = await getAllIds()
+
+    const entities = unwrapOr(
+      await entitiesKv.get(Codec.fromZod(config.parser.Entity), allIds),
+      () => []
+    )
+    const filtered = queryInput.where ? Where.filter(entities, queryInput.where) : entities
     const sorted = queryInput.orderBy ? OrderBy.sort(filtered, queryInput.orderBy) : filtered
     const paginated = Pagination.paginate(sorted, queryInput)
     return Ok({
@@ -67,9 +95,12 @@ export const createDbFromHashMap = <
       return pubSub
     },
     async upsert(input) {
-      for (const e of input.entities) {
-        config.entities.set(config.toPrimaryKey(e), e)
-      }
+      const entities = input.entities.map((e): [string, TEntity] => [config.toPrimaryKey(e), e])
+      await entitiesKv.set(Codec.fromZod(config.parser.Entity), ...entities)
+      const allIds = await getAllIds()
+      const allIdsNew = Array.from(new Set([...allIds, ...entities.map(([k]) => k)]))
+      await allIdsKv.set(Codec.fromZod(z.array(z.string())), ['all', allIdsNew])
+
       publish()
       return Ok({
         entities: input.entities,

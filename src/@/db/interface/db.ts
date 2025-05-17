@@ -40,7 +40,7 @@ export type Infer<T> =
     infer TEntity extends Record<string, unknown>,
     infer TRelated extends Record<string, unknown>
   >
-    ? Db<TEntity, TRelated>
+    ? IDb<TEntity, TRelated>
     : never
 
 export type InferQueryInput<T> =
@@ -57,7 +57,7 @@ export type InferUpsertInput<T> =
 export type InferUpsertOutput<T> =
   T extends Parser<infer TEntity, infer _TRelated> ? UpsertOutput<TEntity> : never
 
-export type Db<
+export type IDb<
   TEntity extends Record<string, unknown>,
   TRelated extends Record<string, unknown>,
 > = {

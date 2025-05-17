@@ -1,4 +1,4 @@
-import { Db } from '~/@/db/interface'
+import { IDb } from '~/@/db/interface'
 import { DbErr } from '~/@/db/interface/error'
 import { PageBasedPagination } from '~/@/pagination/page-based-pagination'
 import { Paginated } from '~/@/pagination/paginated'
@@ -12,8 +12,8 @@ import { IMediaDb } from '../interface/interface'
 
 export const queryDiscoverMovie = async (input: {
   tmdbClient: TmdbClient
-  query: Db.InferQueryInput<typeof IMediaDb.parser>
-}): Promise<Db.InferQueryOutput<typeof IMediaDb.parser>> => {
+  query: IDb.InferQueryInput<typeof IMediaDb.parser>
+}): Promise<IDb.InferQueryOutput<typeof IMediaDb.parser>> => {
   const { tmdbClient, query } = input
 
   const got = await tmdbClient.discover.movie.get({
@@ -67,7 +67,7 @@ export const queryDiscoverMovie = async (input: {
 }
 
 const toTmdbDiscoverMovieSortBy = (
-  query: Db.InferQueryInput<typeof IMediaDb.parser>
+  query: IDb.InferQueryInput<typeof IMediaDb.parser>
 ): TmdbDiscoverMovieSortBy => {
   const { column, direction } = query.orderBy?.[0] ?? { column: 'popularity', direction: 'desc' }
   switch (column) {

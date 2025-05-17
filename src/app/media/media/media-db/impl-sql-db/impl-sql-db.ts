@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
+import { Db } from '~/@/db/impl/impl'
 import { ImageSet } from '~/@/image-set'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { ISqlDb } from '~/@/sql-db/interface'
@@ -40,7 +40,8 @@ const Row = z.object({
 export type Row = z.infer<typeof Row>
 
 export const MediaDb = (config: Config): IMediaDb => {
-  return createDbFromSqlDb({
+  return Db({
+    t: 'sql-db',
     parser: IMediaDb.parser,
     getRelated: async () => ({
       person: {},
