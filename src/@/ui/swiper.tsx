@@ -53,64 +53,21 @@ const Container = (props: SwiperContainerProps) => {
       return
     }
 
-    //
-    // Initial slide
-    //
-
-    if (props.initialSlide) {
-      ref.current.setAttribute('initial-slide', props.initialSlide)
-    }
-    if (props.slideRestoration?.enabled) {
-      const activeIndex = activeIndexBy.get(props.slideRestoration.key)
-      if (activeIndex) {
-        ref.current.setAttribute('initial-slide', activeIndex)
-      }
-    }
-
-    //
-    //
-    //
-
-    if (props.slidesPerView) {
-      ref.current.setAttribute('slides-per-view', props.slidesPerView)
-    }
-    if (props.spaceBetween) {
-      ref.current.setAttribute('space-between', props.spaceBetween)
-    }
-    if (props.loop) {
-      ref.current.setAttribute('loop', props.loop)
-    }
-    if (props.navigation) {
-      ref.current.setAttribute('navigation', props.navigation)
-    }
-    if (props.direction) {
-      ref.current.setAttribute('direction', props.direction)
-    }
-    if (props.pagination) {
-      ref.current.setAttribute('pagination', props.pagination)
-    }
-
-    if (typeof props.slidesOffsetAfter === 'number') {
-      ref.current.setAttribute('slides-offset-after', props.slidesOffsetAfter)
-    }
-    if (typeof props.slidesOffsetBefore === 'number') {
-      ref.current.setAttribute('slides-offset-before', props.slidesOffsetBefore)
-    }
-    const onSlideChange = (event: CustomEvent) => {
-      const [swiper] = event.detail
-      const maybeActiveIndex = swiper.activeIndex
-      const activeIndex = typeof maybeActiveIndex === 'number' ? maybeActiveIndex : 0
-      const swiperSlide = swiper?.slides?.[activeIndex]
-      const slideData = swiperSlide?.getAttribute?.('data')
-      const data = slideData ? decodeData(slideData) : undefined
-      props.onSlideChange?.({ activeSlideIndex: activeIndex, data })
-      activeIndexBy.set(props.slideRestoration?.key, activeIndex)
-    }
-    ref.current.addEventListener('swiperslidechange', onSlideChange)
-    return () => {
-      ref.current.removeEventListener('swiperslidechange', onSlideChange)
-    }
+    Object.assign(ref.current.dataset, {
+      slidesPerView: props.slidesPerView,
+      spaceBetween: props.spaceBetween,
+      loop: props.loop,
+      navigation: props.navigation,
+      direction: props.direction,
+      pagination: props.pagination,
+      slidesOffsetAfter: props.slidesOffsetAfter,
+      slidesOffsetBefore: props.slidesOffsetBefore,
+      initialSlide:
+        props.initialSlide ||
+        (props.slideRestoration?.enabled && activeIndexBy.get(props.slideRestoration.key)),
+    })
   }, [props.slidesPerView, props.spaceBetween, props.loop, props.navigation, props.pagination])
+
   return (
     <swiper-container
       ref={ref}
