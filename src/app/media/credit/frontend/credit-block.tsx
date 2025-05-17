@@ -24,7 +24,12 @@ export const CreditBlock = (props: {
         skeleton={props.skeleton}
       />
 
-      <Typography variant="label" skeleton={props.skeleton} text={props.person?.name ?? ''} />
+      <Typography
+        variant="label"
+        skeletonLength={5}
+        skeleton={props.skeleton}
+        text={props.person?.name ?? ''}
+      />
 
       {props.skeleton && <Typography color="secondary" variant="caption" skeleton />}
 

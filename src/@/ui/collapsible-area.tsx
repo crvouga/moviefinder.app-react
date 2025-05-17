@@ -10,12 +10,11 @@ export const CollapsibleArea = (props: {
 
   return (
     <div
-      className={cn(
-        'relative w-full overflow-hidden',
-        state.collapsed &&
-          `before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-b before:from-transparent before:via-black/50 before:to-black`,
-        props.className
-      )}
+      aria-expanded={!state.collapsed}
+      aria-controls={props.collapsiedHeight?.toString()}
+      role="button"
+      tabIndex={0}
+      className={cn('relative w-full cursor-pointer overflow-hidden', props.className)}
       style={{
         height: state.collapsed ? props.collapsiedHeight : undefined,
         minHeight: state.collapsed ? undefined : props.collapsiedHeight,
@@ -25,6 +24,9 @@ export const CollapsibleArea = (props: {
       }}
     >
       {props.children}
+      {state.collapsed && (
+        <div className="absolute inset-0 top-1/4 bg-gradient-to-b from-transparent to-black" />
+      )}
     </div>
   )
 }

@@ -83,8 +83,9 @@ const init = (): Ctx => {
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
   let kvCached: IKvDb
+  if (config.t === 'sql-db')
+    kvCached ??= KvDb({ t: 'cached', source: kvDb, cache: KvDb({ t: 'hash-map', map: new Map() }) })
   kvCached ??= kvDb
-  kvCached ??= KvDb({ t: 'cached', source: kvDb, cache: KvDb({ t: 'hash-map', map: new Map() }) })
 
   const clientSessionIdStorage = ClientSessionIdStorage({ storage: localStorage })
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
