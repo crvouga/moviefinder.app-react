@@ -115,7 +115,6 @@ const ViewFeed = (props: { feed: Feed }) => {
           direction="vertical"
           onSlideChange={(event) => {
             const parsed = SlideData.safeParse(event.data)
-            debugger
 
             if (!parsed.success) return
 

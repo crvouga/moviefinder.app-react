@@ -48,21 +48,7 @@ const activeIndexBy = new Map<string, number>()
 const Container = (props: SwiperContainerProps) => {
   const ref = useRef<HTMLElement>()
 
-  useEffect(() => {
-    if (!ref.current) return
-
-    const onSlideChange = (event: CustomEvent) => {
-      props.onSlideChange?.({
-        activeSlideIndex: event.detail.activeSlideIndex,
-        data: event.detail.data,
-      })
-    }
-
-    ref.current.addEventListener('swiperslidechange', onSlideChange)
-    return () => {
-      ref.current?.removeEventListener('swiperslidechange', onSlideChange)
-    }
-  }, [])
+  useSwiperSlideChange(ref, props)
 
   return (
     <swiper-container
@@ -81,6 +67,26 @@ const Container = (props: SwiperContainerProps) => {
       {props.children}
     </swiper-container>
   )
+}
+
+const useSwiperSlideChange = (ref: React.RefObject<HTMLElement>, props: SwiperContainerProps) => {
+  useEffect(() => {
+    if (!ref.current) return
+
+    const onSlideChange = (event: CustomEvent) => {
+      const [swiper] = event.detail
+      const maybeActiveIndex = swiper.activeIndex
+      const activeIndex = typeof maybeActiveIndex === 'number' ? maybeActiveIndex : 0
+      const swiperSlide = swiper?.slides?.[activeIndex]
+      const slideData = swiperSlide?.getAttribute?.('data')
+      const data = slideData ? decodeData(slideData) : undefined
+      props.onSlideChange?.({ activeSlideIndex: activeIndex, data })
+    }
+    ref.current?.addEventListener('swiperslidechange', onSlideChange)
+    return () => {
+      ref.current?.removeEventListener('swiperslidechange', onSlideChange)
+    }
+  }, [])
 }
 
 const Slide = (props: { children: React.ReactNode; className?: string; data?: unknown }) => {
