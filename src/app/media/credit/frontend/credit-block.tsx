@@ -7,7 +7,7 @@ import { Credit } from '../credit'
 export const CreditBlock = (props: {
   skeleton?: boolean
   credit?: Credit
-  person?: Person
+  person?: Person | null
   onClick?: () => void
 }) => {
   return (

@@ -22,22 +22,7 @@ export const CreditsSwiper = (props: {
       initialSlide={0}
       spaceBetween={12}
     >
-      {props.credits?.flatMap((credit) => {
-        const person = props.person?.[credit.personId]
-        if (!person) return []
-        return [
-          <Swiper.Slide key={credit.id} className="w-fit">
-            <Clickable
-              onClick={() => {
-                props.onClick?.({ personId: credit.personId, creditId: credit.id })
-              }}
-            >
-              <CreditBlock credit={credit} person={person} />
-            </Clickable>
-          </Swiper.Slide>,
-        ]
-      })}
-      {props.skeleton && (
+      {props.skeleton || (props.credits?.length ?? 0) === 0 ? (
         <>
           {[...Array(6)].map((_, i) => (
             <Swiper.Slide key={i} className="w-fit">
@@ -45,6 +30,20 @@ export const CreditsSwiper = (props: {
             </Swiper.Slide>
           ))}
         </>
+      ) : (
+        props.credits?.flatMap((credit) => {
+          return [
+            <Swiper.Slide key={credit.id} className="w-fit">
+              <Clickable
+                onClick={() => {
+                  props.onClick?.({ personId: credit.personId, creditId: credit.id })
+                }}
+              >
+                <CreditBlock credit={credit} person={props.person?.[credit.personId] ?? null} />
+              </Clickable>
+            </Swiper.Slide>,
+          ]
+        })
       )}
     </Swiper.Container>
   )
