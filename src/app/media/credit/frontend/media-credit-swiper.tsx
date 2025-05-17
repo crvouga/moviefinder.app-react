@@ -3,12 +3,16 @@ import { SwiperContainerProps } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { useCtx } from '~/app/frontend/ctx'
-import { MediaId } from '../../media-id'
+import { MediaId } from '../../media/media-id'
+import { PersonId } from '../../person/person-id'
+import { CreditId } from '../credit-id'
 import { CreditsSwiper } from './credit-swiper'
 
-export const MediaCreditsSwiper = (
-  props: Partial<SwiperContainerProps> & { mediaId: MediaId | null }
-) => {
+export const MediaCreditsSwiper = (props: {
+  swiper?: Partial<SwiperContainerProps>
+  mediaId: MediaId | null
+  onClick: (input: { personId: PersonId; creditId: CreditId }) => void
+}) => {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
 
@@ -16,23 +20,38 @@ export const MediaCreditsSwiper = (
     props.mediaId
       ? ctx.creditDb.liveQuery({
           where: {
-            op: '=',
-            column: 'mediaId',
-            value: props.mediaId,
+            op: 'and',
+            clauses: [
+              {
+                op: '=',
+                column: 'mediaId',
+                value: props.mediaId,
+              },
+              // {
+              //   op: '=',
+              //   column: 'type',
+              //   value: 'cast',
+              // },
+            ],
           },
-          orderBy: [{ column: 'order', direction: 'asc' }],
+          orderBy: [
+            {
+              column: 'order',
+              direction: 'desc',
+            },
+          ],
           limit: 10,
           offset: 0,
         })
       : null
   )
 
-  if (!queried) return <CreditsSwiper {...props} skeleton />
-  if (!isOk(queried)) return <CreditsSwiper {...props} skeleton />
+  if (!queried) return <CreditsSwiper swiper={props.swiper} skeleton />
+
+  if (!isOk(queried)) return <CreditsSwiper swiper={props.swiper} skeleton />
 
   return (
     <CreditsSwiper
-      {...props}
       credits={queried.value.entities.items}
       person={queried.value.related.person}
       onClick={(input) => {

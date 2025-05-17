@@ -22,13 +22,13 @@ export const SqlDb = (config: Config): ISqlDb => {
         const pglite = await config.pglite
         const { rows } = await pglite.query(input.sql, input.params)
 
-        if (input.limit !== undefined) {
-          rows.splice(input.limit)
-        }
+        // if (input.limit !== undefined) {
+        //   rows.splice(input.limit)
+        // }
 
-        if (input.offset !== undefined) {
-          rows.splice(0, input.offset)
-        }
+        // if (input.offset !== undefined) {
+        //   rows.splice(0, input.offset)
+        // }
 
         const parser = input.parser ?? z.unknown()
 

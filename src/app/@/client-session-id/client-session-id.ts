@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { Codec } from '~/@/codec'
 
-const parser = z.string().brand('ClientSessionId')
+const parser = z.string()
 
 export type ClientSessionId = z.infer<typeof parser>
 

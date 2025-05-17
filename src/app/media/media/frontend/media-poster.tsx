@@ -9,7 +9,7 @@ export const MediaPoster = (props: { media: Media }) => {
     <Img
       className="w-full overflow-hidden rounded-lg border object-cover"
       style={{ aspectRatio: ASPECT_RATIO }}
-      src={ImageSet.toHighestRes(props.media.poster)}
+      src={ImageSet.toMiddleRes(props.media.poster)}
       alt={props.media.title ?? ' '}
     />
   )

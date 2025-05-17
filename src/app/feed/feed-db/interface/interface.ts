@@ -1,11 +1,15 @@
-import { Sub } from '~/@/pub-sub'
-import { Result } from '~/@/result'
+import { z } from 'zod'
+import { Db } from '~/@/db/interface'
 import { Feed } from '../../feed'
-import { FeedDbQueryInput } from './query-input'
-import { FeedDbQueryOutput } from './query-output'
 
-export type IFeedDb = {
-  query: (input: FeedDbQueryInput) => Promise<FeedDbQueryOutput>
-  liveQuery: (input: FeedDbQueryInput) => Sub<FeedDbQueryOutput>
-  upsert: (feed: Feed[]) => Promise<Result<null, Error>>
+const parser = Db.parser({
+  Entity: Feed.parser,
+  Field: z.enum(['id', 'client-session-id']),
+  Related: z.object({}),
+})
+
+export type IFeedDb = Db.Infer<typeof parser>
+
+export const IFeedDb = {
+  parser,
 }

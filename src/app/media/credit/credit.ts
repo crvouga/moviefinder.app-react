@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createFaker } from '~/@/faker'
-import { MediaId } from '../media-id'
+import { MediaId } from '../media/media-id'
 import { PersonId } from '../person/person-id'
 import { CreditId } from './credit-id'
 import { CreditType } from './credit-type'

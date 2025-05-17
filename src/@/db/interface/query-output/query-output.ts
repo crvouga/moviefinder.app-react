@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { DbErr } from '~/@/db/interface/error'
-import { Result } from '~/@/result'
+import { isOk, Result } from '~/@/result'
 import { Paginated } from '../../../pagination/paginated'
 
 const parser = <T, U>(entity: z.ZodType<T>, related: z.ZodType<U>) => {
@@ -15,6 +15,13 @@ const parser = <T, U>(entity: z.ZodType<T>, related: z.ZodType<U>) => {
 
 export type QueryOutput<T, U> = z.infer<ReturnType<typeof parser<T, U>>>
 
+const first = <T, U>(query: QueryOutput<T, U> | null | undefined): T | null => {
+  if (!query) return null
+  if (isOk(query)) return query.value.entities.items[0] ?? null
+  return null
+}
+
 export const QueryOutput = {
   parser,
+  first,
 }

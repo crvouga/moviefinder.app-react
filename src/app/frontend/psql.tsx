@@ -101,6 +101,7 @@ ORDER BY
         console.log('No rows returned')
         return
       }
+      // console.clear()
       console.table(rows)
     },
   })

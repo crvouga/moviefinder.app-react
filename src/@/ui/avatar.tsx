@@ -15,7 +15,12 @@ const isImage = (src: string | null | undefined): boolean => {
 export const Avatar = (props: AvatarProps) => {
   if (props.skeleton) {
     return (
-      <div className={cn('size-24 animate-pulse rounded-full bg-neutral-700', props.className)} />
+      <div
+        className={cn(
+          'aspect-square size-24 animate-pulse rounded-full bg-neutral-700',
+          props.className
+        )}
+      />
     )
   }
 

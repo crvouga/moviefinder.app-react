@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { Codec } from '~/@/codec'
-import { MediaId } from '~/app/media/media-id'
+import { MediaId } from '~/app/media/media/media-id'
 import { PersonId } from '~/app/media/person/person-id'
-import { LoginScreen } from '~/app/user/login/login-screen'
+import { LoginScreen } from '~/app/user/login/@/login-screen'
 
 const ScreenFrom = z.discriminatedUnion('t', [
   z.object({

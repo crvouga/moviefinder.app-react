@@ -1,19 +1,21 @@
 import { ImageSet } from '~/@/image-set'
+import { CollapsibleArea } from '~/@/ui/collapsible-area'
 import { Img } from '~/@/ui/img'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { ScreenFrom } from '~/app/@/screen/screen'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
-import { MediaCreditsSwiper } from '../credit/frontend/media-credit-swiper'
+import { MediaCreditsSwiper } from '../../credit/frontend/media-credit-swiper'
 import { Media } from '../media'
 import { MediaId } from '../media-id'
-import { RelationshipTypeMediaPosterSwiper } from '../relationship/frontend/relationship-type-media-poster-swiper'
+import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/relationship-type-media-poster-swiper'
 
 const SLIDES_OFFSET_BEFORE = 24
 const SLIDES_OFFSET_AFTER = 24
 
 export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }) => {
+  const currentScreen = useCurrentScreen()
   const ctx = useCtx()
 
   const queried = useSubscription(['media-query', props.mediaId], () =>
@@ -24,10 +26,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
     })
   )
 
-  const currentScreen = useCurrentScreen()
   const media = queried?.t === 'ok' ? queried.value.entities.items[0] : null
-
-  console.log({ media })
 
   return (
     <ScreenLayout
@@ -43,29 +42,54 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
 
       <Section title="Cast & Crew">
         <MediaCreditsSwiper
-          slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
-          slidesOffsetAfter={SLIDES_OFFSET_AFTER}
           mediaId={media?.id ?? null}
+          swiper={{
+            slidesOffsetBefore: SLIDES_OFFSET_BEFORE,
+            slidesOffsetAfter: SLIDES_OFFSET_AFTER,
+          }}
+          onClick={({ personId }) => {
+            currentScreen.push({ t: 'person-details', personId })
+          }}
         />
       </Section>
 
       <Section title="Similar">
         <RelationshipTypeMediaPosterSwiper
-          slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
-          slidesOffsetAfter={SLIDES_OFFSET_AFTER}
-          mediaId={media?.id ?? null}
-          relationshipType="similar"
-          from={media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }}
+          swiper={{
+            slidesOffsetBefore: SLIDES_OFFSET_BEFORE,
+            slidesOffsetAfter: SLIDES_OFFSET_AFTER,
+          }}
+          query={{
+            mediaId: media?.id ?? null,
+            relationshipType: 'similar',
+          }}
+          onClick={(clicked) => {
+            currentScreen.push({
+              t: 'media-details',
+              mediaId: clicked.mediaId,
+              from: media?.id ? { t: 'media-details', mediaId: media.id } : { t: 'feed' },
+            })
+          }}
         />
       </Section>
 
       <Section title="Recommendations">
         <RelationshipTypeMediaPosterSwiper
-          slidesOffsetBefore={SLIDES_OFFSET_BEFORE}
-          slidesOffsetAfter={SLIDES_OFFSET_AFTER}
-          mediaId={media?.id ?? null}
-          relationshipType="recommendation"
-          from={media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }}
+          swiper={{
+            slidesOffsetBefore: SLIDES_OFFSET_BEFORE,
+            slidesOffsetAfter: SLIDES_OFFSET_AFTER,
+          }}
+          query={{
+            mediaId: media?.id ?? null,
+            relationshipType: 'recommendation',
+          }}
+          onClick={(clicked) => {
+            currentScreen.push({
+              t: 'media-details',
+              mediaId: clicked.mediaId,
+              from: media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' },
+            })
+          }}
         />
       </Section>
     </ScreenLayout>
@@ -74,13 +98,13 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
 
 const MainSection = (props: { media: Media | null }) => {
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-4 pb-12">
+    <div className="flex w-full flex-col items-center justify-start">
       <Img
         className="aspect-video w-full object-cover"
         src={ImageSet.toHighestRes(props.media?.backdrop)}
         alt={props.media?.title ?? ' '}
       />
-      <div className="flex w-full flex-col items-center justify-start gap-4 p-6">
+      <CollapsibleArea collapsiedHeight={200} className="flex flex-col items-center gap-3 p-6">
         {props.media ? (
           <>
             <p className="text-center text-3xl font-bold">{props.media.title}</p>
@@ -92,7 +116,7 @@ const MainSection = (props: { media: Media | null }) => {
             <div className="h-26 w-full animate-pulse rounded bg-neutral-700" />
           </>
         )}
-      </div>
+      </CollapsibleArea>
     </div>
   )
 }

@@ -3,19 +3,19 @@ import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { Person } from '../../person/person'
 import { PersonId } from '../../person/person-id'
 import { Credit } from '../credit'
-import { CreditCard, CreditCardSkeleton } from './credit'
+import { CreditId } from '../credit-id'
+import { CreditBlock } from './credit-block'
 
-export const CreditsSwiper = (
-  props: Partial<SwiperContainerProps> & {
-    credits?: Credit[]
-    person?: { [personId: PersonId]: Person }
-    onClick?: (input: { personId: PersonId }) => void
-    skeleton?: boolean
-  }
-) => {
+export const CreditsSwiper = (props: {
+  swiper?: Partial<SwiperContainerProps>
+  credits?: Credit[]
+  person?: { [personId: PersonId]: Person }
+  onClick?: (input: { personId: PersonId; creditId: CreditId }) => void
+  skeleton?: boolean
+}) => {
   return (
     <Swiper.Container
-      {...props}
+      {...props.swiper}
       direction="horizontal"
       className="w-full"
       slidesPerView="auto"
@@ -28,10 +28,10 @@ export const CreditsSwiper = (
           <Swiper.Slide key={credit.id} className="w-fit">
             <Clickable
               onClick={() => {
-                props.onClick?.({ personId: credit.personId })
+                props.onClick?.({ personId: credit.personId, creditId: credit.id })
               }}
             >
-              <CreditCard credit={credit} person={person} />
+              <CreditBlock credit={credit} person={person} />
             </Clickable>
           </Swiper.Slide>,
         ]
@@ -40,7 +40,7 @@ export const CreditsSwiper = (
         <>
           {[...Array(4)].map((_, i) => (
             <Swiper.Slide key={i} className="w-fit">
-              <CreditCardSkeleton />
+              <CreditBlock skeleton />
             </Swiper.Slide>
           ))}
         </>

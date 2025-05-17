@@ -1,18 +1,19 @@
-import { forwardRef, useEffect, useState } from 'react'
+import { forwardRef, useEffect, useReducer } from 'react'
 import { z } from 'zod'
+import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
+import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
 import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../frontend/ctx'
-import { Media } from '../media/media'
-import { MediaId } from '../media/media-id'
+import { Media } from '../media/media/media'
+import { MediaId } from '../media/media/media-id'
 import { Feed } from './feed'
-import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
 import { FeedItem } from './feed-item'
 
@@ -27,17 +28,19 @@ export const FeedScreen = () => {
     })
   )
 
-  const feed = FeedDbQueryOutput.first(feedQuery)
+  const feed = QueryOutput.first(feedQuery)
 
   useEffect(() => {
     if (feedQuery && !feed) {
-      ctx.feedDb.upsert([
-        {
-          id: FeedId.generate(),
-          activeIndex: 0,
-          clientSessionId: ctx.clientSessionId,
-        },
-      ])
+      ctx.feedDb.upsert({
+        entities: [
+          {
+            id: FeedId.generate(),
+            activeIndex: 0,
+            clientSessionId: ctx.clientSessionId,
+          },
+        ],
+      })
     }
   }, [ctx, feedQuery, feed])
 
@@ -52,16 +55,31 @@ const PAGE_SIZE = 5
 
 const SlideData = z.object({
   feedIndex: z.number().int().min(0),
-  mediaId: MediaId.parser.nullable(),
+  mediaId: MediaId.parser,
   slideIndex: z.number().int().min(0),
 })
+type SlideData = z.infer<typeof SlideData>
+
+type Msg = { t: 'observed-first' } | { t: 'observed-last' }
+
+type State = { limit: number; offset: number }
+
+const init = (feed: Feed): State => {
+  return { limit: PAGE_SIZE + 1, offset: Math.max(0, feed.activeIndex - PAGE_SIZE) }
+}
+
+const reducer = (state: State, msg: Msg): State => {
+  switch (msg.t) {
+    case 'observed-first':
+      return { ...state, offset: Math.max(0, state.offset - PAGE_SIZE) }
+    case 'observed-last':
+      return { ...state, limit: state.limit + PAGE_SIZE }
+  }
+}
 
 const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
-  const [state, setState] = useState({
-    limit: PAGE_SIZE + 1,
-    offset: Math.max(0, props.feed.activeIndex - PAGE_SIZE),
-  })
+  const [state, dispatch] = useReducer(reducer, init(props.feed))
 
   const mediaQuery = useSubscription(
     ['media-query', 'offset', state.offset, 'limit', state.limit],
@@ -89,59 +107,50 @@ const ViewFeed = (props: { feed: Feed }) => {
         (item) => item.feedIndex === props.feed.activeIndex
       )
 
-      const onSlideChange = (event: { data: unknown }) => {
-        const parsed = SlideData.safeParse(event.data)
-        if (!parsed.success) return
-
-        ctx.feedDb.upsert([{ ...props.feed, activeIndex: parsed.data.feedIndex }])
-
-        const mediaId = parsed.data.mediaId
-        if (mediaId) {
-          ctx.mediaDb.query({
-            where: { op: '=', column: 'id', value: mediaId },
-            limit: 1,
-            offset: 0,
-          })
-        }
-
-        if (parsed.data.slideIndex >= feedItems.length - 1) {
-          setState((prev) => ({
-            ...prev,
-            limit: prev.limit + PAGE_SIZE,
-          }))
-        } else if (parsed.data.slideIndex <= 0) {
-          setState((prev) => ({ ...prev, offset: prev.offset - PAGE_SIZE }))
-        }
-      }
-
       return (
         <Swiper.Container
           initialSlide={initialSlideIndex}
           slidesPerView={1}
           className="h-full w-full"
           direction="vertical"
-          onSlideChange={onSlideChange}
+          onSlideChange={(event) => {
+            const parsed = SlideData.safeParse(event.data)
+
+            if (!parsed.success) return
+
+            ctx.feedDb.upsert({
+              entities: [{ ...props.feed, activeIndex: parsed.data.feedIndex }],
+            })
+            ctx.mediaDb.query({
+              where: { op: '=', column: 'id', value: parsed.data.mediaId },
+              limit: 1,
+              offset: 0,
+            })
+          }}
         >
-          {feedItems.map((item, slideIndex) => (
-            <Swiper.Slide
-              key={item.media.id}
-              data={{
-                slideIndex: slideIndex,
-                feedIndex: item.feedIndex,
-                mediaId: item.media.id,
-              }}
-            >
-              <SlideContent item={item.media} />
-            </Swiper.Slide>
-          ))}
-          <Swiper.Slide
-            data={{
-              slideIndex: feedItems.length,
-              feedIndex: feedItems[feedItems.length - 1]?.feedIndex ?? 0,
-              mediaId: null,
-            }}
-          >
-            <ImgLoading />
+          <Swiper.Slide>
+            <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-first' })}>
+              <ImgLoading />
+            </WrapIntersectionObserver>
+          </Swiper.Slide>
+
+          {feedItems.map((item, slideIndex) => {
+            const data: SlideData = {
+              slideIndex: slideIndex,
+              feedIndex: item.feedIndex,
+              mediaId: item.media.id,
+            }
+            return (
+              <Swiper.Slide key={item.media.id} data={data}>
+                <SlideContent item={item.media} />
+              </Swiper.Slide>
+            )
+          })}
+
+          <Swiper.Slide>
+            <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-last' })}>
+              <ImgLoading />
+            </WrapIntersectionObserver>
           </Swiper.Slide>
         </Swiper.Container>
       )

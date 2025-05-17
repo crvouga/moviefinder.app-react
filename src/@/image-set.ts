@@ -42,6 +42,12 @@ const random = async (): Promise<ImageSet> => {
   }
 }
 
+const toLowestRes = (imageSet: ImageSet | undefined): string | undefined => {
+  if (!imageSet) return undefined
+  const maybeSrc = imageSet.lowestToHighestRes[0]
+  return maybeSrc ?? undefined
+}
+
 export const ImageSet = {
   parser,
   random,
@@ -49,5 +55,6 @@ export const ImageSet = {
   empty,
   toHighestRes,
   toMiddleRes,
+  toLowestRes,
   isEmpty,
 }

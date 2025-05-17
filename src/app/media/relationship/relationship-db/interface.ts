@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { Db } from '~/@/db/interface'
-import { Media } from '../../media'
-import { MediaId } from '../../media-id'
+import { Media } from '../../media/media'
+import { MediaId } from '../../media/media-id'
 import { Relationship } from '../relationship'
 
 const parser = Db.parser({

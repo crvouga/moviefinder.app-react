@@ -1,17 +1,17 @@
-import { z } from 'zod'
+import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
+import { SendCodeScreen } from './frontend/send-code-screen'
+import { VerifyCodeScreen } from './frontend/verify-code-screen'
 
-const parser = z.discriminatedUnion('t', [
-  z.object({
-    t: z.literal('send-code'),
-  }),
-  z.object({
-    t: z.literal('verify-code'),
-    phoneNumber: z.string(),
-  }),
-])
+export const LoginScreen = () => {
+  const currentScreen = useCurrentScreen()
+  if (currentScreen.value.t !== 'login') throw new Error('invalid screen')
 
-export type LoginScreen = z.infer<typeof parser>
-
-export const LoginScreen = {
-  parser,
+  switch (currentScreen.value.c.t) {
+    case 'send-code':
+      return <SendCodeScreen />
+    case 'verify-code':
+      return <VerifyCodeScreen phoneNumber={currentScreen.value.c.phoneNumber} />
+    default:
+      throw new Error('invalid screen')
+  }
 }

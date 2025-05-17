@@ -4,8 +4,8 @@ import { ILogger, Logger } from '~/@/logger'
 import { createPglite } from '~/@/pglite/create-pglite'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbApiKey } from '~/@/tmdb-client/@/api-key'
-import { MediaDbBackend } from '../media/media-db/impl/backend'
-import { IMediaDb } from '../media/media-db/interface/interface'
+import { MediaDbBackend } from '../media/media/media-db/impl/backend'
+import { IMediaDb } from '../media/media/media-db/interface/interface'
 
 export type Ctx = {
   mediaDb: IMediaDb

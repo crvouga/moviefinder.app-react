@@ -3,7 +3,7 @@ import { KvDb } from '~/@/kv-db/impl'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
-import { createPgliteWorker } from '~/@/pglite/pglite-worker/create-pglite-worker'
+import { createPglite } from '~/@/pglite/create-pglite'
 import { PubSub } from '~/@/pub-sub'
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
@@ -14,8 +14,8 @@ import { FeedDb } from '../feed/feed-db/impl'
 import { IFeedDb } from '../feed/feed-db/interface/interface'
 import { CreditDb } from '../media/credit/credit-db/impl-sql-db'
 import { ICreditDb } from '../media/credit/credit-db/interface'
-import { MediaDbFrontend } from '../media/media-db/impl/frontend'
-import { IMediaDb } from '../media/media-db/interface/interface'
+import { MediaDbFrontend } from '../media/media/media-db/impl/frontend'
+import { IMediaDb } from '../media/media/media-db/interface/interface'
 import { PersonDb } from '../media/person/person-db/impl-sql-db'
 import { IPersonDb } from '../media/person/person-db/interface'
 import { RelationshipDb } from '../media/relationship/relationship-db/impl-sql-db'
@@ -41,19 +41,14 @@ export type Ctx = {
 const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
-  // const logger = Logger.prefix('app', Logger({ t: 'console' }))
-  const logger = Logger({ t: 'noop' })
+  const logger = Logger.prefix('app', Logger({ t: 'console' }))
+  // const logger = Logger({ t: 'noop' })
 
-  // const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
-  const pglite = createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
+  const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
+  // const pglite = createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
   // const pglite = createPgliteWorker({ t: 'in-memory' })
 
-  const sqlDb = SqlDb({
-    t: 'pglite',
-    // @ts-ignore
-    pglite,
-    logger,
-  })
+  const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 

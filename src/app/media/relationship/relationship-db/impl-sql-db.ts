@@ -5,7 +5,7 @@ import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { isErr } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
-import { IMediaDb } from '../../media-db/interface/interface'
+import { IMediaDb } from '../../media/media-db/interface/interface'
 import { IRelationshipDb } from './interface'
 
 export type Config = {

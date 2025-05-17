@@ -23,14 +23,8 @@ export const useScrollRestoration = (input: {
   useEffect(() => {
     const scrollTop = scrollTopStore.get(input.scrollKey)
     if (!scrollTop) return
-    setTimeout(
-      () => {
-        input.scrollableRef.current?.scrollTo({
-          top: scrollTop,
-          behavior: 'instant',
-        })
-      },
-      input.delay ? TimeSpan.toMilliseconds(input.delay) : 50
-    )
+    const element = input.scrollableRef.current
+    if (!element) return
+    element.scrollTop = scrollTop
   }, [input.scrollKey])
 }

@@ -37,7 +37,13 @@ export type SwiperContainerProps = {
   onSlideChange?: (input: { activeSlideIndex: number; data: unknown }) => void
   slidesOffsetAfter?: number
   slidesOffsetBefore?: number
+  slideRestoration?: {
+    enabled: boolean
+    key: string
+  }
 }
+
+const activeIndexBy = new Map<string, number>()
 
 const Container = (props: SwiperContainerProps) => {
   const ref = useRef<HTMLElement>()
@@ -46,6 +52,24 @@ const Container = (props: SwiperContainerProps) => {
     if (!ref.current) {
       return
     }
+
+    //
+    // Initial slide
+    //
+
+    if (props.initialSlide) {
+      ref.current.setAttribute('initial-slide', props.initialSlide)
+    }
+    if (props.slideRestoration?.enabled) {
+      const activeIndex = activeIndexBy.get(props.slideRestoration.key)
+      if (activeIndex) {
+        ref.current.setAttribute('initial-slide', activeIndex)
+      }
+    }
+
+    //
+    //
+    //
 
     if (props.slidesPerView) {
       ref.current.setAttribute('slides-per-view', props.slidesPerView)
@@ -65,9 +89,7 @@ const Container = (props: SwiperContainerProps) => {
     if (props.pagination) {
       ref.current.setAttribute('pagination', props.pagination)
     }
-    if (props.initialSlide) {
-      ref.current.setAttribute('initial-slide', props.initialSlide)
-    }
+
     if (typeof props.slidesOffsetAfter === 'number') {
       ref.current.setAttribute('slides-offset-after', props.slidesOffsetAfter)
     }
@@ -82,6 +104,7 @@ const Container = (props: SwiperContainerProps) => {
       const slideData = swiperSlide?.getAttribute?.('data')
       const data = slideData ? decodeData(slideData) : undefined
       props.onSlideChange?.({ activeSlideIndex: activeIndex, data })
+      activeIndexBy.set(props.slideRestoration?.key, activeIndex)
     }
     ref.current.addEventListener('swiperslidechange', onSlideChange)
     return () => {

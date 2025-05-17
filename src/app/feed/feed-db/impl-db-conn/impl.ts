@@ -1,17 +1,12 @@
 import { z } from 'zod'
-import { OrderBy } from '~/@/db/interface/query-input/order-by'
-import { Where } from '~/@/db/interface/query-input/where'
+import { createDbFromSqlDb } from '~/@/db/impl/create-db-from-sql-db'
 import { ILogger } from '~/@/logger'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
-import { isErr, Ok, Result } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
-import { SqlDbParam } from '~/@/sql-db/sql-db-param'
-import { toBulkInsertSql } from '~/@/sql/bulk-insert'
 import { ClientSessionId } from '~/app/@/client-session-id/client-session-id'
-import { Feed } from '../../feed'
 import { IFeedDb } from '../interface/interface'
-import { FeedColumn, FeedDbQueryInput } from '../interface/query-input'
-import { FeedDbQueryOutput } from '../interface/query-output'
+import { Feed } from '../../feed'
+import { FeedId } from '../../feed-id'
 
 export type Config = {
   t: 'db-conn'
@@ -41,103 +36,67 @@ const Row = z.object({
 
 type Row = z.infer<typeof Row>
 
-const rowToFeed = (row: Row): Feed => {
-  return {
-    id: row.id,
-    clientSessionId: ClientSessionId.fromString(row.client_session_id),
-    activeIndex: row.active_index,
-  }
-}
-
-const feedColumnToSqlColumn = (column: FeedColumn): string => {
-  switch (column) {
-    case 'id': {
-      return 'id'
-    }
-    case 'client-session-id': {
-      return 'client_session_id'
-    }
-    default: {
-      throw new Error('Unreachable')
-    }
-  }
-}
-
 export const FeedDb = (config: Config): IFeedDb => {
-  const run = config.migrationPolicy.run({ sqlDb: config.sqlDb, up: [up], down: [down] })
-
-  return {
-    async query(input) {
-      await run
-      const { sql, params } = toSqlDbInput(input)
-      const queried = await config.sqlDb.query({
-        sql,
-        params,
-        parser: Row,
-      })
-      return fromSqlDbOutput({ queried, query: input })
+  return createDbFromSqlDb({
+    sqlDb: config.sqlDb,
+    parser: IFeedDb.parser,
+    rowParser: Row,
+    entityToRow: (entity) => {
+      return {
+        id: entity.id,
+        client_session_id: entity.clientSessionId.toString(),
+        active_index: entity.activeIndex,
+      }
     },
-    liveQuery(query) {
-      const { sql, params } = toSqlDbInput(query)
-      return config.sqlDb.liveQuery({ sql, params, parser: Row }).map((queried) => {
-        return fromSqlDbOutput({ queried, query })
-      })
+    fieldToSqlColumn: (field) => {
+      switch (field) {
+        case 'id': {
+          return 'id'
+        }
+        case 'client-session-id': {
+          return 'client_session_id'
+        }
+        default: {
+          throw new Error('Unreachable')
+        }
+      }
     },
-    async upsert(feed) {
-      await run
-      const { params, variables } = toBulkInsertSql({
-        params: feed.map((feed) => [feed.id, feed.clientSessionId, feed.activeIndex, Date.now()]),
-      })
-      const result = await config.sqlDb.query({
-        sql: `
-          INSERT INTO feed (
-            id,
-            client_session_id,
-            active_index,
-            created_at_posix
-          ) VALUES ${variables}
-          ON CONFLICT (id) DO UPDATE SET
-            client_session_id = EXCLUDED.client_session_id,
-            active_index = EXCLUDED.active_index,
-            updated_at_posix = EXCLUDED.updated_at_posix
-        `,
-        params,
-        parser: z.unknown(),
-      })
 
-      if (isErr(result)) return result
-      return Ok(null)
+    rowToEntity: (row): Feed => {
+      return {
+        id: FeedId.fromString(row.id),
+        clientSessionId: ClientSessionId.fromString(row.client_session_id),
+        activeIndex: row.active_index,
+      }
     },
-  }
-}
 
-const fromSqlDbOutput = (input: {
-  queried: Result<{ rows: Row[] }, Error>
-  query: FeedDbQueryInput
-}): FeedDbQueryOutput => {
-  if (isErr(input.queried)) return input.queried
-  return Ok({
-    items: input.queried.value.rows.map(rowToFeed),
-    total: input.queried.value.rows.length,
-    offset: input.query.offset,
-    limit: input.query.limit,
+    getRelated: async (_entities) => {
+      return {}
+    },
+
+    viewName: 'feed',
+    primaryKey: 'id',
+    entityKeyToSqlColumn: (key) => {
+      switch (key) {
+        case 'id': {
+          return 'id'
+        }
+        case 'activeIndex': {
+          return 'active_index'
+        }
+        case 'clientSessionId': {
+          return 'client_session_id'
+        }
+        default: {
+          throw new Error('Unreachable')
+        }
+      }
+    },
+
+    migration: {
+      down: [down],
+      up: [up],
+      policy: config.migrationPolicy,
+    },
   })
-}
-
-const toSqlDbInput = (input: FeedDbQueryInput) => {
-  const whereStr = input.where ? Where.toSql(input.where, feedColumnToSqlColumn) : ''
-  const orderByStr = input.orderBy ? OrderBy.toSql(input.orderBy, feedColumnToSqlColumn) : ''
-  const sql = `
-    SELECT id, client_session_id, active_index 
-    FROM feed 
-    ${whereStr}
-    ${orderByStr}
-    LIMIT $1
-    OFFSET $2
-  `
-  const params: SqlDbParam[] = [input.limit, input.offset]
-  return {
-    sql,
-    params,
-  }
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Media } from '../media/media'
+import { Media } from '../media/media/media'
 import { Paginated } from '~/@/pagination/paginated'
 
 const parser = z.discriminatedUnion('t', [

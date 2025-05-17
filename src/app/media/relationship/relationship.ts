@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { MediaId } from '../media-id'
+import { MediaId } from '../media/media-id'
 import { RelationshipId } from './relationship-id'
 import { RelationshipType } from './relationship-type'
 
