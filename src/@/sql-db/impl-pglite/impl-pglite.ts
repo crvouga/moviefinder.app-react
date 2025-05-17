@@ -22,19 +22,19 @@ export const SqlDb = (config: Config): ISqlDb => {
         const pglite = await config.pglite
         const { rows } = await pglite.query(input.sql, input.params)
 
-        // if (input.limit !== undefined) {
-        //   rows.splice(input.limit)
-        // }
+        if (input.limit !== undefined) {
+          rows.splice(input.limit)
+        }
 
-        // if (input.offset !== undefined) {
-        //   rows.splice(0, input.offset)
-        // }
+        if (input.offset !== undefined) {
+          rows.splice(0, input.offset)
+        }
 
         const parser = input.parser ?? z.unknown()
 
         const parsedRows = rows.map((row) => parser.parse(row))
 
-        logger.info('query', { sql: input.sql, params: input.params, rows: parsedRows })
+        logger.info('query', input.sql, input.params, parsedRows)
 
         return Ok({ rows: parsedRows })
       } catch (error) {
@@ -50,7 +50,7 @@ export const SqlDb = (config: Config): ISqlDb => {
       offset?: number
       waitFor?: Promise<unknown>
     }): Sub<Result<{ rows: TRow[] }, Error>> {
-      logger.info('liveQuery', { sql: input.sql, params: input.params })
+      logger.info('liveQuery', input.sql, input.params)
       const pubSub = PubSub<Result<{ rows: TRow[] }, Error>>()
 
       try {

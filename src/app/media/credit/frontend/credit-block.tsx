@@ -11,7 +11,7 @@ export const CreditBlock = (props: {
 }) => {
   return (
     <div
-      className="flex h-full w-24 flex-col items-center justify-start rounded-lg pr-2"
+      className="flex h-full w-24 flex-col items-center justify-start rounded-lg"
       style={{
         overflow: 'hidden',
         height: '200px',

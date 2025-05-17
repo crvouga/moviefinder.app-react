@@ -1,5 +1,5 @@
 import { ImplBrowserStorage } from './impl-browser-storage'
-import { ImplSqlDb } from './impl-db-conn'
+import { ImplSqlDb } from './impl-sql-db'
 import { IKvDb } from './interface'
 
 export type Config = ImplBrowserStorage.Config | ImplSqlDb.Config

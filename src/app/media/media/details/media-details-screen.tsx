@@ -7,9 +7,9 @@ import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaCreditsSwiper } from '../../credit/frontend/media-credit-swiper'
+import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/relationship-type-media-poster-swiper'
 import { Media } from '../media'
 import { MediaId } from '../media-id'
-import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/relationship-type-media-poster-swiper'
 
 const SLIDES_OFFSET_BEFORE = 24
 const SLIDES_OFFSET_AFTER = 24
@@ -101,14 +101,14 @@ const MainSection = (props: { media: Media | null }) => {
     <div className="flex w-full flex-col items-center justify-start">
       <Img
         className="aspect-video w-full object-cover"
-        src={ImageSet.toHighestRes(props.media?.backdrop)}
+        src={ImageSet.toMiddleRes(props.media?.backdrop)}
         alt={props.media?.title ?? ' '}
       />
       <CollapsibleArea collapsiedHeight={200} className="flex flex-col items-center gap-3 p-6">
         {props.media ? (
           <>
             <p className="text-center text-3xl font-bold">{props.media.title}</p>
-            <p className="text-center text-sm">{props.media.description}</p>
+            <p className="max-w-lg text-center text-base">{props.media.description}</p>
           </>
         ) : (
           <>

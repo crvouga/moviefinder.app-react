@@ -1,5 +1,5 @@
 import { Logger } from '~/@/logger'
-import { ImplSqlDb } from './impl-db-conn'
+import { ImplSqlDb } from './impl-sql-db'
 import { IFeedDb } from './interface/interface'
 
 export type Config = ImplSqlDb.Config

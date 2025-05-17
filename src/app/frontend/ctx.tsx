@@ -44,7 +44,8 @@ const init = (): Ctx => {
   const logger = Logger.prefix('app', Logger({ t: 'console' }))
   // const logger = Logger({ t: 'noop' })
 
-  const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
+  const pglite = createPglite({ t: 'in-memory' })
+  // const pglite = createPglite({ t: 'indexed-db', databaseName: 'db' })
   // const pglite = createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
   // const pglite = createPgliteWorker({ t: 'in-memory' })
 

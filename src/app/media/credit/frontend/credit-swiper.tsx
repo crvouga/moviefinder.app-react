@@ -20,6 +20,7 @@ export const CreditsSwiper = (props: {
       className="w-full"
       slidesPerView="auto"
       initialSlide={0}
+      spaceBetween={12}
     >
       {props.credits?.flatMap((credit) => {
         const person = props.person?.[credit.personId]

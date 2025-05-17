@@ -19,9 +19,7 @@ const up = `
 CREATE TABLE IF NOT EXISTS feed (
   id TEXT PRIMARY KEY,
   client_session_id TEXT NOT NULL,
-  active_index INTEGER NOT NULL,
-  created_at_posix REAL NOT NULL,
-  updated_at_posix REAL
+  active_index INTEGER NOT NULL
 )
 `
 const down = `

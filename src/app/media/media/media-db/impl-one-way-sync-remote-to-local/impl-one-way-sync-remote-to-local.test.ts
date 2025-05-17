@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { Db } from '~/@/db/interface'
 import { intersectionWith } from '~/@/intersection-with'
-import { KvDb } from '~/@/kv-db/impl-db-conn/impl-db-conn'
+import { KvDb } from '~/@/kv-db/impl-sql-db/impl-sql-db'
 import { Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { PubSub } from '~/@/pub-sub'
