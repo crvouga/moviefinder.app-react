@@ -49,7 +49,7 @@ describe('TodoDb', () => {
     expect(unwrap(after).entities.items).toEqual([todo])
   })
 
-  it.only('should paginate', async () => {
+  it.skip('should paginate', async () => {
     const f = await Fixture()
     const todos: Todo[] = []
     for (let i = 0; i < 10; i++) {

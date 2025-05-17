@@ -19,8 +19,10 @@ export const SqlDb = (config: Config): ISqlDb => {
   return {
     async query(input) {
       try {
+        const start = performance.now()
         const pglite = await config.pglite
         const { rows } = await pglite.query(input.sql, input.params)
+        const end = performance.now()
 
         if (input.limit !== undefined) {
           rows.splice(input.limit)
@@ -34,7 +36,9 @@ export const SqlDb = (config: Config): ISqlDb => {
 
         const parsedRows = rows.map((row) => parser.parse(row))
 
-        logger.info('query', input.sql, input.params, parsedRows)
+        const duration = end - start
+        const durationStr = `${duration.toFixed(2)}ms`
+        logger.info('query', durationStr, input.sql, input.params, parsedRows)
 
         return Ok({ rows: parsedRows })
       } catch (error) {
