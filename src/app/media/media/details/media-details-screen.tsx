@@ -1,6 +1,7 @@
 import { ImageSet } from '~/@/image-set'
 import { CollapsibleArea } from '~/@/ui/collapsible-area'
 import { Img } from '~/@/ui/img'
+import { SwiperContainerProps } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { ScreenFrom } from '~/app/@/screen/screen'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
@@ -11,8 +12,10 @@ import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/r
 import { Media } from '../media'
 import { MediaId } from '../media-id'
 
-const SLIDES_OFFSET_BEFORE = 24
-const SLIDES_OFFSET_AFTER = 24
+const SWIPER_PROPS: Partial<SwiperContainerProps> = {
+  slidesOffsetBefore: 24,
+  slidesOffsetAfter: 24,
+}
 
 export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }) => {
   const currentScreen = useCurrentScreen()
@@ -28,14 +31,24 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
 
   const media = queried?.t === 'ok' ? queried.value.entities.items[0] : null
 
+  const from: ScreenFrom = media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }
+
+  const preloadMedia = (input: { mediaId: MediaId }) => {
+    ctx.mediaDb.query({
+      where: { op: '=', column: 'id', value: input.mediaId },
+      limit: 1,
+      offset: 0,
+    })
+  }
+
+  const pushMediaDetails = (input: { mediaId: MediaId }) => {
+    currentScreen.push({ t: 'media-details', mediaId: input.mediaId, from })
+  }
+
   return (
     <ScreenLayout
       includeGutter
-      topBar={{
-        onBack: () => currentScreen.push(props.from),
-        title: media?.title ?? ' ',
-      }}
-      key={props.mediaId.toString()}
+      topBar={{ onBack: () => currentScreen.push(props.from), title: media?.title ?? ' ' }}
       scrollKey={props.mediaId.toString()}
     >
       <MainSection media={media ?? null} />
@@ -43,10 +56,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
       <Section title="Cast & Crew">
         <MediaCreditsSwiper
           mediaId={media?.id ?? null}
-          swiper={{
-            slidesOffsetBefore: SLIDES_OFFSET_BEFORE,
-            slidesOffsetAfter: SLIDES_OFFSET_AFTER,
-          }}
+          swiper={SWIPER_PROPS}
           onClick={({ personId }) => {
             currentScreen.push({ t: 'person-details', personId })
           }}
@@ -55,55 +65,25 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
 
       <Section title="Similar">
         <RelationshipTypeMediaPosterSwiper
-          swiper={{
-            slidesOffsetBefore: SLIDES_OFFSET_BEFORE,
-            slidesOffsetAfter: SLIDES_OFFSET_AFTER,
-          }}
+          swiper={SWIPER_PROPS}
           query={{
             mediaId: media?.id ?? null,
             relationshipType: 'similar',
           }}
-          onPreload={(input) => {
-            ctx.mediaDb.query({
-              where: { op: '=', column: 'id', value: input.mediaId },
-              limit: 1,
-              offset: 0,
-            })
-          }}
-          onClick={(clicked) => {
-            currentScreen.push({
-              t: 'media-details',
-              mediaId: clicked.mediaId,
-              from: media?.id ? { t: 'media-details', mediaId: media.id } : { t: 'feed' },
-            })
-          }}
+          onPreload={preloadMedia}
+          onClick={pushMediaDetails}
         />
       </Section>
 
       <Section title="Recommendations">
         <RelationshipTypeMediaPosterSwiper
-          swiper={{
-            slidesOffsetBefore: SLIDES_OFFSET_BEFORE,
-            slidesOffsetAfter: SLIDES_OFFSET_AFTER,
-          }}
+          swiper={SWIPER_PROPS}
           query={{
             mediaId: media?.id ?? null,
             relationshipType: 'recommendation',
           }}
-          onPreload={(input) => {
-            ctx.mediaDb.query({
-              where: { op: '=', column: 'id', value: input.mediaId },
-              limit: 1,
-              offset: 0,
-            })
-          }}
-          onClick={(clicked) => {
-            currentScreen.push({
-              t: 'media-details',
-              mediaId: clicked.mediaId,
-              from: media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' },
-            })
-          }}
+          onPreload={preloadMedia}
+          onClick={pushMediaDetails}
         />
       </Section>
     </ScreenLayout>
