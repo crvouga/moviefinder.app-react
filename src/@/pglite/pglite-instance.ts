@@ -1,6 +1,6 @@
-import { PgliteInstance, PgliteConfig } from './types'
+import { IPgliteInstance, PgliteConfig } from './types'
 
-export const createPglite = async (config: PgliteConfig): Promise<PgliteInstance> => {
+export const PgliteInstance = async (config: PgliteConfig): Promise<IPgliteInstance> => {
   const { PGlite, MemoryFS, IdbFs } = await import('@electric-sql/pglite')
   const { live } = await import('@electric-sql/pglite/live')
 

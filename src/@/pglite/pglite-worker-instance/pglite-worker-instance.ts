@@ -1,10 +1,10 @@
 import { live } from '@electric-sql/pglite/live'
 import { PGliteWorker } from '@electric-sql/pglite/worker'
-import { PgliteConfig, PgliteInstance } from '../types'
+import { PgliteConfig, IPgliteInstance } from '../types'
 // @ts-ignore
 import PGWorker from './worker.js?worker'
 
-export const createPgliteWorker = async (config: PgliteConfig): Promise<PgliteInstance> => {
+export const PgliteWorkerInstance = async (config: PgliteConfig): Promise<IPgliteInstance> => {
   const pglite = new PGliteWorker(
     new PGWorker({
       type: 'module',

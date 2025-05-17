@@ -1,6 +1,6 @@
 import { Logger } from '~/@/logger'
 import { Config, SqlDb } from '../impl'
-import { createPglite } from '~/@/pglite/create-pglite'
+import { PgliteInstance } from '~/@/pglite/pglite-instance'
 
 const Fixture = (config: Config) => {
   const sqlDb = SqlDb(config)
@@ -9,7 +9,7 @@ const Fixture = (config: Config) => {
   }
 }
 
-const pglite = createPglite({ t: 'in-memory' })
+const pglite = PgliteInstance({ t: 'in-memory' })
 
 export const Fixtures = async () => {
   const configs: Config[] = []

@@ -1,5 +1,6 @@
 import { ImageSet } from '~/@/image-set'
 import { Avatar } from '~/@/ui/avatar'
+import { Typography } from '~/@/ui/typography'
 import { Person } from '../../person/person'
 import { Credit } from '../credit'
 
@@ -11,10 +12,10 @@ export const CreditBlock = (props: {
 }) => {
   return (
     <div
-      className="flex h-full w-24 flex-col items-center justify-start rounded-lg"
+      className="flex h-full w-24 flex-col items-center justify-start gap-1 rounded-lg"
       style={{
         overflow: 'hidden',
-        height: '200px',
+        height: '160px',
       }}
     >
       <Avatar
@@ -23,22 +24,26 @@ export const CreditBlock = (props: {
         skeleton={props.skeleton}
       />
 
-      <p className="text-center text-sm font-bold">{props.person?.name}</p>
+      <Typography variant="label" skeleton={props.skeleton} text={props.person?.name ?? ''} />
 
-      {props.skeleton && (
-        <p className="h-4 w-full animate-pulse rounded-full bg-neutral-700 text-center text-sm font-bold" />
-      )}
-
-      {props.skeleton && (
-        <p className="h-4 w-full animate-pulse rounded-full bg-neutral-700 text-center text-xs text-neutral-400" />
-      )}
+      {props.skeleton && <Typography color="secondary" variant="caption" skeleton />}
 
       {props.credit?.job && (
-        <p className="text-center text-xs text-neutral-400">{props.credit.job}</p>
+        <Typography
+          color="secondary"
+          variant="caption"
+          skeleton={props.skeleton}
+          text={props.credit?.job ?? ''}
+        />
       )}
 
       {props.credit?.character && (
-        <p className="text-center text-xs text-neutral-400">{props.credit.character}</p>
+        <Typography
+          color="secondary"
+          variant="caption"
+          skeleton={props.skeleton}
+          text={props.credit?.character ?? ''}
+        />
       )}
     </div>
   )

@@ -4,9 +4,9 @@ import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger, Logger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
-import { createPglite } from '~/@/pglite/create-pglite'
-import { createPgliteWorker } from '~/@/pglite/pglite-worker/create-pglite-worker'
-import { PgliteInstance } from '~/@/pglite/types'
+import { PgliteInstance } from '~/@/pglite/pglite-instance'
+import { PgliteWorkerInstance } from '~/@/pglite/pglite-worker-instance/pglite-worker-instance'
+import { IPgliteInstance } from '~/@/pglite/types'
 import { PubSub } from '~/@/pub-sub'
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
@@ -48,11 +48,11 @@ const init = (): Ctx => {
   logger ??= Logger.prefix('app', Logger({ t: 'console' }))
   logger ??= Logger({ t: 'noop' })
 
-  let pglite: Promise<PgliteInstance>
-  pglite ??= createPglite({ t: 'indexed-db', databaseName: 'db' })
-  pglite ??= createPglite({ t: 'in-memory' })
-  pglite ??= createPgliteWorker({ t: 'indexed-db', databaseName: 'db' })
-  pglite ??= createPgliteWorker({ t: 'in-memory' })
+  let pglite: Promise<IPgliteInstance>
+  pglite ??= PgliteInstance({ t: 'indexed-db', databaseName: 'db' })
+  pglite ??= PgliteInstance({ t: 'in-memory' })
+  pglite ??= PgliteWorkerInstance({ t: 'indexed-db', databaseName: 'db' })
+  pglite ??= PgliteWorkerInstance({ t: 'in-memory' })
 
   const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
 
@@ -104,6 +104,7 @@ const init = (): Ctx => {
   })
 
   let feedDb: IFeedDb
+  feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
   feedDb ??= FeedDb({ t: 'hash-map', logger })
   feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
 

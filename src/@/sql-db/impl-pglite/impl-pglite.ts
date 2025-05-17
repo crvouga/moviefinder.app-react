@@ -1,7 +1,7 @@
 import type { LiveQuery } from '@electric-sql/pglite/live'
 import { z } from 'zod'
 import { ILogger, Logger } from '~/@/logger'
-import { PgliteInstance, PgliteWorkerInstance } from '~/@/pglite/types'
+import { IPgliteInstance, IPgliteWorkerInstance } from '~/@/pglite/types'
 import { PubSub, Sub } from '~/@/pub-sub'
 import { Err, Ok, Result } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
@@ -10,7 +10,7 @@ import { compileSql } from '~/@/sql/compile'
 
 export type Config = {
   t: 'pglite'
-  pglite: Promise<PgliteInstance | PgliteWorkerInstance>
+  pglite: Promise<IPgliteInstance | IPgliteWorkerInstance>
   logger: ILogger
 }
 

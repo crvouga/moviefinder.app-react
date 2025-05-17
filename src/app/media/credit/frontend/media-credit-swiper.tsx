@@ -27,11 +27,6 @@ export const MediaCreditsSwiper = (props: {
                 column: 'mediaId',
                 value: props.mediaId,
               },
-              // {
-              //   op: '=',
-              //   column: 'type',
-              //   value: 'cast',
-              // },
             ],
           },
           orderBy: [
@@ -52,6 +47,7 @@ export const MediaCreditsSwiper = (props: {
 
   return (
     <CreditsSwiper
+      swiper={props.swiper}
       credits={queried.value.entities.items}
       person={queried.value.related.person}
       onClick={(input) => {

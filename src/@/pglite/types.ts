@@ -11,10 +11,10 @@ export type PgliteConfig =
       databaseName: string
     }
 
-export type PgliteInstance = PGlite & {
+export type IPgliteInstance = PGlite & {
   live: LiveNamespace
 }
 
-export type PgliteWorkerInstance = PGliteWorker & {
+export type IPgliteWorkerInstance = PGliteWorker & {
   live: LiveNamespace
 }

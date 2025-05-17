@@ -1,7 +1,7 @@
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { ILogger, Logger } from '~/@/logger'
-import { createPglite } from '~/@/pglite/create-pglite'
+import { PgliteInstance } from '~/@/pglite/pglite-instance'
 import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbApiKey } from '~/@/tmdb-client/@/api-key'
 import { MediaDbBackend } from '../media/media/media-db/impl/backend'
@@ -25,7 +25,7 @@ const init = (): Ctx => {
 
   const isProd = process.env.NODE_ENV === 'production'
 
-  const pglite = createPglite({ t: 'in-memory' })
+  const pglite = PgliteInstance({ t: 'in-memory' })
 
   const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
 

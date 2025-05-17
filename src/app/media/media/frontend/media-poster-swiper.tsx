@@ -2,7 +2,7 @@ import { Clickable } from '~/@/ui/clickable'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { Media } from '../media'
 import { MediaId } from '../media-id'
-import { MediaPoster, MediaPosterSkeleton } from './media-poster'
+import { MediaPoster } from './media-poster'
 
 export const MediaPosterSwiper = (props: {
   swiper?: Partial<SwiperContainerProps>
@@ -16,7 +16,7 @@ export const MediaPosterSwiper = (props: {
       {props.skeleton || (props.media?.length ?? 0) === 0
         ? [...Array(4)].map((_, i) => (
             <Swiper.Slide key={i} className="w-42">
-              <MediaPosterSkeleton />
+              <MediaPoster skeleton />
             </Swiper.Slide>
           ))
         : props.media?.map((m) => (

@@ -22,7 +22,7 @@ export type Config<
   getRelated: (entities: TEntity[]) => Promise<TRelated>
 }
 
-export const createDbFromHashMap = <
+export const createDbFromKvDb = <
   TEntity extends Record<string, unknown>,
   TRelated extends Record<string, unknown>,
 >(

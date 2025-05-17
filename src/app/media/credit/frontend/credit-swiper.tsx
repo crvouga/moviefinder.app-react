@@ -39,7 +39,7 @@ export const CreditsSwiper = (props: {
       })}
       {props.skeleton && (
         <>
-          {[...Array(4)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <Swiper.Slide key={i} className="w-fit">
               <CreditBlock skeleton />
             </Swiper.Slide>
