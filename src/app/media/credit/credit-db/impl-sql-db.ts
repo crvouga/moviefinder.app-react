@@ -95,7 +95,7 @@ export const CreditDb = (config: Config): ICreditDb => {
       up,
       down,
     },
-    entityKeyToSqlColumn: (key) => {
+    entityKeyToSqlColumn(key) {
       switch (key) {
         case 'id':
           return 'id'
@@ -108,7 +108,7 @@ export const CreditDb = (config: Config): ICreditDb => {
         case 'character':
           return 'character'
         case 'order':
-          return '"order"'
+          return 'order'
         case 'type':
           return 'type'
         default:

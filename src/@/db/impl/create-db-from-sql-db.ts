@@ -11,14 +11,14 @@ import { toBulkInsertSql } from '~/@/sql/bulk-insert'
 import { Db } from '../interface'
 import { QueryInput } from '../interface/query-input/query-input'
 import { QueryOutput } from '../interface/query-output/query-output'
+import { quoteIfPostgresKeyword } from '../interface/postgres-keywords'
 
 export type Config<
-  TField extends string,
   TEntity extends Record<string, unknown>,
-  TRelated,
-  TRow,
+  TRelated extends Record<string, unknown>,
+  TRow extends Record<string, unknown>,
 > = {
-  parser: Db.Parser<TField, TEntity, TRelated>
+  parser: Db.Parser<TEntity, TRelated>
   sqlDb: ISqlDb
   viewName: string
   primaryKey: string
@@ -27,8 +27,8 @@ export type Config<
     down: string[]
     policy: IMigrationPolicy
   }
-  fieldToSqlColumn: (field: TField) => string
-  entityKeyToSqlColumn: (key: keyof TEntity) => string
+  fieldToSqlColumn: (field: keyof TEntity) => keyof TRow
+  entityKeyToSqlColumn: (key: keyof TEntity) => keyof TRow
   rowParser: z.ZodType<TRow>
   rowToEntity: (row: TRow) => TEntity
   entityToRow: (entity: TEntity) => TRow
@@ -36,20 +36,19 @@ export type Config<
 }
 
 export const createDbFromSqlDb = <
-  TField extends string,
   TEntity extends Record<string, unknown>,
-  TRelated,
+  TRelated extends Record<string, unknown>,
   TRow extends Record<string, unknown>,
 >(
-  config: Config<TField, TEntity, TRelated, TRow>
-): Db.Db<TField, TEntity, TRelated> => {
+  config: Config<TEntity, TRelated, TRow>
+): Db.Db<TEntity, TRelated> => {
   const run = config.migration?.policy.run({
     sqlDb: config.sqlDb,
     up: config.migration.up,
     down: config.migration.down,
   })
   const mapOutput = (input: {
-    queryInput: QueryInput<TField>
+    queryInput: QueryInput<TEntity>
     related: TRelated
     dbOutput: Result<{ rows: TRow[] }, Error>
   }): QueryOutput<TEntity, TRelated> => {
@@ -70,7 +69,7 @@ export const createDbFromSqlDb = <
     return output
   }
 
-  const toSql = (queryInput: QueryInput<TField>) => {
+  const toSql = (queryInput: QueryInput<TEntity>) => {
     const params: SqlDbParam[] = [queryInput.limit, queryInput.offset]
     const whereClause = queryInput.where
       ? Where.toSql(queryInput.where, config.fieldToSqlColumn)
@@ -146,13 +145,13 @@ OFFSET $2
 
       const sql = `
 INSERT INTO ${config.viewName} (
-${sqlColumns.map((column) => `\t${column}`).join(',\n')}
+${sqlColumns.map((column) => `\t${quoteIfPostgresKeyword(column)}`).join(',\n')}
 )
 VALUES
 ${variables}
 ON CONFLICT (${config.primaryKey}) 
 DO UPDATE SET
-${sqlColumns.map((column) => `\t${column} = EXCLUDED.${column}`).join(',\n')}
+${sqlColumns.map((column) => `\t${quoteIfPostgresKeyword(column)} = EXCLUDED.${quoteIfPostgresKeyword(column)}`).join(',\n')}
 `
 
       const queried = await config.sqlDb.query({ sql, params: flatParams, parser: z.unknown() })

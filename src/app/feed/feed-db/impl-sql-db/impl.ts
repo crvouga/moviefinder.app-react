@@ -51,8 +51,11 @@ export const FeedDb = (config: Config): IFeedDb => {
         case 'id': {
           return 'id'
         }
-        case 'client-session-id': {
+        case 'clientSessionId': {
           return 'client_session_id'
+        }
+        case 'activeIndex': {
+          return 'active_index'
         }
         default: {
           throw new Error('Unreachable')

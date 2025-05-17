@@ -4,7 +4,6 @@ import { Feed } from '../../feed'
 
 const parser = Db.parser({
   Entity: Feed.parser,
-  Field: z.enum(['id', 'client-session-id']),
   Related: z.object({}),
 })
 

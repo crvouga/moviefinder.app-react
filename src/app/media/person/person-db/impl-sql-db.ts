@@ -74,7 +74,7 @@ export const PersonDb = (config: Config): IPersonDb => {
         }),
       }
     },
-    fieldToSqlColumn: (field) => {
+    fieldToSqlColumn(field) {
       switch (field) {
         case 'id':
           return 'id'
@@ -82,6 +82,8 @@ export const PersonDb = (config: Config): IPersonDb => {
           return 'name'
         case 'popularity':
           return 'popularity'
+        case 'profile':
+          return 'profile_urls'
       }
     },
     primaryKey: 'id',

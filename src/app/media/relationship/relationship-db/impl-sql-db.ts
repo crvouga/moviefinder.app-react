@@ -83,18 +83,18 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
       up,
       down,
     },
-    entityKeyToSqlColumn: (key) => {
+    entityKeyToSqlColumn(key) {
       switch (key) {
         case 'id':
           return 'id'
         case 'from':
-          return '"from"'
+          return 'from'
         case 'to':
-          return '"to"'
+          return 'to'
         case 'type':
           return 'type'
         case 'order':
-          return '"order"'
+          return 'order'
         default:
           throw new Error(`Unreachable: ${key}`)
       }
@@ -109,18 +109,18 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
         order: row.order,
       }
     },
-    fieldToSqlColumn: (field) => {
+    fieldToSqlColumn(field) {
       switch (field) {
         case 'id':
           return 'id'
         case 'from':
-          return '"from"'
+          return 'from'
         case 'to':
-          return '"to"'
+          return 'to'
         case 'type':
           return 'type'
         case 'order':
-          return '"order"'
+          return 'order'
         default:
           throw new Error(`Unreachable: ${field}`)
       }

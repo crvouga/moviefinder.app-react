@@ -2,18 +2,30 @@ import { z } from 'zod'
 import { OrderBy } from './order-by'
 import { Where } from './where'
 
-const parser = <T>(column: z.ZodType<T>) => {
-  return z.object({
+export type QueryInput<TEntity extends Record<string, unknown>> = {
+  where?: Where<TEntity>
+  orderBy?: OrderBy<TEntity>
+  limit: number
+  offset: number
+}
+
+const parser = <TEntity extends Record<string, unknown>>(
+  column: z.ZodObject<z.ZodRawShape>
+): z.ZodType<QueryInput<TEntity>> => {
+  const schema = z.object({
     where: Where.parser(column).optional(),
     orderBy: OrderBy.parser(column).optional(),
     limit: z.number(),
     offset: z.number(),
   })
+  // @ts-ignore
+  return schema
 }
 
-export type QueryInput<T> = z.infer<ReturnType<typeof parser<T>>>
-
-const toSql = <T>(queryInput: QueryInput<T>, columnToSqlColumn: (column: T) => string): string => {
+const toSql = <TEntity extends Record<string, unknown>>(
+  queryInput: QueryInput<TEntity>,
+  columnToSqlColumn: (column: keyof TEntity) => string
+): string => {
   return [
     queryInput.where ? Where.toSql(queryInput.where, columnToSqlColumn) : '',
     queryInput.orderBy ? OrderBy.toSql(queryInput.orderBy, columnToSqlColumn) : '',

@@ -24,7 +24,7 @@ export const FeedScreen = () => {
     ctx.feedDb.liveQuery({
       limit: 1,
       offset: 0,
-      where: { op: '=', column: 'client-session-id', value: ctx.clientSessionId },
+      where: { op: '=', column: 'clientSessionId', value: ctx.clientSessionId },
     })
   )
 

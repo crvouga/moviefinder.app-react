@@ -5,7 +5,6 @@ import { PersonId } from '../../person/person-id'
 import { Credit } from '../credit'
 
 const parser = Db.parser({
-  Field: z.enum(['id', 'mediaId', 'personId', 'job', 'character', 'order', 'type']),
   Entity: Credit.parser,
   Related: z.object({
     person: z.record(PersonId.parser, Person.parser),

@@ -1,15 +1,16 @@
 import { z } from 'zod'
 import { quoteIfPostgresKeyword } from '../postgres-keywords'
+import { keyOf } from '~/@/zod/key-of'
 
-export type Where<T> =
+export type Where<T extends Record<string, unknown>> =
   | {
       op: '='
-      column: T
+      column: keyof T
       value: string
     }
   | {
       op: 'in'
-      column: T
+      column: keyof T
       value: string[]
     }
   | {
@@ -17,28 +18,33 @@ export type Where<T> =
       clauses: Where<T>[]
     }
 
-const parser = <T>(column: z.ZodType<T>): z.ZodType<Where<T>> => {
+const parser = <TEntity extends Record<string, unknown>>(
+  column: z.ZodObject<z.ZodRawShape>
+): z.ZodType<Where<TEntity>> => {
   const schema = z.discriminatedUnion('op', [
     z.object({
       op: z.literal('='),
-      column,
+      column: keyOf(column),
       value: z.string(),
     }),
     z.object({
       op: z.literal('in'),
-      column,
+      column: keyOf(column),
       value: z.array(z.string()),
     }),
     z.object({
       op: z.literal('and'),
-      clauses: z.any(),
+      clauses: z.unknown(),
     }),
   ])
   // @ts-ignore
   return schema
 }
 
-export const toSql = <T>(where: Where<T>, columnToSqlColumn: (column: T) => string): string => {
+export const toSql = <TEntity extends Record<string, unknown>>(
+  where: Where<TEntity>,
+  columnToSqlColumn: (column: keyof TEntity) => string | number | symbol
+): string => {
   switch (where.op) {
     case 'in': {
       if (where.value.length === 0) return ''
@@ -54,7 +60,10 @@ export const toSql = <T>(where: Where<T>, columnToSqlColumn: (column: T) => stri
   }
 }
 
-const mapColumn = <T, U>(where: Where<T>, mapFn: (column: T) => U): Where<U> => {
+const mapColumn = <TEntity extends Record<string, unknown>, U extends Record<string, unknown>>(
+  where: Where<TEntity>,
+  mapFn: (column: keyof TEntity) => keyof U
+): Where<U> => {
   switch (where.op) {
     case 'in': {
       return {
