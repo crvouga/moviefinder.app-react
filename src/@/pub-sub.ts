@@ -1,5 +1,3 @@
-import { useCallback, useEffect, useState } from 'react'
-
 export type Sub<T> = {
   subscribe: (callback: (value: T) => void) => () => void
   next: (filter: (value: T) => boolean) => Promise<T>
@@ -57,31 +55,4 @@ export const PubSub = <T>(): PubSub<T> => {
       return pubSub
     },
   }
-}
-
-const valueCache = new Map<string, unknown>()
-
-export const useSubscription = <T>(
-  key: (string | number | symbol | undefined | null | boolean)[],
-  createSub: () => Sub<T> | null
-): T | null => {
-  const keyString = key.join('-')
-
-  const createSubCallback = useCallback(() => createSub(), [keyString])
-
-  const [value, setValue] = useState<T | null>(() => {
-    const cached = valueCache.get(keyString)
-    if (cached) return cached as T
-    return null
-  })
-
-  useEffect(() => {
-    const sub = createSubCallback()
-    return sub?.subscribe((value) => {
-      setValue(value)
-      valueCache.set(keyString, value)
-    })
-  }, [keyString, createSubCallback])
-
-  return value
 }

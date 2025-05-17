@@ -1,8 +1,8 @@
-import { useSubscription } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
 import { Clickable } from '~/@/ui/clickable'
 import { WithPreload } from '~/@/ui/preload'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
+import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../../media-id'
@@ -14,7 +14,7 @@ export const CreditsCardSwiper = (
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
 
-  const queried = useSubscription(['credit-query', ctx.clientSessionId, props.mediaId], () =>
+  const queried = useSubscription(['credit-query', props.mediaId], () =>
     props.mediaId
       ? ctx.creditDb.liveQuery({
           where: {

@@ -1,6 +1,7 @@
-import { useSubscription } from '~/@/pub-sub'
 import { isOk } from '~/@/result'
 import { SwiperContainerProps } from '~/@/ui/swiper'
+import { useSubscription } from '~/@/ui/use-subscription'
+import { ScreenFrom } from '~/app/@/screen/screen'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaPosterSwiper } from '../../frontend/media-poster-swiper'
 import { Media } from '../../media'
@@ -11,12 +12,13 @@ export const RelationshipTypeMediaPosterSwiper = (
   props: Partial<SwiperContainerProps> & {
     mediaId: MediaId | null
     relationshipType: RelationshipType
+    from: ScreenFrom
   }
 ) => {
   const ctx = useCtx()
 
   const queried = useSubscription(
-    ['relationship-query', ctx.clientSessionId, props.relationshipType, props.mediaId],
+    ['relationship-query', props.relationshipType, props.mediaId],
     () =>
       ctx.relationshipDb.liveQuery({
         limit: 10,
@@ -56,5 +58,5 @@ export const RelationshipTypeMediaPosterSwiper = (
     media.push(mediaItem)
   }
 
-  return <MediaPosterSwiper {...props} media={media} />
+  return <MediaPosterSwiper {...props} media={media} from={props.from} />
 }

@@ -1,21 +1,21 @@
 import { forwardRef, useEffect, useReducer } from 'react'
 import { z } from 'zod'
 import { ImageSet } from '~/@/image-set'
-import { useSubscription } from '~/@/pub-sub'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
 import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
+import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
 import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../frontend/ctx'
 import { Media } from '../media/media'
+import { MediaId } from '../media/media-id'
 import { Feed } from './feed'
 import { FeedDbQueryOutput } from './feed-db/interface/query-output'
 import { FeedId } from './feed-id'
 import { FeedItem } from './feed-item'
-import { MediaId } from '../media/media-id'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -154,7 +154,9 @@ const SlideContent = (props: { item: Media }) => {
   return (
     <button
       className="h-full w-full cursor-pointer"
-      onClick={() => currentScreen.push({ t: 'media-details', mediaId: props.item.id })}
+      onClick={() =>
+        currentScreen.push({ t: 'media-details', mediaId: props.item.id, from: { t: 'feed' } })
+      }
     >
       <Img
         className="h-full w-full object-cover"

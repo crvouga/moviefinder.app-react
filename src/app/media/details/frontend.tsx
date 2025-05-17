@@ -1,6 +1,7 @@
 import { ImageSet } from '~/@/image-set'
-import { useSubscription } from '~/@/pub-sub'
 import { Img } from '~/@/ui/img'
+import { useSubscription } from '~/@/ui/use-subscription'
+import { ScreenFrom } from '~/app/@/screen/screen'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
@@ -12,10 +13,10 @@ import { RelationshipTypeMediaPosterSwiper } from '../relationship/frontend/rela
 const SLIDES_OFFSET_BEFORE = 24
 const SLIDES_OFFSET_AFTER = 24
 
-export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
+export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }) => {
   const ctx = useCtx()
 
-  const queried = useSubscription(['media-query', ctx.clientSessionId, props.mediaId], () =>
+  const queried = useSubscription(['media-query', props.mediaId], () =>
     ctx.mediaDb.liveQuery({
       where: { op: '=', column: 'id', value: props.mediaId },
       limit: 1,
@@ -30,7 +31,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
     <ScreenLayout
       includeGutter
       topBar={{
-        onBack: () => currentScreen.push({ t: 'feed' }),
+        onBack: () => currentScreen.push(props.from),
         title: media?.title ?? ' ',
       }}
       scrollKey={props.mediaId.toString()}
@@ -51,6 +52,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
           slidesOffsetAfter={SLIDES_OFFSET_AFTER}
           mediaId={media?.id ?? null}
           relationshipType="similar"
+          from={media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }}
         />
       </Section>
 
@@ -60,6 +62,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId }) => {
           slidesOffsetAfter={SLIDES_OFFSET_AFTER}
           mediaId={media?.id ?? null}
           relationshipType="recommendation"
+          from={media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }}
         />
       </Section>
     </ScreenLayout>

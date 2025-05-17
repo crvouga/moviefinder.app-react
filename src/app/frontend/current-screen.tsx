@@ -16,7 +16,12 @@ export const CurrentScreen = () => {
       return <AccountScreen />
     }
     case 'media-details': {
-      return <MediaDetailsScreen mediaId={currentScreen.value.mediaId} />
+      return (
+        <MediaDetailsScreen
+          mediaId={currentScreen.value.mediaId}
+          from={currentScreen.value.from ?? { t: 'feed' }}
+        />
+      )
     }
     case 'login': {
       return <LoginScreen />
@@ -25,7 +30,7 @@ export const CurrentScreen = () => {
       return (
         <PersonDetailsScreen
           personId={currentScreen.value.personId}
-          from={currentScreen.value.from}
+          from={currentScreen.value.from ?? { t: 'feed' }}
         />
       )
     }
