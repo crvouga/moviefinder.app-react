@@ -13,7 +13,8 @@ export const RelationshipTypeMediaPosterSwiper = (props: {
     mediaId: MediaId | null
     relationshipType: RelationshipType
   }
-  onClick: (clicked: { mediaId: MediaId }) => void
+  onClick: (input: { mediaId: MediaId }) => void
+  onPreload: (input: { mediaId: MediaId }) => void
 }) => {
   const ctx = useCtx()
 
@@ -56,5 +57,12 @@ export const RelationshipTypeMediaPosterSwiper = (props: {
     return media ? [media] : []
   })
 
-  return <MediaPosterSwiper swiper={props.swiper} media={media} onClick={props.onClick} />
+  return (
+    <MediaPosterSwiper
+      swiper={props.swiper}
+      media={media}
+      onClick={props.onClick}
+      onPreload={props.onPreload}
+    />
+  )
 }

@@ -63,6 +63,13 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
             mediaId: media?.id ?? null,
             relationshipType: 'similar',
           }}
+          onPreload={(input) => {
+            ctx.mediaDb.query({
+              where: { op: '=', column: 'id', value: input.mediaId },
+              limit: 1,
+              offset: 0,
+            })
+          }}
           onClick={(clicked) => {
             currentScreen.push({
               t: 'media-details',
@@ -82,6 +89,13 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
           query={{
             mediaId: media?.id ?? null,
             relationshipType: 'recommendation',
+          }}
+          onPreload={(input) => {
+            ctx.mediaDb.query({
+              where: { op: '=', column: 'id', value: input.mediaId },
+              limit: 1,
+              offset: 0,
+            })
           }}
           onClick={(clicked) => {
             currentScreen.push({

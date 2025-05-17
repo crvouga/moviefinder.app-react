@@ -8,6 +8,7 @@ export const MediaPosterSwiper = (props: {
   swiper?: Partial<SwiperContainerProps>
   media?: Media[]
   onClick?: (input: { mediaId: MediaId }) => void
+  onPreload?: (input: { mediaId: MediaId }) => void
   skeleton?: boolean
 }) => {
   return (
@@ -22,6 +23,12 @@ export const MediaPosterSwiper = (props: {
             <Swiper.Slide key={m.id} className="w-42">
               <Clickable
                 className="w-full"
+                onHover={() => {
+                  props.onPreload?.({ mediaId: m.id })
+                }}
+                onPointerDown={() => {
+                  props.onPreload?.({ mediaId: m.id })
+                }}
                 onClick={() => {
                   props.onClick?.({ mediaId: m.id })
                 }}
