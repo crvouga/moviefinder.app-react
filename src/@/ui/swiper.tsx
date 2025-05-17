@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef } from 'react'
 import { register } from 'swiper/element/bundle'
 register()
 
@@ -48,25 +48,21 @@ const activeIndexBy = new Map<string, number>()
 const Container = (props: SwiperContainerProps) => {
   const ref = useRef<HTMLElement>()
 
-  useLayoutEffect(() => {
-    if (!ref.current) {
-      return
+  useEffect(() => {
+    if (!ref.current) return
+
+    const onSlideChange = (event: CustomEvent) => {
+      props.onSlideChange?.({
+        activeSlideIndex: event.detail.activeSlideIndex,
+        data: event.detail.data,
+      })
     }
 
-    Object.assign(ref.current.dataset, {
-      slidesPerView: props.slidesPerView,
-      spaceBetween: props.spaceBetween,
-      loop: props.loop,
-      navigation: props.navigation,
-      direction: props.direction,
-      pagination: props.pagination,
-      slidesOffsetAfter: props.slidesOffsetAfter,
-      slidesOffsetBefore: props.slidesOffsetBefore,
-      initialSlide:
-        props.initialSlide ||
-        (props.slideRestoration?.enabled && activeIndexBy.get(props.slideRestoration.key)),
-    })
-  }, [props.slidesPerView, props.spaceBetween, props.loop, props.navigation, props.pagination])
+    ref.current.addEventListener('swiperslidechange', onSlideChange)
+    return () => {
+      ref.current?.removeEventListener('swiperslidechange', onSlideChange)
+    }
+  }, [])
 
   return (
     <swiper-container
@@ -79,6 +75,8 @@ const Container = (props: SwiperContainerProps) => {
       navigation={props.navigation}
       pagination={props.pagination}
       initial-slide={props.initialSlide}
+      slides-offset-after={props.slidesOffsetAfter}
+      slides-offset-before={props.slidesOffsetBefore}
     >
       {props.children}
     </swiper-container>

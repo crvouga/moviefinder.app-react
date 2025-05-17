@@ -115,6 +115,7 @@ const ViewFeed = (props: { feed: Feed }) => {
           direction="vertical"
           onSlideChange={(event) => {
             const parsed = SlideData.safeParse(event.data)
+            debugger
 
             if (!parsed.success) return
 
@@ -128,11 +129,13 @@ const ViewFeed = (props: { feed: Feed }) => {
             })
           }}
         >
-          <Swiper.Slide>
-            <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-first' })}>
-              <ImgLoading />
-            </WrapIntersectionObserver>
-          </Swiper.Slide>
+          {false && (
+            <Swiper.Slide>
+              <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-first' })}>
+                <ImgLoading />
+              </WrapIntersectionObserver>
+            </Swiper.Slide>
+          )}
 
           {feedItems.map((item, slideIndex) => {
             const data: SlideData = {
