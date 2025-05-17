@@ -36,6 +36,10 @@ const EntryCodec: Codec<Entry> = {
   },
 }
 
+const hashSql = (sql: string[]) => {
+  return btoa(toDeterministicHash(sql))
+}
+
 export const MigrationPolicy = (config: Config): IMigrationPolicy => {
   const logger = Logger.prefix('dangerously-wipe-on-new-schema', config.logger)
   return {
@@ -45,7 +49,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         down: input.down,
       }
       logger.info('running migration policy', logPayload)
-      const key = toDeterministicHash(input.up)
+      const key = hashSql(input.up)
       const prevSchemaResult = await config.kvDb.get(EntryCodec, [key])
       if (isErr(prevSchemaResult)) {
         logger.error('failed to get previous schema', { error: prevSchemaResult.error })
@@ -94,8 +98,8 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         return
       }
 
-      const prevHash = toDeterministicHash(prevSchema.up)
-      const newHash = toDeterministicHash(input.up)
+      const prevHash = hashSql(prevSchema.up)
+      const newHash = hashSql(input.up)
       const didChange = prevHash !== newHash
       if (!didChange) {
         logger.info('no change in schema. skipping.', logPayload)
