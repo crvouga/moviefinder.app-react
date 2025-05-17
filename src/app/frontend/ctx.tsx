@@ -64,9 +64,9 @@ const init = (): Ctx => {
   migrationPolicy = MigrationPolicy({ t: 'always-run', logger })
 
   let kvDb: IKvDb
+  kvDb ??= KvDb({ t: 'hash-map', map: new Map() })
   kvDb ??= KvDb({ t: 'sql-db', sqlDb, migrationPolicy })
   kvDb ??= KvDb({ t: 'browser-storage', storage: localStorage })
-  kvDb ??= KvDb({ t: 'hash-map', map: new Map() })
 
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
@@ -78,24 +78,24 @@ const init = (): Ctx => {
   clientSessionIdStorage.set(clientSessionId)
 
   let mediaDbLocal: IMediaDb
-  mediaDbLocal ??= MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy })
   mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
+  mediaDbLocal ??= MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy })
 
   let personDb: IPersonDb
-  personDb ??= PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
   personDb ??= PersonDb({ t: 'hash-map' })
+  personDb ??= PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
 
   let relationshipDb: IRelationshipDb
-  relationshipDb ??= RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
   relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
+  relationshipDb ??= RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
 
   let creditDb: ICreditDb
-  creditDb ??= CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
   creditDb ??= CreditDb({ t: 'hash-map', personDb })
+  creditDb ??= CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
 
   let videoDb: IVideoDb
-  videoDb ??= VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
   videoDb ??= VideoDb({ t: 'hash-map' })
+  videoDb ??= VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
@@ -109,9 +109,9 @@ const init = (): Ctx => {
   })
 
   let feedDb: IFeedDb
+  feedDb ??= FeedDb({ t: 'hash-map', logger })
   feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
   feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
-  feedDb ??= FeedDb({ t: 'hash-map', logger })
 
   return {
     kvDb,

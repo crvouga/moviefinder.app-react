@@ -21,7 +21,7 @@ export type TypographyProps = {
   color?: 'primary' | 'secondary' | 'tertiary' | 'quaternary'
 }
 
-const SKELETON_CHAR = '_'
+const SKELETON_CHAR = 'S '
 
 export const Typography = (props: TypographyProps) => {
   return (

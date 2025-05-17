@@ -7,11 +7,7 @@ import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
 import { PersonId } from '../person-id'
 
-// const SLIDES_OFFSET_BEFORE = 24
-// const SLIDES_OFFSET_AFTER = 24
-
 export const PersonDetailsScreen = (props: { personId: PersonId | null; from: ScreenFrom }) => {
-  if (props.personId === null) return null
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
   const queried = useSubscription(['person-query', ctx.clientSessionId, props.personId], () =>
