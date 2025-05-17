@@ -68,6 +68,8 @@ const init = (): Ctx => {
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
   clientSessionIdStorage.set(clientSessionId)
 
+  const hashMap = new Map<string, any>()
+
   let mediaDbLocal: IMediaDb
   mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
   mediaDbLocal ??= MediaDbFrontend({ t: 'db-conn', sqlDb, migrationPolicy })

@@ -21,31 +21,37 @@ export const RelationshipTypeMediaPosterSwiper = (props: {
   const queried = useSubscription(
     ['relationship-query', props.query.relationshipType, props.query.mediaId],
     () =>
-      ctx.relationshipDb.liveQuery({
-        limit: 10,
-        offset: 0,
-        where: {
-          op: 'and',
-          clauses: [
-            {
-              column: 'type',
-              op: '=',
-              value: props.query.relationshipType,
+      props.query.mediaId
+        ? ctx.relationshipDb.liveQuery({
+            limit: 10,
+            offset: 0,
+            where: {
+              op: 'and',
+              clauses: [
+                {
+                  column: 'type',
+                  op: '=',
+                  value: props.query.relationshipType,
+                },
+                {
+                  column: 'from',
+                  op: '=',
+                  value: props.query.mediaId,
+                },
+              ],
             },
-            {
-              column: 'from',
-              op: '=',
-              value: props.query.mediaId ?? '',
-            },
-          ],
-        },
-        orderBy: [
-          {
-            column: 'to',
-            direction: 'asc',
-          },
-        ],
-      })
+            orderBy: [
+              {
+                column: 'to',
+                direction: 'asc',
+              },
+              {
+                column: 'id',
+                direction: 'asc',
+              },
+            ],
+          })
+        : null
   )
 
   if (!queried) return <MediaPosterSwiper swiper={props.swiper} skeleton />
