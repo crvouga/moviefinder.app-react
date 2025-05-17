@@ -66,8 +66,12 @@ const init = (): Ctx => {
   let kvDb: IKvDb
   kvDb ??= KvDb({ t: 'sql-db', sqlDb, migrationPolicy })
   kvDb ??= KvDb({ t: 'browser-storage', storage: localStorage })
+  kvDb ??= KvDb({ t: 'hash-map', map: new Map() })
 
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
+
+  let kvCached: IKvDb
+  kvCached ??= KvDb({ t: 'cached', source: kvDb, cache: KvDb({ t: 'hash-map', map: new Map() }) })
 
   const clientSessionIdStorage = ClientSessionIdStorage({ storage: localStorage })
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
@@ -95,7 +99,7 @@ const init = (): Ctx => {
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
-    kvDb,
+    kvDb: kvCached,
     local: mediaDbLocal,
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,

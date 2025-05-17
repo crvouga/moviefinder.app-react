@@ -30,7 +30,6 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId; from: ScreenFrom }
   )
 
   const media = queried?.t === 'ok' ? queried.value.entities.items[0] : null
-  console.log('media', media)
 
   const from: ScreenFrom = media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }
 
