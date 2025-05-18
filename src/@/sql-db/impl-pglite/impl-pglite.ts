@@ -38,7 +38,7 @@ export const SqlDb = (config: Config): ISqlDb => {
         const parsedRows = rows.map((row) => parser.parse(row))
 
         const duration = end - start
-        const durationStr = `${duration.toFixed(2)}ms`
+        const durationStr = `${duration.toFixed(2)}ms\n`
         logger.info('query', durationStr, compileSql(input.sql, input.params), parsedRows)
 
         return Ok({ rows: parsedRows })

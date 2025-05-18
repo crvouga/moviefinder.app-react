@@ -30,6 +30,7 @@ export const ScreenLayout = (props: {
       <div
         ref={scrollableRef}
         className="flex w-full flex-1 flex-col items-center justify-start overflow-x-hidden overflow-y-auto"
+        key={props.scrollKey}
       >
         {props.children}
       </div>
