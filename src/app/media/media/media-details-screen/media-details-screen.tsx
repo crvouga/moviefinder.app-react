@@ -46,7 +46,10 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
       <SectionLayout title="Cast & Crew">
         <MediaCreditsSwiper
           mediaId={media?.id ?? null}
-          swiper={SWIPER_PROPS}
+          swiper={{
+            ...SWIPER_PROPS,
+            slideRestoration: { enabled: true, key: 'media-details-swiper-cast-and-crew' },
+          }}
           onClick={({ personId }) => {
             currentScreen.push({ t: 'person-details', personId })
           }}
@@ -55,7 +58,10 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
 
       <SectionLayout title="Similar">
         <RelationshipTypeMediaPosterSwiper
-          swiper={SWIPER_PROPS}
+          swiper={{
+            ...SWIPER_PROPS,
+            slideRestoration: { enabled: true, key: 'media-details-swiper-similar' },
+          }}
           query={{
             mediaId: media?.id ?? null,
             relationshipType: 'similar',
@@ -67,7 +73,10 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
 
       <SectionLayout title="Recommendations">
         <RelationshipTypeMediaPosterSwiper
-          swiper={SWIPER_PROPS}
+          swiper={{
+            ...SWIPER_PROPS,
+            slideRestoration: { enabled: true, key: 'media-details-swiper-recommendations' },
+          }}
           query={{
             mediaId: media?.id ?? null,
             relationshipType: 'recommendation',

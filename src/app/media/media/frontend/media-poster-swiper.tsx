@@ -15,12 +15,14 @@ export const MediaPosterSwiper = (props: {
     <Swiper.Container {...props.swiper} slidesPerView="auto" spaceBetween={12} className="w-full">
       {props.skeleton || (props.media?.length ?? 0) === 0
         ? [...Array(4)].map((_, i) => (
-            <Swiper.Slide key={i} className="w-42">
-              <MediaPoster skeleton />
-            </Swiper.Slide>
+            <SwiperSlide key={i}>
+              <Clickable className="w-full">
+                <MediaPoster skeleton />
+              </Clickable>
+            </SwiperSlide>
           ))
         : props.media?.map((m) => (
-            <Swiper.Slide key={m.id} className="w-42">
+            <SwiperSlide key={m.id}>
               <Clickable
                 className="w-full"
                 onHover={() => {
@@ -35,8 +37,12 @@ export const MediaPosterSwiper = (props: {
               >
                 <MediaPoster media={m} />
               </Clickable>
-            </Swiper.Slide>
+            </SwiperSlide>
           ))}
     </Swiper.Container>
   )
+}
+
+const SwiperSlide = (props: { children: React.ReactNode }) => {
+  return <Swiper.Slide className="w-42">{props.children}</Swiper.Slide>
 }

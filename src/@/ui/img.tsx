@@ -17,8 +17,19 @@ export const Img = forwardRef<
     img.onerror = () => setState('error')
   }, [props.src])
 
+  const src = props.src ?? ' '
+
+  if (!props.src) {
+    return (
+      <div
+        ref={ref as React.Ref<HTMLDivElement>}
+        className={cn(props.className, 'animate-pulse bg-neutral-700')}
+        style={props.style}
+      />
+    )
+  }
+
   switch (state) {
-    case 'loading':
     case 'error': {
       return (
         <div
@@ -32,13 +43,10 @@ export const Img = forwardRef<
       return (
         <img
           ref={ref as React.Ref<HTMLImageElement>}
-          src={props.src}
+          src={src}
           className={cn(props.className, 'bg-neutral-700')}
           alt={props.alt}
           style={props.style}
-          onError={(e) => {
-            e.currentTarget.style.display = 'none'
-          }}
         />
       )
     }

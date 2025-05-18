@@ -126,7 +126,7 @@ const init = (): Ctx => {
     remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
     pubSub: PubSub(),
-    throttle: TimeSpan.minutes(1),
+    throttle: TimeSpan.seconds(30),
     relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
   })
 

@@ -49,7 +49,7 @@ const Container = (props: SwiperContainerProps) => {
   const ref = useRef<HTMLElement>()
 
   useSwiperSlideChange(ref, props)
-
+  useSlideRestoration(ref, props)
   return (
     <swiper-container
       ref={ref}
@@ -69,6 +69,17 @@ const Container = (props: SwiperContainerProps) => {
   )
 }
 
+const activeSlideIndexStore = new Map<string, number>()
+
+const useSlideRestoration = (ref: React.RefObject<HTMLElement>, props: SwiperContainerProps) => {
+  useEffect(() => {
+    if (!ref.current) return
+    const activeIndex = activeSlideIndexStore.get(props.slideRestoration?.key)
+    if (!activeIndex) return
+    ref.current.swiper.slideTo(activeIndex, 0)
+  }, [])
+}
+
 const useSwiperSlideChange = (ref: React.RefObject<HTMLElement>, props: SwiperContainerProps) => {
   useEffect(() => {
     if (!ref.current) return
@@ -81,6 +92,7 @@ const useSwiperSlideChange = (ref: React.RefObject<HTMLElement>, props: SwiperCo
       const slideData = swiperSlide?.getAttribute?.('data')
       const data = slideData ? decodeData(slideData) : undefined
       props.onSlideChange?.({ activeSlideIndex: activeIndex, data })
+      activeSlideIndexStore.set(props.slideRestoration?.key, activeIndex)
     }
     ref.current?.addEventListener('swiperslidechange', onSlideChange)
     return () => {
