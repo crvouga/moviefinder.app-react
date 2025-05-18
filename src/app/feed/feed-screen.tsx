@@ -174,7 +174,7 @@ const SlideContent = (props: { item: Media }) => {
         src={ImageSet.toHighestRes(props.item.poster)}
         alt={props.item.title ?? ''}
       />
-      <PreloadImg image={ImageSet.toHighestRes(props.item.backdrop)} />
+      <PreloadImg images={props.item.backdrop.lowestToHighestRes} />
     </button>
   )
 }

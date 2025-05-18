@@ -1,3 +1,5 @@
+import { QueryOutput } from '~/@/db/interface/query-output/query-output'
+import { preloadImg } from '~/@/ui/preload-img'
 import { SwiperContainerProps } from '~/@/ui/swiper'
 import { ScreenFrom } from '~/app/@/screen/current-screen'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
@@ -23,12 +25,15 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
 
   const from: ScreenFrom = media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }
 
-  const preloadMedia = (input: { mediaId: MediaId }) => {
-    ctx.mediaDb.query({
+  const preloadMedia = async (input: { mediaId: MediaId }) => {
+    const got = await ctx.mediaDb.query({
       where: { op: '=', column: 'id', value: input.mediaId },
       limit: 1,
       offset: 0,
     })
+    const media = QueryOutput.first(got)
+    if (!media) return
+    preloadImg(media.backdrop.lowestToHighestRes)
   }
 
   const pushMediaDetails = (input: { mediaId: MediaId }) => {
