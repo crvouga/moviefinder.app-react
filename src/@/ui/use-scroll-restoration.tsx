@@ -23,7 +23,7 @@ export const useScrollRestoration = (input: {
     }
 
     setScrollTop()
-    input.scrollableRef.current?.addEventListener('scroll', onScroll)
+    input.scrollableRef.current?.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       input.scrollableRef.current?.removeEventListener('scroll', onScroll)
     }
