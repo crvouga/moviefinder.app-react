@@ -1,8 +1,8 @@
 import { useRef } from 'react'
 import { TimeSpan } from '~/@/time-span'
 import { BottomButton, BottomButtons } from '~/@/ui/bottom-buttons'
-import { useScrollRestoration } from '~/@/ui/use-scroll-restoration'
 import { TopBar } from '~/@/ui/top-bar'
+import { useScrollRestoration } from '~/@/ui/use-scroll-restoration'
 import { useAppBottomButtons } from './app-bottom-buttons'
 
 export const ScreenLayout = (props: {
@@ -14,13 +14,13 @@ export const ScreenLayout = (props: {
   children: React.ReactNode
   includeAppBottomButtons?: boolean
   includeGutter?: boolean
-  scrollKey?: string
+  scrollKey: string
 }) => {
   const appBottomButtons = useAppBottomButtons()
   const scrollableRef = useRef<HTMLDivElement>(null)
   useScrollRestoration({
     scrollableRef: scrollableRef as React.RefObject<HTMLElement>,
-    scrollKey: props.scrollKey ?? '',
+    scrollKey: props.scrollKey,
     delay: TimeSpan.milliseconds(0),
   })
   return (
@@ -29,7 +29,6 @@ export const ScreenLayout = (props: {
 
       <div
         ref={scrollableRef}
-        key={props.scrollKey}
         className="flex w-full flex-1 flex-col items-center justify-start overflow-x-hidden overflow-y-auto"
       >
         {props.children}

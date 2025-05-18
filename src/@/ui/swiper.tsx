@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { register } from 'swiper/element/bundle'
 register()
 
@@ -37,10 +37,7 @@ export type SwiperContainerProps = {
   onSlideChange?: (input: { activeSlideIndex: number; data: unknown }) => void
   slidesOffsetAfter?: number
   slidesOffsetBefore?: number
-  slideRestoration?: {
-    enabled: boolean
-    key: string
-  }
+  slideRestorationKey?: string
 }
 
 const activeIndexBy = new Map<string, number>()
@@ -69,13 +66,16 @@ const Container = (props: SwiperContainerProps) => {
   )
 }
 
-const activeSlideIndexStore = new Map<string, number>()
+const slideRestorationCache = new Map<string, number>()
 
 const useSlideRestoration = (ref: React.RefObject<HTMLElement>, props: SwiperContainerProps) => {
   useEffect(() => {
     if (!ref.current) return
-    const activeIndex = activeSlideIndexStore.get(props.slideRestoration?.key)
-    if (!activeIndex) return
+
+    const activeIndex = slideRestorationCache.get(props.slideRestorationKey)
+
+    if (typeof activeIndex !== 'number') return
+
     ref.current.swiper.slideTo(activeIndex, 0)
   }, [])
 }
@@ -92,7 +92,8 @@ const useSwiperSlideChange = (ref: React.RefObject<HTMLElement>, props: SwiperCo
       const slideData = swiperSlide?.getAttribute?.('data')
       const data = slideData ? decodeData(slideData) : undefined
       props.onSlideChange?.({ activeSlideIndex: activeIndex, data })
-      activeSlideIndexStore.set(props.slideRestoration?.key, activeIndex)
+
+      slideRestorationCache.set(props.slideRestorationKey, activeIndex)
     }
     ref.current?.addEventListener('swiperslidechange', onSlideChange)
     return () => {

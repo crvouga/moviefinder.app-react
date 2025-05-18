@@ -39,7 +39,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
     <ScreenLayout
       includeGutter
       topBar={{ onBack: () => currentScreen.push(props.from), title: media?.title ?? ' ' }}
-      scrollKey={props.mediaId?.toString() ?? ''}
+      scrollKey={`media-details-${props.mediaId?.toString() ?? ''}`}
     >
       <MainSection media={media ?? null} />
 
@@ -48,7 +48,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
           mediaId={media?.id ?? null}
           swiper={{
             ...SWIPER_PROPS,
-            slideRestoration: { enabled: true, key: 'media-details-swiper-cast-and-crew' },
+            slideRestorationKey: `media-details-swiper-cast-and-crew-${media?.id}`,
           }}
           onClick={({ personId }) => {
             currentScreen.push({ t: 'person-details', personId })
@@ -60,7 +60,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
         <RelationshipTypeMediaPosterSwiper
           swiper={{
             ...SWIPER_PROPS,
-            slideRestoration: { enabled: true, key: 'media-details-swiper-similar' },
+            slideRestorationKey: `media-details-swiper-similar-${media?.id}`,
           }}
           query={{
             mediaId: media?.id ?? null,
@@ -75,7 +75,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
         <RelationshipTypeMediaPosterSwiper
           swiper={{
             ...SWIPER_PROPS,
-            slideRestoration: { enabled: true, key: 'media-details-swiper-recommendations' },
+            slideRestorationKey: `media-details-swiper-recommendations-${media?.id}`,
           }}
           query={{
             mediaId: media?.id ?? null,

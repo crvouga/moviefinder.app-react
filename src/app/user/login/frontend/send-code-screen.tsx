@@ -31,6 +31,7 @@ export const SendCodeScreen = () => {
 
   return (
     <ScreenLayout
+      scrollKey="send-code"
       topBar={{
         title: 'Send Code',
         onBack: () => {

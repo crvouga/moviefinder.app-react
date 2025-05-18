@@ -31,6 +31,7 @@ export const VerifyCodeScreen = ({ phoneNumber }: { phoneNumber: string }) => {
 
   return (
     <ScreenLayout
+      scrollKey="verify-code"
       topBar={{
         title: 'Verify Code',
         onBack: () => {

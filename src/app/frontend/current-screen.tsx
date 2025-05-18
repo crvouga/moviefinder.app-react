@@ -14,37 +14,28 @@ export const CurrentScreen = () => {
       <ConditionalHide t="feed">
         <FeedScreen />
       </ConditionalHide>
-      <ConditionalHide t="account">
-        <AccountScreen />
-      </ConditionalHide>
-      <ConditionalHide t="media-details">
+
+      {currentScreen.value.t === 'account' && <AccountScreen />}
+
+      {currentScreen.value.t === 'media-details' && (
         <MediaDetailsScreen
-          mediaId={currentScreen.value.t === 'media-details' ? currentScreen.value.mediaId : null}
-          from={
-            currentScreen.value.t === 'media-details'
-              ? (currentScreen.value.from ?? { t: 'feed' })
-              : { t: 'feed' }
-          }
+          mediaId={currentScreen.value.mediaId}
+          from={currentScreen.value.from ?? { t: 'feed' }}
         />
-      </ConditionalHide>
-      <ConditionalHide t="login">
-        <LoginScreen />
-      </ConditionalHide>
-      <ConditionalHide t="person-details">
+      )}
+
+      {currentScreen.value.t === 'login' && <LoginScreen />}
+
+      {currentScreen.value.t === 'person-details' && (
         <PersonDetailsScreen
-          personId={
-            currentScreen.value.t === 'person-details' ? currentScreen.value.personId : null
-          }
-          from={
-            currentScreen.value.t === 'person-details'
-              ? (currentScreen.value.from ?? { t: 'feed' })
-              : { t: 'feed' }
-          }
+          personId={currentScreen.value.personId}
+          from={currentScreen.value.from ?? { t: 'feed' }}
         />
-      </ConditionalHide>
+      )}
     </>
   )
 }
+
 const ConditionalHide = (props: { children: React.ReactNode; t: ICurrentScreen['t'] }) => {
   const currentScreen = useCurrentScreen()
   return (

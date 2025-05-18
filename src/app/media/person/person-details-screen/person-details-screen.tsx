@@ -24,6 +24,7 @@ export const PersonDetailsScreen = (props: { personId: PersonId | null; from: Sc
 
   return (
     <ScreenLayout
+      scrollKey="person-details"
       includeGutter
       topBar={{
         onBack: () => currentScreen.push(props.from),

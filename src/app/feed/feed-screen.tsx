@@ -45,7 +45,7 @@ export const FeedScreen = () => {
   }, [ctx, feedQuery, feed])
 
   return (
-    <ScreenLayout topBar={{ title: 'Feed' }} includeAppBottomButtons>
+    <ScreenLayout scrollKey="feed" topBar={{ title: 'Feed' }} includeAppBottomButtons>
       {feed ? <ViewFeed feed={feed} /> : <ImgLoading />}
     </ScreenLayout>
   )

@@ -3,7 +3,7 @@ import { LoginCta } from './login-cta'
 
 export const AccountScreen = () => {
   return (
-    <ScreenLayout topBar={{ title: 'Account' }} includeAppBottomButtons>
+    <ScreenLayout scrollKey="account" topBar={{ title: 'Account' }} includeAppBottomButtons>
       <LoginCta />
     </ScreenLayout>
   )
