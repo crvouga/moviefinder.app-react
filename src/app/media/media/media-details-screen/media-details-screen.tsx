@@ -1,7 +1,7 @@
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { preloadImages } from '~/@/ui/img'
 import { SwiperContainerProps } from '~/@/ui/swiper'
-import { ScreenFrom } from '~/app/@/screen/current-screen'
+import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'

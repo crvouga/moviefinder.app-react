@@ -26,7 +26,7 @@ export const VerifyCodeScreen = ({ phoneNumber }: { phoneNumber: string }) => {
     patch({ request: Loading })
     await new Promise((resolve) => setTimeout(resolve, 1000))
     patch({ request: Ok(null) })
-    currentScreen.push({ t: 'account' })
+    currentScreen.push({ t: 'user', c: { t: 'account' } })
   }
 
   return (

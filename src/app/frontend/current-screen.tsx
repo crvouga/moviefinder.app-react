@@ -1,50 +1,55 @@
 import { cn } from '~/@/ui/cn'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
-import { ICurrentScreen } from '../@/screen/current-screen'
+import { ICurrentScreen } from '../@/screen/current-screen-types'
 import { FeedScreen } from '../feed/feed-screen'
 import { MediaDetailsScreen } from '../media/media/media-details-screen/media-details-screen'
 import { PersonDetailsScreen } from '../media/person/person-details-screen/person-details-screen'
-import { AccountScreen } from '../user/account/account-screen'
 import { LoginScreen } from '../user/login/login-screen'
+import { UserScreen } from '../user/user-screen'
 
 export const CurrentScreen = () => {
   const currentScreen = useCurrentScreen()
   return (
     <>
-      <ConditionalHide t="feed">
+      <ConditionalHide name="feed" show={currentScreen.value.t === 'feed'}>
         <FeedScreen />
       </ConditionalHide>
 
-      {currentScreen.value.t === 'account' && <AccountScreen />}
-
-      {currentScreen.value.t === 'media-details' && (
-        <MediaDetailsScreen
-          mediaId={currentScreen.value.mediaId}
-          from={currentScreen.value.from ?? { t: 'feed' }}
-        />
-      )}
-
-      {currentScreen.value.t === 'login' && <LoginScreen />}
-
-      {currentScreen.value.t === 'person-details' && (
-        <PersonDetailsScreen
-          personId={currentScreen.value.personId}
-          from={currentScreen.value.from ?? { t: 'feed' }}
-        />
-      )}
+      <CurrentScreenSwitch screen={currentScreen.value} />
     </>
   )
 }
 
-const ConditionalHide = (props: { children: React.ReactNode; t: ICurrentScreen['t'] }) => {
-  const currentScreen = useCurrentScreen()
+const CurrentScreenSwitch = (props: { screen: ICurrentScreen }) => {
+  switch (props.screen.t) {
+    case 'feed':
+      return null
+    case 'user':
+      return <UserScreen screen={props.screen.c} />
+    case 'login':
+      return <LoginScreen screen={props.screen.c} />
+    case 'media-details':
+      return (
+        <MediaDetailsScreen
+          mediaId={props.screen.mediaId}
+          from={props.screen.from ?? { t: 'feed' }}
+        />
+      )
+    case 'person-details':
+      return (
+        <PersonDetailsScreen
+          personId={props.screen.personId}
+          from={props.screen.from ?? { t: 'feed' }}
+        />
+      )
+  }
+}
+
+const ConditionalHide = (props: { children: React.ReactNode; name: string; show: boolean }) => {
   return (
     <div
-      data-screen={props.t}
-      className={cn(
-        currentScreen.value.t !== props.t && 'hidden',
-        'flex h-full w-full flex-col overflow-hidden'
-      )}
+      data-screen={props.name}
+      className={cn(!props.show && 'hidden', 'flex h-full w-full flex-col overflow-hidden')}
     >
       {props.children}
     </div>

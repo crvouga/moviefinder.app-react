@@ -9,6 +9,7 @@ export const ScreenLayout = (props: {
   topBar: {
     title: string
     onBack?: () => void
+    onMore?: () => void
   }
   actions?: BottomButton[]
   children: React.ReactNode
@@ -25,7 +26,11 @@ export const ScreenLayout = (props: {
   })
   return (
     <div className="flex w-full flex-1 flex-col items-center justify-center overflow-hidden">
-      <TopBar onBack={props.topBar.onBack} title={props.topBar.title} />
+      <TopBar
+        onBack={props.topBar.onBack}
+        title={props.topBar.title}
+        onMore={props.topBar.onMore}
+      />
 
       <div
         ref={scrollableRef}

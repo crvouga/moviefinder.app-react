@@ -7,6 +7,7 @@ export const usePath = <T>(config: {
 }): {
   value: T
   push: (value: T) => void
+  replace: (value: T) => void
 } => {
   const { defaultValue, codec } = config
   const path = usePathname()
@@ -17,6 +18,11 @@ export const usePath = <T>(config: {
       const encoded = codec.encode(value)
       window.history.pushState({}, '', '/' + encoded)
       window.dispatchEvent(new Event('pushstate'))
+    },
+    replace: (value: T) => {
+      const encoded = codec.encode(value)
+      window.history.replaceState({}, '', '/' + encoded)
+      window.dispatchEvent(new Event('replacestate'))
     },
   }
 }

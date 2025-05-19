@@ -1,5 +1,5 @@
 import { Button } from '~/@/ui/button'
-import { IconDoorOpenSolid } from '~/@/ui/icon/door-open/solid'
+import { IconDoorOpenSolid } from '~/@/ui/icon'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 
 export const LoginCta = () => {

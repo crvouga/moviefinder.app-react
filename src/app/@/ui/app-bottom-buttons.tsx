@@ -1,6 +1,5 @@
 import { BottomButton } from '~/@/ui/bottom-buttons'
-import { IconHomeSolid } from '~/@/ui/icon/home/solid'
-import { IconUserCircleSolid } from '~/@/ui/icon/user-circle/solid'
+import { IconHomeSolid, IconUserCircleSolid } from '~/@/ui/icon'
 import { useCurrentScreen } from '../screen/use-current-screen'
 
 export const useAppBottomButtons = (): BottomButton[] => {
@@ -15,8 +14,8 @@ export const useAppBottomButtons = (): BottomButton[] => {
     {
       icon: (props) => <IconUserCircleSolid {...props} />,
       label: 'Account',
-      selected: currentScreen.value.t === 'account',
-      onClick: () => currentScreen.push({ t: 'account' }),
+      selected: currentScreen.value.t === 'user',
+      onClick: () => currentScreen.push({ t: 'user', c: { t: 'account' } }),
     },
   ]
 }

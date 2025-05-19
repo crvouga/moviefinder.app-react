@@ -1,7 +1,7 @@
 import { ImageSet } from '~/@/image-set'
 import { Avatar } from '~/@/ui/avatar'
 import { useSubscription } from '~/@/ui/use-subscription'
-import { ScreenFrom } from '~/app/@/screen/current-screen'
+import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'

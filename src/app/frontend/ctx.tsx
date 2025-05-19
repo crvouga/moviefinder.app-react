@@ -38,6 +38,7 @@ export type Ctx = {
   relationshipDb: IRelationshipDb
   creditDb: ICreditDb
   videoDb: IVideoDb
+  pglite: Promise<IPgliteInstance>
 }
 
 type Config = {
@@ -143,6 +144,7 @@ const init = (): Ctx => {
     relationshipDb,
     creditDb,
     videoDb,
+    pglite,
   }
 }
 

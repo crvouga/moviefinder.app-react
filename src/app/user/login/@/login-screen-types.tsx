@@ -10,8 +10,8 @@ const parser = z.discriminatedUnion('t', [
   }),
 ])
 
-export type LoginScreen = z.infer<typeof parser>
+export type ILoginScreen = z.infer<typeof parser>
 
-export const LoginScreen = {
+export const ILoginScreen = {
   parser,
 }

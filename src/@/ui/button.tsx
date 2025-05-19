@@ -1,4 +1,5 @@
 import React from 'react'
+import { Clickable } from './clickable'
 import { cn } from './cn'
 import { Spinner } from './spinner'
 
@@ -31,7 +32,7 @@ export type ButtonInput = {
 
 export const Button = (input: ButtonInput) => {
   return (
-    <button
+    <Clickable
       disabled={input.disabled || input.loading}
       type={input.type ?? 'button'}
       className={cn(
@@ -43,7 +44,6 @@ export const Button = (input: ButtonInput) => {
         input.disabled && 'cursor-not-allowed opacity-60',
         input.loading && 'cursor-wait opacity-70'
       )}
-      role="button"
       onClick={(e) =>
         input.onClick?.({
           currentTarget: e.currentTarget,
@@ -70,7 +70,7 @@ export const Button = (input: ButtonInput) => {
           <Spinner className="size-8" />
         </div>
       )}
-    </button>
+    </Clickable>
   )
 }
 

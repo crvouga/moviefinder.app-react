@@ -35,7 +35,7 @@ export const SendCodeScreen = () => {
       topBar={{
         title: 'Send Code',
         onBack: () => {
-          currentScreen.push({ t: 'account' })
+          currentScreen.push({ t: 'user', c: { t: 'account' } })
         },
       }}
     >

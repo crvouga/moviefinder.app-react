@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { cn } from './cn'
-import { IconXMark } from './icon/x-mark/solid'
+import { IconXMarkSolid } from './icon'
 
 export const TextField = (input: {
   startIcon?: ReactNode
@@ -80,7 +80,7 @@ export const TextField = (input: {
               input.onClear?.()
             }}
           >
-            <IconXMark className="size-6" />
+            <IconXMarkSolid className="size-6" />
           </button>
         )}
       </div>

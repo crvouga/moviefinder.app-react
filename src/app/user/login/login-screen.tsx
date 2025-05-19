@@ -1,16 +1,13 @@
-import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
+import { ILoginScreen } from './@/login-screen-types'
 import { SendCodeScreen } from './frontend/send-code-screen'
 import { VerifyCodeScreen } from './frontend/verify-code-screen'
 
-export const LoginScreen = () => {
-  const currentScreen = useCurrentScreen()
-  if (currentScreen.value.t !== 'login') return null
-
-  switch (currentScreen.value.c.t) {
+export const LoginScreen = (props: { screen: ILoginScreen }) => {
+  switch (props.screen.t) {
     case 'send-code':
       return <SendCodeScreen />
     case 'verify-code':
-      return <VerifyCodeScreen phoneNumber={currentScreen.value.c.phoneNumber} />
+      return <VerifyCodeScreen phoneNumber={props.screen.phoneNumber} />
     default:
       throw new Error('invalid screen')
   }

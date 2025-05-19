@@ -2,7 +2,8 @@ import { z } from 'zod'
 import { Codec } from '~/@/codec'
 import { MediaId } from '~/app/media/media/media-id'
 import { PersonId } from '~/app/media/person/person-id'
-import { LoginScreen } from '~/app/user/login/@/login-screen'
+import { ILoginScreen } from '~/app/user/login/@/login-screen-types'
+import { IUserScreen } from '~/app/user/@/user-screen-types'
 
 const ScreenFrom = z.discriminatedUnion('t', [
   z.object({
@@ -25,11 +26,12 @@ const parser = z.discriminatedUnion('t', [
     t: z.literal('feed'),
   }),
   z.object({
-    t: z.literal('account'),
+    t: z.literal('user'),
+    c: IUserScreen.parser,
   }),
   z.object({
     t: z.literal('login'),
-    c: LoginScreen.parser,
+    c: ILoginScreen.parser,
   }),
   z.object({
     t: z.literal('media-details'),

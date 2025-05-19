@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.0",
+    "@electric-sql/pglite-repl": "^0.2.19",
     "@faker-js/faker": "^9.7.0",
     "@trpc/client": "^11.0.0-rc.833",
     "@trpc/server": "^11.0.0-rc.833",
