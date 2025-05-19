@@ -15,7 +15,7 @@ export type Ctx = {
 }
 
 const init = (): Ctx => {
-  const logger = Logger.prefix('app', Logger({ t: 'console' }))
+  const logger = Logger({ t: 'console', prefix: ['app'] })
 
   const TMDB_API_READ_ACCESS_TOKEN = TmdbApiKey.parse(process.env.TMDB_API_READ_ACCESS_TOKEN)
 

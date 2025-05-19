@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { Codec } from '~/@/codec'
 import { toDeterministicHash } from '~/@/deterministic-hash'
-import { ILogger, Logger } from '~/@/logger'
+import { ILogger } from '~/@/logger'
 import { isErr } from '~/@/result'
 import { IKvDb } from '../../kv-db/interface'
 import { IMigrationPolicy } from '../interface'
@@ -41,14 +41,14 @@ const hashSql = (sql: string[]) => {
 }
 
 export const MigrationPolicy = (config: Config): IMigrationPolicy => {
-  const logger = Logger.prefix('dangerously-wipe-on-new-schema', config.logger)
+  const logger = config.logger.prefix(['dangerously-wipe-on-new-schema'])
   return {
     async run(input) {
       const logPayload = {
         up: input.up,
         down: input.down,
       }
-      logger.info('running migration policy', logPayload)
+      logger.debug('running migration policy', logPayload)
       const key = hashSql(input.up)
       const prevSchemaResult = await config.kvDb.get(EntryCodec, [key])
       if (isErr(prevSchemaResult)) {
@@ -57,9 +57,9 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       }
       const prevSchema = prevSchemaResult.value[0]
       if (!prevSchema) {
-        logger.info('no previous schema. running up migration', logPayload)
+        logger.debug('no previous schema. running up migration', logPayload)
 
-        logger.info('running down migration to ensure the up migration succeeds', logPayload)
+        logger.debug('running down migration to ensure the up migration succeeds', logPayload)
 
         for (const down of input.down) {
           const downResult = await input.sqlDb.query({
@@ -74,7 +74,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
           }
         }
 
-        logger.info('running up migration', logPayload)
+        logger.debug('running up migration', logPayload)
 
         for (const up of input.up) {
           const upResult = await input.sqlDb.query({
@@ -92,9 +92,9 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
           up: input.up,
           down: input.down,
         }
-        logger.info('up migration complete. writing new schema', { input, entryNew })
+        logger.debug('up migration complete. writing new schema', { input, entryNew })
         await config.kvDb.set(EntryCodec, [key, entryNew])
-        logger.info('new schema written', { input, entryNew })
+        logger.debug('new schema written', { input, entryNew })
         return
       }
 
@@ -102,11 +102,11 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
       const newHash = hashSql(input.up)
       const didChange = prevHash !== newHash
       if (!didChange) {
-        logger.info('no change in schema. skipping.', logPayload)
+        logger.debug('no change in schema. skipping.', logPayload)
         return
       }
 
-      logger.info('schema changed. running down migration', logPayload)
+      logger.debug('schema changed. running down migration', logPayload)
       for (const down of prevSchema.down) {
         const downResult = await input.sqlDb.query({
           sql: down,
@@ -119,7 +119,7 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         }
       }
 
-      logger.info('down migration complete. running up migration', logPayload)
+      logger.debug('down migration complete. running up migration', logPayload)
       for (const up of input.up) {
         const upResult = await input.sqlDb.query({
           sql: up,
@@ -132,13 +132,13 @@ export const MigrationPolicy = (config: Config): IMigrationPolicy => {
         }
       }
 
-      logger.info('up migration complete. writing new schema', logPayload)
+      logger.debug('up migration complete. writing new schema', logPayload)
       const entryNew: Entry = {
         up: input.up,
         down: input.down,
       }
       await config.kvDb.set(EntryCodec, [key, entryNew])
-      logger.info('new schema written', { input, entryNew })
+      logger.debug('new schema written', { input, entryNew })
     },
   }
 }

@@ -8,7 +8,7 @@ export type Config = ImplDangerouslyWipeOnNewSchema.Config | ImplNoop.Config | I
 
 export const MigrationPolicy = (config: Config): IMigrationPolicy => {
   const configLogger = 'logger' in config ? config.logger : Logger({ t: 'noop' })
-  const logger = Logger.prefix('migration-policy', configLogger)
+  const logger = configLogger.prefix(['migration-policy'])
   switch (config.t) {
     case 'noop':
       return ImplNoop.MigrationPolicy({ ...config })

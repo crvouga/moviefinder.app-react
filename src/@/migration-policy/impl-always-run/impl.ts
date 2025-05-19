@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ILogger, Logger } from '~/@/logger'
+import { ILogger } from '~/@/logger'
 import { IMigrationPolicy } from '../interface'
 
 export type Config = {
@@ -8,7 +8,7 @@ export type Config = {
 }
 
 export const MigrationPolicy = (config: Config): IMigrationPolicy => {
-  const logger = Logger.prefix('always-run', config.logger)
+  const logger = config.logger.prefix(['always-run'])
   return {
     async run(input) {
       logger.info('running migration policy', { input })

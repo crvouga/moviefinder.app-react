@@ -1,12 +1,12 @@
 import type { LiveQuery } from '@electric-sql/pglite/live'
 import { z } from 'zod'
-import { ILogger, Logger } from '~/@/logger'
+import { ILogger } from '~/@/logger'
 import { IPgliteInstance, IPgliteWorkerInstance } from '~/@/pglite/types'
 import { PubSub, Sub } from '~/@/pub-sub'
 import { Err, Ok, Result } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { SqlDbParam } from '~/@/sql-db/sql-db-param'
-import { compileSql } from '~/@/sql/compile'
+import { toPrettySql } from '~/@/sql/pretty-sql'
 
 export type Config = {
   t: 'pglite'
@@ -15,7 +15,7 @@ export type Config = {
 }
 
 export const SqlDb = (config: Config): ISqlDb => {
-  const logger = Logger.prefix('pglite', config.logger)
+  const logger = config.logger.prefix(['pglite'])
 
   return {
     async query(input) {
@@ -39,7 +39,7 @@ export const SqlDb = (config: Config): ISqlDb => {
 
         const duration = end - start
         const durationStr = `${duration.toFixed(2)}ms\n`
-        logger.info('query', durationStr, compileSql(input.sql, input.params), parsedRows)
+        logger.debug('query', durationStr, toPrettySql(input.sql, input.params), parsedRows)
 
         return Ok({ rows: parsedRows })
       } catch (error) {
@@ -78,8 +78,8 @@ export const SqlDb = (config: Config): ISqlDb => {
                 return []
               })
               const result = Ok({ rows: parsedRows })
-              logger.info(
-                `liveQuery\n${compileSql(input.sql, [...(input.params ?? [])])}\n`,
+              logger.debug(
+                `liveQuery\n${toPrettySql(input.sql, [...(input.params ?? [])])}\n`,
                 result.value.rows
               )
               return pubSub.publish(result)

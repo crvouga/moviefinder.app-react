@@ -7,4 +7,7 @@ export const loggerNoop: ILogger = {
   debug() {},
   trace() {},
   fatal() {},
+  prefix() {
+    return loggerNoop
+  },
 }

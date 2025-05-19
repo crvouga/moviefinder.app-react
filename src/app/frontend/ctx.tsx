@@ -52,7 +52,7 @@ const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
   let logger: ILogger
-  logger ??= Logger.prefix('app', Logger({ t: 'console' }))
+  logger ??= Logger({ t: 'console', prefix: ['app'] })
   logger ??= Logger({ t: 'noop' })
 
   let pglite: Promise<IPgliteInstance>
@@ -65,7 +65,7 @@ const init = (): Ctx => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 
-  const trpcClient = TrpcClient({ backendUrl })
+  const trpcClient = TrpcClient({ backendUrl, logger })
 
   let migrationPolicy: IMigrationPolicy
   migrationPolicy = MigrationPolicy({ t: 'always-run', logger })
