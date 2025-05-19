@@ -10,4 +10,12 @@ export const loggerNoop: ILogger = {
   prefix() {
     return loggerNoop
   },
+  setMaxLevel: {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    trace: () => {},
+    fatal: () => {},
+  },
 }

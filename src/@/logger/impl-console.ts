@@ -1,4 +1,4 @@
-import type { ILogger, LogLevel } from './interface'
+import { LOG_LEVEL_ORDER, type ILogger, type LogLevel } from './interface'
 
 export type Config = {
   t: 'console'
@@ -19,28 +19,78 @@ const toPrefix = (config: Config, logLevel: LogLevel): string => {
   return `${colors[logLevel]}[${logLevel}] [${config.prefix.join('] [')}]${RESET}`
 }
 
+type State = {
+  maxLogLevel: LogLevel
+}
+
+let state: State = { maxLogLevel: 'info' }
+
+const setMaxLevel = (logLevel: LogLevel) => {
+  state = { ...state, maxLogLevel: logLevel }
+  console.log(`max log level is set to ${logLevel}`)
+}
+
+const shouldLog = (maxLogLevel: LogLevel, logLevel: LogLevel): boolean => {
+  return LOG_LEVEL_ORDER.indexOf(maxLogLevel) >= LOG_LEVEL_ORDER.indexOf(logLevel)
+}
+
 export const Logger = (config: Config): ILogger => {
   return {
     info(...args) {
-      console.log(toPrefix(config, 'info'), ...args)
+      if (shouldLog(state.maxLogLevel, 'info')) {
+        console.log(toPrefix(config, 'info'), ...args)
+      }
     },
     warn(...args) {
-      console.warn(toPrefix(config, 'warn'), ...args)
+      if (shouldLog(state.maxLogLevel, 'warn')) {
+        console.warn(toPrefix(config, 'warn'), ...args)
+      }
     },
     error(...args) {
-      console.error(toPrefix(config, 'error'), ...args)
+      if (shouldLog(state.maxLogLevel, 'error')) {
+        console.error(toPrefix(config, 'error'), ...args)
+      }
     },
     debug(...args) {
-      console.debug(toPrefix(config, 'debug'), ...args)
+      if (shouldLog(state.maxLogLevel, 'debug')) {
+        console.debug(toPrefix(config, 'debug'), ...args)
+      }
     },
     trace(...args) {
-      console.trace(toPrefix(config, 'trace'), ...args)
+      if (shouldLog(state.maxLogLevel, 'trace')) {
+        console.trace(toPrefix(config, 'trace'), ...args)
+      }
     },
     fatal(...args) {
-      console.error(toPrefix(config, 'fatal'), ...args)
+      if (shouldLog(state.maxLogLevel, 'fatal')) {
+        console.error(toPrefix(config, 'fatal'), ...args)
+      }
     },
     prefix(prefix: string[]) {
-      return Logger({ ...config, prefix: [...config.prefix, ...prefix] })
+      return Logger({
+        ...config,
+        prefix: [...config.prefix, ...prefix],
+      })
+    },
+    setMaxLevel: {
+      info: () => {
+        setMaxLevel('info')
+      },
+      warn: () => {
+        setMaxLevel('warn')
+      },
+      error: () => {
+        setMaxLevel('error')
+      },
+      debug: () => {
+        setMaxLevel('debug')
+      },
+      trace: () => {
+        setMaxLevel('trace')
+      },
+      fatal: () => {
+        setMaxLevel('fatal')
+      },
     },
   }
 }

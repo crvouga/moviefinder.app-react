@@ -1,10 +1,7 @@
 import { SqlDbParam } from '../sql-db/sql-db-param'
 import { compileSql } from './compile'
 
-const PURPLE = '\x1b[35m'
-const RESET = '\x1b[0m'
-
-const SQL_KEYWORDS = [
+export const SQL_KEYWORDS = [
   'SELECT',
   'FROM',
   'WHERE',
@@ -54,10 +51,5 @@ const SQL_KEYWORDS = [
 export const toPrettySql = (sql: string, params: SqlDbParam[] | undefined) => {
   const compiledSql = compileSql(sql, params)
 
-  const prettySql = compiledSql.replace(
-    new RegExp(`\\b(${SQL_KEYWORDS.join('|')})\\b`, 'gi'),
-    `${PURPLE}$1${RESET}`
-  )
-
-  return prettySql
+  return compiledSql
 }

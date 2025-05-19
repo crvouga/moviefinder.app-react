@@ -6,7 +6,7 @@ import { PubSub, Sub } from '~/@/pub-sub'
 import { Err, Ok, Result } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { SqlDbParam } from '~/@/sql-db/sql-db-param'
-import { toPrettySql } from '~/@/sql/pretty-sql'
+import { compileSql } from '~/@/sql/compile'
 
 export type Config = {
   t: 'pglite'
@@ -39,7 +39,7 @@ export const SqlDb = (config: Config): ISqlDb => {
 
         const duration = end - start
         const durationStr = `${duration.toFixed(2)}ms\n`
-        logger.debug('query', durationStr, toPrettySql(input.sql, input.params), parsedRows)
+        logger.debug('query', durationStr, compileSql(input.sql, input.params), parsedRows)
 
         return Ok({ rows: parsedRows })
       } catch (error) {
@@ -79,7 +79,7 @@ export const SqlDb = (config: Config): ISqlDb => {
               })
               const result = Ok({ rows: parsedRows })
               logger.debug(
-                `liveQuery\n${toPrettySql(input.sql, [...(input.params ?? [])])}\n`,
+                `liveQuery\n${compileSql(input.sql, [...(input.params ?? [])])}\n`,
                 result.value.rows
               )
               return pubSub.publish(result)
