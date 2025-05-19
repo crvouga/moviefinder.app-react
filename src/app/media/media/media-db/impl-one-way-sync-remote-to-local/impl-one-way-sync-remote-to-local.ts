@@ -1,5 +1,6 @@
 import { IDb } from '~/@/db/interface'
 import { toDeterministicHash } from '~/@/deterministic-hash'
+import { KvDb } from '~/@/kv-db/impl'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { PubSub } from '~/@/pub-sub'
@@ -24,7 +25,7 @@ export type Config = {
   kvDb: IKvDb
   mediaDbLocal: IMediaDb
   mediaDbRemote: IMediaDb
-  pubSub: PubSub<OneWaySyncRemoteToLocalMsg>
+  pubSub?: PubSub<OneWaySyncRemoteToLocalMsg>
   throttle: TimeSpan
   relatedDbs: {
     creditDb: ICreditDb
@@ -35,12 +36,15 @@ export type Config = {
 }
 
 export const MediaDb = (config: Config): IMediaDb => {
+  const kvDb = KvDb({
+    t: 'cached',
+    source: config.kvDb,
+    cache: KvDb({ t: 'hash-map', map: new Map() }),
+  })
   const remoteToLocalSync = throttleByKeyDurable(
-    config.kvDb,
+    kvDb,
     config.throttle,
-    (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => {
-      return toDeterministicHash(query)
-    },
+    (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => toDeterministicHash(query),
     async (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => {
       const remoteQueried = await config.mediaDbRemote.query(query)
       const media = isOk(remoteQueried) ? remoteQueried.value.entities.items : []
@@ -64,7 +68,7 @@ export const MediaDb = (config: Config): IMediaDb => {
           }),
         ])
       }
-      config.pubSub.publish({
+      config.pubSub?.publish({
         t: 'synced-remote-to-local',
         remoteQuery: remoteQueried,
         localUpsert,

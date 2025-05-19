@@ -7,7 +7,6 @@ import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { PgliteInstance } from '~/@/pglite/pglite-instance'
 import { PgliteWorkerInstance } from '~/@/pglite/pglite-worker-instance/pglite-worker-instance'
 import { IPgliteInstance } from '~/@/pglite/types'
-import { PubSub } from '~/@/pub-sub'
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { TimeSpan } from '~/@/time-span'
@@ -53,8 +52,8 @@ const init = (): Ctx => {
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
   let logger: ILogger
-  logger ??= Logger({ t: 'noop' })
   logger ??= Logger.prefix('app', Logger({ t: 'console' }))
+  logger ??= Logger({ t: 'noop' })
 
   let pglite: Promise<IPgliteInstance>
   pglite ??= PgliteWorkerInstance({ t: 'indexed-db', databaseName: 'db' })
@@ -77,11 +76,6 @@ const init = (): Ctx => {
   kvDb ??= KvDb({ t: 'browser-storage', storage: localStorage })
 
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
-
-  let kvCached: IKvDb
-  if (config.storage === 'sql-db')
-    kvCached ??= KvDb({ t: 'cached', source: kvDb, cache: KvDb({ t: 'hash-map', map: new Map() }) })
-  kvCached ??= kvDb
 
   const clientSessionIdStorage = ClientSessionIdStorage({ storage: localStorage })
   const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
@@ -128,10 +122,17 @@ const init = (): Ctx => {
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
     logger,
-    kvDb: kvCached,
+    kvDb,
     mediaDbLocal,
-    mediaDbRemote,
-    pubSub: PubSub(),
+    mediaDbRemote: MediaDbFrontend({
+      t: 'one-way-sync-remote-to-local',
+      logger,
+      kvDb,
+      mediaDbLocal: MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy }),
+      mediaDbRemote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
+      throttle: TimeSpan.seconds(30),
+      relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
+    }),
     throttle: TimeSpan.seconds(30),
     relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
   })

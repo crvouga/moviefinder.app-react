@@ -78,8 +78,7 @@ export const SqlDb = (config: Config): ISqlDb => {
               })
               const result = Ok({ rows: parsedRows })
               logger.info(
-                'liveQuery',
-                compileSql(input.sql, [...(input.params ?? [])]),
+                `liveQuery\n${compileSql(input.sql, [...(input.params ?? [])])}\n`,
                 result.value.rows
               )
               return pubSub.publish(result)
