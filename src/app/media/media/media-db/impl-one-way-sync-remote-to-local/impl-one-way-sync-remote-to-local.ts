@@ -22,8 +22,8 @@ export type Config = {
   t: 'one-way-sync-remote-to-local'
   logger: ILogger
   kvDb: IKvDb
-  local: IMediaDb
-  remote: IMediaDb
+  mediaDbLocal: IMediaDb
+  mediaDbRemote: IMediaDb
   pubSub: PubSub<OneWaySyncRemoteToLocalMsg>
   throttle: TimeSpan
   relatedDbs: {
@@ -42,9 +42,9 @@ export const MediaDb = (config: Config): IMediaDb => {
       return toDeterministicHash(query)
     },
     async (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => {
-      const remoteQueried = await config.remote.query(query)
+      const remoteQueried = await config.mediaDbRemote.query(query)
       const media = isOk(remoteQueried) ? remoteQueried.value.entities.items : []
-      const localUpsert = await config.local.upsert({ entities: media })
+      const localUpsert = await config.mediaDbLocal.upsert({ entities: media })
       if (isOk(remoteQueried)) {
         await Promise.all([
           config.relatedDbs.creditDb.upsert({
@@ -59,7 +59,7 @@ export const MediaDb = (config: Config): IMediaDb => {
           config.relatedDbs.personDb.upsert({
             entities: Object.values(remoteQueried.value.related.person),
           }),
-          config.local.upsert({
+          config.mediaDbLocal.upsert({
             entities: Object.values(remoteQueried.value.related.media),
           }),
         ])
@@ -72,14 +72,14 @@ export const MediaDb = (config: Config): IMediaDb => {
     }
   )
   return {
-    ...config.local,
+    ...config.mediaDbLocal,
     liveQuery(query) {
       remoteToLocalSync(query)
-      return config.local.liveQuery(query)
+      return config.mediaDbLocal.liveQuery(query)
     },
     query(query) {
       remoteToLocalSync(query)
-      return config.local.query(query)
+      return config.mediaDbLocal.query(query)
     },
   }
 }

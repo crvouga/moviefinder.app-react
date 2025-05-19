@@ -3,9 +3,8 @@ import { z } from 'zod'
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
-import { Img } from '~/@/ui/img'
+import { Img, usePreloadImg } from '~/@/ui/img'
 import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
-import { PreloadImg } from '~/@/ui/preload-img'
 import { Swiper } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
@@ -162,6 +161,7 @@ const ViewFeed = (props: { feed: Feed }) => {
 
 const SlideContent = (props: { item: Media }) => {
   const currentScreen = useCurrentScreen()
+  usePreloadImg({ srcList: props.item.backdrop.lowestToHighestRes })
   return (
     <button
       className="h-full w-full cursor-pointer"
@@ -174,7 +174,6 @@ const SlideContent = (props: { item: Media }) => {
         src={ImageSet.toHighestRes(props.item.poster)}
         alt={props.item.title ?? ''}
       />
-      <PreloadImg images={props.item.backdrop.lowestToHighestRes} />
     </button>
   )
 }

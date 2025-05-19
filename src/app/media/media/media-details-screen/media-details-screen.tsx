@@ -1,5 +1,5 @@
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
-import { preloadImg } from '~/@/ui/preload-img'
+import { preloadImages } from '~/@/ui/img'
 import { SwiperContainerProps } from '~/@/ui/swiper'
 import { ScreenFrom } from '~/app/@/screen/current-screen'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
@@ -20,7 +20,6 @@ const SWIPER_PROPS: Partial<SwiperContainerProps> = {
 export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
   const currentScreen = useCurrentScreen()
   const ctx = useCtx()
-
   const { media } = useMediaDetailsQuery({ mediaId: props.mediaId })
 
   const from: ScreenFrom = media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }
@@ -31,9 +30,12 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
       limit: 1,
       offset: 0,
     })
+
     const media = QueryOutput.first(got)
+
     if (!media) return
-    preloadImg(media.backdrop.lowestToHighestRes)
+
+    preloadImages({ srcList: media.backdrop.lowestToHighestRes })
   }
 
   const pushMediaDetails = (input: { mediaId: MediaId }) => {

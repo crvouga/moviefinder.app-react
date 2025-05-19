@@ -41,24 +41,20 @@ export type Ctx = {
   videoDb: IVideoDb
 }
 
-type Config =
-  | {
-      t: 'sql-db'
-    }
-  | {
-      t: 'hash-map'
-    }
+type Config = {
+  storage: 'sql-db' | 'hash-map'
+}
 
 const init = (): Ctx => {
   let config: Config
-  config ??= { t: 'sql-db' }
-  config ??= { t: 'hash-map' }
+  config ??= { storage: 'sql-db' }
+  config ??= { storage: 'hash-map' }
 
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
   let logger: ILogger
-  logger ??= Logger.prefix('app', Logger({ t: 'console' }))
   logger ??= Logger({ t: 'noop' })
+  logger ??= Logger.prefix('app', Logger({ t: 'console' }))
 
   let pglite: Promise<IPgliteInstance>
   pglite ??= PgliteWorkerInstance({ t: 'indexed-db', databaseName: 'db' })
@@ -76,14 +72,14 @@ const init = (): Ctx => {
   migrationPolicy = MigrationPolicy({ t: 'always-run', logger })
 
   let kvDb: IKvDb
-  if (config.t === 'hash-map') kvDb ??= KvDb({ t: 'hash-map', map: new Map() })
-  if (config.t === 'sql-db') kvDb ??= KvDb({ t: 'sql-db', sqlDb, migrationPolicy })
+  if (config.storage === 'hash-map') kvDb ??= KvDb({ t: 'hash-map', map: new Map() })
+  if (config.storage === 'sql-db') kvDb ??= KvDb({ t: 'sql-db', sqlDb, migrationPolicy })
   kvDb ??= KvDb({ t: 'browser-storage', storage: localStorage })
 
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
   let kvCached: IKvDb
-  if (config.t === 'sql-db')
+  if (config.storage === 'sql-db')
     kvCached ??= KvDb({ t: 'cached', source: kvDb, cache: KvDb({ t: 'hash-map', map: new Map() }) })
   kvCached ??= kvDb
 
@@ -92,48 +88,53 @@ const init = (): Ctx => {
   clientSessionIdStorage.set(clientSessionId)
 
   let mediaDbLocal: IMediaDb
-  if (config.t === 'hash-map') mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
-  if (config.t === 'sql-db')
+  if (config.storage === 'hash-map') mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
+  if (config.storage === 'sql-db')
     mediaDbLocal ??= MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy })
   mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
 
+  let mediaDbRemote: IMediaDb
+  mediaDbRemote ??= MediaDbFrontend({ t: 'trpc-client', trpcClient })
+
   let personDb: IPersonDb
-  if (config.t === 'hash-map') personDb ??= PersonDb({ t: 'hash-map' })
-  if (config.t === 'sql-db') personDb ??= PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  if (config.storage === 'hash-map') personDb ??= PersonDb({ t: 'hash-map' })
+  if (config.storage === 'sql-db') personDb ??= PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
   personDb ??= PersonDb({ t: 'hash-map' })
 
   let relationshipDb: IRelationshipDb
-  if (config.t === 'hash-map')
+  if (config.storage === 'hash-map')
     relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
-  if (config.t === 'sql-db')
+  if (config.storage === 'sql-db')
     relationshipDb ??= RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
   relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
 
   let creditDb: ICreditDb
-  if (config.t === 'hash-map') creditDb ??= CreditDb({ t: 'hash-map', personDb })
-  if (config.t === 'sql-db') creditDb ??= CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
+  if (config.storage === 'hash-map') creditDb ??= CreditDb({ t: 'hash-map', personDb })
+  if (config.storage === 'sql-db')
+    creditDb ??= CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
   creditDb ??= CreditDb({ t: 'hash-map', personDb })
 
   let videoDb: IVideoDb
-  if (config.t === 'hash-map') videoDb ??= VideoDb({ t: 'hash-map' })
-  if (config.t === 'sql-db') videoDb ??= VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  if (config.storage === 'hash-map') videoDb ??= VideoDb({ t: 'hash-map' })
+  if (config.storage === 'sql-db') videoDb ??= VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
   videoDb ??= VideoDb({ t: 'hash-map' })
+
+  let feedDb: IFeedDb
+  if (config.storage === 'hash-map') feedDb ??= FeedDb({ t: 'hash-map', logger })
+  if (config.storage === 'sql-db')
+    feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
+  feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
 
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
-    kvDb: kvCached,
-    local: mediaDbLocal,
-    remote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
     logger,
+    kvDb: kvCached,
+    mediaDbLocal,
+    mediaDbRemote,
     pubSub: PubSub(),
     throttle: TimeSpan.seconds(30),
     relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
   })
-
-  let feedDb: IFeedDb
-  if (config.t === 'hash-map') feedDb ??= FeedDb({ t: 'hash-map', logger })
-  if (config.t === 'sql-db') feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
-  feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
 
   return {
     kvDb,
