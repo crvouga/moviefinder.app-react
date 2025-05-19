@@ -70,10 +70,11 @@ export const SqlDb = (config: Config): ISqlDb => {
             callback: (pgResult) => {
               const parsedRows = pgResult.rows.flatMap((row) => {
                 const parsed = input.parser.safeParse(row)
-                if (parsed.success) {
-                  return parsed.data
-                }
+
+                if (parsed.success) return parsed.data
+
                 logger.error('liveQuery', { error: parsed.error, row })
+
                 return []
               })
               const result = Ok({ rows: parsedRows })

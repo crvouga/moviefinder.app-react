@@ -119,22 +119,16 @@ const init = (): Ctx => {
     feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
   feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
 
+  const relatedDbs = { personDb, relationshipDb, creditDb, videoDb }
+  const throttle = TimeSpan.seconds(30)
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
     logger,
     kvDb,
+    throttle,
+    relatedDbs,
     mediaDbLocal,
-    mediaDbRemote: MediaDbFrontend({
-      t: 'one-way-sync-remote-to-local',
-      logger,
-      kvDb,
-      mediaDbLocal: MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy }),
-      mediaDbRemote: MediaDbFrontend({ t: 'trpc-client', trpcClient }),
-      throttle: TimeSpan.seconds(30),
-      relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
-    }),
-    throttle: TimeSpan.seconds(30),
-    relatedDbs: { personDb, relationshipDb, creditDb, videoDb },
+    mediaDbRemote,
   })
 
   return {
