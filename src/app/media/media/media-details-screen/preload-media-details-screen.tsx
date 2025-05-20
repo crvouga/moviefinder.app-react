@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { ImageSet } from '~/@/image-set'
 import { preloadImages } from '~/@/ui/img'
-import { Ctx, useCtx } from '~/app/frontend/ctx'
+import { Ctx } from '~/app/frontend/ctx'
 import { MediaCreditsSwiper } from '../../credit/frontend/media-credit-swiper'
 import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/relationship-type-media-poster-swiper'
 import { MediaId } from '../media-id'
@@ -66,18 +65,4 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
   }
 
   preloadImages({ srcList })
-}
-
-export const usePreloadMedia = (input: { mediaId: MediaId }) => {
-  const { mediaId } = input
-  const ctx = useCtx()
-  useEffect(() => {
-    preloadMediaDetailsScreen({ ctx, mediaId })
-  }, [mediaId])
-}
-
-export const PreloadMedia = (props: { mediaId: MediaId }) => {
-  usePreloadMedia(props)
-
-  return null
 }
