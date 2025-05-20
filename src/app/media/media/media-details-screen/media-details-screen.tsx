@@ -1,5 +1,3 @@
-import { QueryOutput } from '~/@/db/interface/query-output/query-output'
-import { preloadImages } from '~/@/ui/img'
 import { SwiperContainerProps } from '~/@/ui/swiper'
 import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
@@ -7,6 +5,7 @@ import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaCreditsSwiper } from '../../credit/frontend/media-credit-swiper'
 import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/relationship-type-media-poster-swiper'
+import { preloadMedia } from '../frontend/media-preload'
 import { MediaId } from '../media-id'
 import { MainSection } from './main-section'
 import { SectionLayout } from './section-layout'
@@ -19,24 +18,9 @@ const SWIPER_PROPS: Partial<SwiperContainerProps> = {
 
 export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
   const currentScreen = useCurrentScreen()
-  const ctx = useCtx()
   const { media } = useMediaDetailsQuery({ mediaId: props.mediaId })
-
+  const ctx = useCtx()
   const from: ScreenFrom = media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }
-
-  const preloadMedia = async (input: { mediaId: MediaId }) => {
-    const got = await ctx.mediaDb.query({
-      where: { op: '=', column: 'id', value: input.mediaId },
-      limit: 1,
-      offset: 0,
-    })
-
-    const media = QueryOutput.first(got)
-
-    if (!media) return
-
-    preloadImages({ srcList: media.backdrop.lowestToHighestRes })
-  }
 
   const pushMediaDetails = (input: { mediaId: MediaId }) => {
     currentScreen.push({ t: 'media-details', mediaId: input.mediaId, from })
@@ -73,7 +57,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
             mediaId: media?.id ?? null,
             relationshipType: 'similar',
           }}
-          onPreload={preloadMedia}
+          onPreload={(input) => preloadMedia({ ctx, mediaId: input.mediaId })}
           onClick={pushMediaDetails}
         />
       </SectionLayout>
@@ -88,7 +72,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
             mediaId: media?.id ?? null,
             relationshipType: 'recommendation',
           }}
-          onPreload={preloadMedia}
+          onPreload={(input) => preloadMedia({ ctx, mediaId: input.mediaId })}
           onClick={pushMediaDetails}
         />
       </SectionLayout>

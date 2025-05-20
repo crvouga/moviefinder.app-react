@@ -21,7 +21,14 @@ const first = <T, U>(query: QueryOutput<T, U> | null | undefined): T | null => {
   return null
 }
 
+const related = <T, U>(query: QueryOutput<T, U> | null | undefined): U | null => {
+  if (!query) return null
+  if (isOk(query)) return query.value.related ?? null
+  return null
+}
+
 export const QueryOutput = {
   parser,
   first,
+  related,
 }

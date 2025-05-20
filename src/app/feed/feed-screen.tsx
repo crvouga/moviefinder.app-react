@@ -3,13 +3,14 @@ import { z } from 'zod'
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
-import { Img, usePreloadImg } from '~/@/ui/img'
+import { Img } from '~/@/ui/img'
 import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { Swiper } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
 import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../frontend/ctx'
+import { usePreloadMedia } from '../media/media/frontend/media-preload'
 import { Media } from '../media/media/media'
 import { MediaId } from '../media/media/media-id'
 import { Feed } from './feed'
@@ -161,7 +162,7 @@ const ViewFeed = (props: { feed: Feed }) => {
 
 const SlideContent = (props: { item: Media }) => {
   const currentScreen = useCurrentScreen()
-  usePreloadImg({ srcList: props.item.backdrop.lowestToHighestRes })
+  usePreloadMedia({ mediaId: props.item.id })
   return (
     <button
       className="h-full w-full cursor-pointer"

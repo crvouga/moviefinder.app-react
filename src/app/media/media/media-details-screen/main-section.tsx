@@ -9,7 +9,7 @@ export const MainSection = (props: { media: Media | null }) => {
     <section className="flex w-full flex-col items-center justify-start">
       <Img
         className="aspect-video w-full object-cover"
-        src={ImageSet.toMiddleRes(props.media?.backdrop)}
+        src={ImageSet.toHighestRes(props.media?.backdrop)}
         alt={props.media?.title ?? ' '}
       />
       <CollapsibleArea collapsiedHeight={200} className="flex flex-col items-center gap-3 p-6">

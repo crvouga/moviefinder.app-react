@@ -7,8 +7,9 @@ const isImageLoaded = (url: string | undefined): boolean => {
   return img.complete
 }
 
-export const preloadImages = (input: { srcList: string[] }) => {
+export const preloadImages = (input: { srcList: (string | undefined)[] }) => {
   for (const src of input.srcList) {
+    if (!src) continue
     const img = new Image()
     img.src = src
     img.onload = () => {}

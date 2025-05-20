@@ -20,7 +20,7 @@ export const CreditBlock = (props: {
     >
       <Avatar
         className="size-24 rounded-full border"
-        src={ImageSet.toMiddleRes(props.person?.profile)}
+        src={ImageSet.toHighestRes(props.person?.profile)}
         skeleton={props.skeleton}
       />
 

@@ -1,5 +1,5 @@
 import { LRUCache } from 'lru-cache'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { Sub } from '../pub-sub'
 
 const valueCache = new LRUCache<string, Record<string, unknown>>({
@@ -23,9 +23,11 @@ export const useSubscription = <T extends Record<string, unknown>>(
 
   const [value, setValue] = useState<T | null>(init)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setValue(init)
+  }, [keyString])
 
+  useEffect(() => {
     const sub = createSubCallback()
 
     const unsub = sub?.subscribe((value) => {
