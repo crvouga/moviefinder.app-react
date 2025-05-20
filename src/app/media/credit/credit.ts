@@ -40,8 +40,8 @@ const random = async (override?: Partial<Credit>): Promise<Credit> => {
 const compute = (credit: Credit): Credit => {
   return {
     ...credit,
-    computedIsDirector: Boolean(credit.job?.toLowerCase().startsWith('director') ?? null),
-    computedIsCast: credit.type === 'cast',
+    computedIsDirector: Boolean(credit.job?.toLowerCase() === 'director'),
+    computedIsCast: Boolean(credit.type === 'cast'),
   }
 }
 
