@@ -139,20 +139,21 @@ export const queryMovieDetails = async (input: {
   for (const [i, movie] of enumerate(got.value.body.recommendations?.results ?? [])) {
     if (!movie.id) continue
     const relationshipType: RelationshipType = 'recommendation'
-    const relationshipId = RelationshipId.fromTmdbId({
-      tmdbId: movie.id,
+    const toId = MediaId.fromTmdbId(movie.id)
+    const relationshipId = RelationshipId.init({
+      fromId: mediaId,
+      toId: toId,
       type: relationshipType,
     })
-    const relatedMediaId = MediaId.fromTmdbId(movie.id)
     relationship[relationshipId] = {
       id: relationshipId,
       from: mediaId,
-      to: relatedMediaId,
+      to: toId,
       type: relationshipType,
       order: i * (got.value.body.recommendations?.page ?? 1),
     }
-    relatedMedia[relatedMediaId] = {
-      id: relatedMediaId,
+    relatedMedia[toId] = {
+      id: toId,
       title: movie.title ?? null,
       description: movie.overview ?? null,
       poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, movie.poster_path ?? null),
@@ -167,20 +168,21 @@ export const queryMovieDetails = async (input: {
   for (const [i, movie] of enumerate(got.value.body.similar?.results ?? [])) {
     if (!movie.id) continue
     const relationshipType: RelationshipType = 'similar'
-    const relationshipId = RelationshipId.fromTmdbId({
-      tmdbId: movie.id,
+    const toId = MediaId.fromTmdbId(movie.id)
+    const relationshipId = RelationshipId.init({
+      fromId: mediaId,
+      toId,
       type: relationshipType,
     })
-    const relatedMediaId = MediaId.fromTmdbId(movie.id)
     relationship[relationshipId] = {
       id: relationshipId,
       from: mediaId,
-      to: relatedMediaId,
+      to: toId,
       type: relationshipType,
       order: i * (got.value.body.similar?.page ?? 1),
     }
-    relatedMedia[relatedMediaId] = {
-      id: relatedMediaId,
+    relatedMedia[toId] = {
+      id: toId,
       title: movie.title ?? null,
       description: movie.overview ?? null,
       poster: TmdbConfiguration.toPosterImageSet(gotConfig.value.body, movie.poster_path ?? null),

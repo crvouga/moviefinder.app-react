@@ -15,9 +15,10 @@ export type Relationship = z.infer<typeof parser>
 
 const random = async (override?: Partial<Relationship>): Promise<Relationship> => {
   return {
-    id: RelationshipId.fromTmdbId({
-      tmdbId: Math.floor(Math.random() * 1000000),
-      type: 'recommendation',
+    id: RelationshipId.init({
+      fromId: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
+      toId: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
+      type: await RelationshipType.random(),
     }),
     from: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),
     to: MediaId.fromTmdbId(Math.floor(Math.random() * 1000000)),

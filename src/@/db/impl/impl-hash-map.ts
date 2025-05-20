@@ -14,7 +14,7 @@ export type Config<
   t: 'hash-map'
   parser: IDb.Parser<TEntity, TRelated>
   entities: Map<string, TEntity>
-  indexes: Map<string, string[]>
+  indexes: Map<string, Set<string>>
   toPrimaryKey: (entity: TEntity) => string
   getRelated: (entities: TEntity[]) => Promise<TRelated>
 }

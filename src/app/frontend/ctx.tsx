@@ -47,8 +47,8 @@ type Config = {
 
 const init = (): Ctx => {
   let config: Config
-  config ??= { storage: 'hash-map' }
   config ??= { storage: 'sql-db' }
+  config ??= { storage: 'hash-map' }
 
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
 
@@ -121,7 +121,7 @@ const init = (): Ctx => {
   feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
 
   const relatedDbs = { personDb, relationshipDb, creditDb, videoDb }
-  const throttle = TimeSpan.seconds(0)
+  const throttle = TimeSpan.minutes(30)
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
     logger,
