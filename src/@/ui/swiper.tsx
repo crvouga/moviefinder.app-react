@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef } from 'react'
 import { register } from 'swiper/element/bundle'
 register()
 
@@ -38,6 +38,7 @@ export type SwiperContainerProps = {
   slidesOffsetAfter?: number
   slidesOffsetBefore?: number
   slideRestorationKey?: string
+  cssMode?: boolean
 }
 
 const activeIndexBy = new Map<string, number>()
@@ -47,6 +48,7 @@ const Container = (props: SwiperContainerProps) => {
 
   useSwiperSlideChange(ref, props)
   useSlideRestoration(ref, props)
+  useCssModeSlidesOffsets(ref, props)
   return (
     <swiper-container
       ref={ref}
@@ -60,10 +62,33 @@ const Container = (props: SwiperContainerProps) => {
       initial-slide={props.initialSlide}
       slides-offset-after={props.slidesOffsetAfter}
       slides-offset-before={props.slidesOffsetBefore}
+      css-mode={props.cssMode}
+      key={props.cssMode}
     >
       {props.children}
     </swiper-container>
   )
+}
+
+const useCssModeSlidesOffsets = (
+  ref: React.RefObject<HTMLElement>,
+  props: SwiperContainerProps
+) => {
+  useLayoutEffect(() => {
+    if (!ref.current || !props.cssMode) return
+
+    const container = ref.current
+    const slides = container.querySelectorAll('swiper-slide')
+
+    if (slides.length === 0) return
+
+    if (props.slidesOffsetBefore) {
+      slides[0].style.paddingLeft = `${props.slidesOffsetBefore}px`
+    }
+    if (props.slidesOffsetAfter) {
+      slides[slides.length - 1].style.paddingRight = `${props.slidesOffsetAfter}px`
+    }
+  }, [props])
 }
 
 const slideRestorationCache = new Map<string, number>()

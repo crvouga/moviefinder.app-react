@@ -13,11 +13,7 @@ import { useSubscription } from '~/@/ui/use-subscription'
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { Media } from '../media'
-
-const SWIPER_PROPS: Partial<SwiperContainerProps> = {
-  slidesOffsetBefore: 24,
-  slidesOffsetAfter: 24,
-}
+import { useIsMobile } from '~/@/ui/use-is-mobile'
 
 const toQuery = (input: { mediaId: MediaId }): QueryInput<Media> => {
   return {
@@ -30,6 +26,13 @@ const toQuery = (input: { mediaId: MediaId }): QueryInput<Media> => {
 const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
+  const isMobile = useIsMobile()
+
+  const swiperProps: Partial<SwiperContainerProps> = {
+    slidesOffsetBefore: 24,
+    slidesOffsetAfter: 24,
+    cssMode: isMobile && false,
+  }
 
   const queried = useSubscription(['media-query', props.mediaId], () =>
     props.mediaId ? ctx.mediaDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null
@@ -54,7 +57,7 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
         <MediaCreditsSwiper.View
           mediaId={media?.id ?? null}
           swiper={{
-            ...SWIPER_PROPS,
+            ...swiperProps,
             slideRestorationKey: `media-details-swiper-cast-and-crew-${media?.id}`,
           }}
           onClick={({ personId }) => {
@@ -66,7 +69,7 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
       <SectionLayout title="Similar">
         <RelationshipTypeMediaPosterSwiper.View
           swiper={{
-            ...SWIPER_PROPS,
+            ...swiperProps,
             slideRestorationKey: `media-details-swiper-similar-${media?.id}`,
           }}
           query={{
@@ -81,7 +84,7 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
       <SectionLayout title="Recommendations">
         <RelationshipTypeMediaPosterSwiper.View
           swiper={{
-            ...SWIPER_PROPS,
+            ...swiperProps,
             slideRestorationKey: `media-details-swiper-recommendations-${media?.id}`,
           }}
           query={{

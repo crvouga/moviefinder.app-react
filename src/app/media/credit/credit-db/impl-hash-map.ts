@@ -1,6 +1,7 @@
 import { Db } from '~/@/db/impl/impl'
 import { isOk } from '~/@/result'
 import { IPersonDb } from '../../person/person-db/interface'
+import { Credit } from '../credit'
 import { ICreditDb } from './interface'
 
 export type Config = {
@@ -9,11 +10,11 @@ export type Config = {
 }
 
 export const CreditDb = (config: Config): ICreditDb => {
-  const entities = new Map()
   return Db({
     t: 'hash-map',
     parser: ICreditDb.parser,
-    entities,
+    map: (entity) => Credit.compute(entity),
+    entities: new Map(),
     indexes: new Map(),
     toPrimaryKey: (entity) => entity.id,
     getRelated: async (entities) => {

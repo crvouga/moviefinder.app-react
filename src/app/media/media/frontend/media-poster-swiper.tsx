@@ -1,5 +1,4 @@
 import { Clickable } from '~/@/ui/clickable'
-import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { Media } from '../media'
 import { MediaId } from '../media-id'
@@ -24,20 +23,20 @@ export const MediaPosterSwiper = (props: {
           ))
         : props.media?.map((m) => (
             <SwiperSlide key={m.id}>
-              <WrapIntersectionObserver
-                onVisible={() => {
+              <Clickable
+                className="w-full"
+                onPointerDown={() => {
                   props.onPreload?.({ mediaId: m.id })
                 }}
+                onHover={() => {
+                  props.onPreload?.({ mediaId: m.id })
+                }}
+                onClick={() => {
+                  props.onClick?.({ mediaId: m.id })
+                }}
               >
-                <Clickable
-                  className="w-full"
-                  onClick={() => {
-                    props.onClick?.({ mediaId: m.id })
-                  }}
-                >
-                  <MediaPoster media={m} />
-                </Clickable>
-              </WrapIntersectionObserver>
+                <MediaPoster media={m} />
+              </Clickable>
             </SwiperSlide>
           ))}
     </Swiper.Container>

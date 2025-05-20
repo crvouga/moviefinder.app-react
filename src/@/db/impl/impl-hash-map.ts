@@ -16,6 +16,7 @@ export type Config<
   entities: Map<string, TEntity>
   indexes: Map<string, Set<string>>
   toPrimaryKey: (entity: TEntity) => string
+  map?: (entity: TEntity) => TEntity
   getRelated: (entities: TEntity[]) => Promise<TRelated>
 }
 
@@ -69,7 +70,7 @@ export const Db = <
     },
     async upsert(input) {
       for (const e of input.entities) {
-        config.entities.set(config.toPrimaryKey(e), e)
+        config.entities.set(config.toPrimaryKey(e), config.map ? config.map(e) : e)
       }
       publish()
       return Ok({
