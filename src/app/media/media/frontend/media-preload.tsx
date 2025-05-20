@@ -4,6 +4,7 @@ import { preloadImages } from '~/@/ui/img'
 import { Ctx } from '~/app/backend/ctx'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../media-id'
+import { ImageSet } from '~/@/image-set'
 
 export const preloadMedia = async (input: { ctx: Ctx; mediaId: MediaId }) => {
   const got = await input.ctx.mediaDb.query({
@@ -24,9 +25,9 @@ export const preloadMedia = async (input: { ctx: Ctx; mediaId: MediaId }) => {
 
   if (related) {
     srcList.push(
-      ...Object.values(related.media).flatMap((media) => media.backdrop.lowestToHighestRes),
-      ...Object.values(related.media).flatMap((media) => media.poster.lowestToHighestRes),
-      ...Object.values(related.person).flatMap((person) => person.profile.lowestToHighestRes)
+      ...Object.values(related.media).flatMap((media) => ImageSet.toHighestRes(media.backdrop)),
+      ...Object.values(related.media).flatMap((media) => ImageSet.toHighestRes(media.poster)),
+      ...Object.values(related.person).flatMap((person) => ImageSet.toHighestRes(person.profile))
     )
   }
 
