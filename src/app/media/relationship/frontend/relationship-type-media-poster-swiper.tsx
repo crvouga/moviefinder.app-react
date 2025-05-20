@@ -1,3 +1,4 @@
+import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { isOk } from '~/@/result'
 import { SwiperContainerProps } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
@@ -5,9 +6,49 @@ import { useCtx } from '~/app/frontend/ctx'
 import { MediaPosterSwiper } from '../../media/frontend/media-poster-swiper'
 import { Media } from '../../media/media'
 import { MediaId } from '../../media/media-id'
+import { Relationship } from '../relationship'
 import { RelationshipType } from '../relationship-type'
 
-export const RelationshipTypeMediaPosterSwiper = (props: {
+const toQuery = (props: {
+  mediaId: MediaId | null
+  relationshipType: RelationshipType
+}): QueryInput<Relationship> => {
+  return {
+    limit: 10,
+    offset: 0,
+    where: {
+      op: 'and',
+      clauses: [
+        {
+          column: 'type',
+          op: '=',
+          value: props.relationshipType,
+        },
+        ...(props.mediaId
+          ? [
+              {
+                column: 'from',
+                op: '=',
+                value: props.mediaId,
+              } as const,
+            ]
+          : []),
+      ],
+    },
+    orderBy: [
+      {
+        column: 'to',
+        direction: 'asc',
+      },
+      {
+        column: 'id',
+        direction: 'asc',
+      },
+    ],
+  }
+}
+
+const View = (props: {
   swiper?: Partial<SwiperContainerProps>
   query: {
     mediaId: MediaId | null
@@ -20,38 +61,7 @@ export const RelationshipTypeMediaPosterSwiper = (props: {
 
   const queried = useSubscription(
     ['relationship-query', props.query.relationshipType, props.query.mediaId],
-    () =>
-      props.query.mediaId
-        ? ctx.relationshipDb.liveQuery({
-            limit: 10,
-            offset: 0,
-            where: {
-              op: 'and',
-              clauses: [
-                {
-                  column: 'type',
-                  op: '=',
-                  value: props.query.relationshipType,
-                },
-                {
-                  column: 'from',
-                  op: '=',
-                  value: props.query.mediaId,
-                },
-              ],
-            },
-            orderBy: [
-              {
-                column: 'to',
-                direction: 'asc',
-              },
-              {
-                column: 'id',
-                direction: 'asc',
-              },
-            ],
-          })
-        : null
+    () => (props.query.mediaId ? ctx.relationshipDb.liveQuery(toQuery(props.query)) : null)
   )
 
   if (!queried) return <MediaPosterSwiper swiper={props.swiper} skeleton />
@@ -71,4 +81,9 @@ export const RelationshipTypeMediaPosterSwiper = (props: {
       onPreload={props.onPreload}
     />
   )
+}
+
+export const RelationshipTypeMediaPosterSwiper = {
+  View,
+  toQuery,
 }

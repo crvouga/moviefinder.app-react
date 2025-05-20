@@ -10,12 +10,12 @@ import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '../@/screen/use-current-screen'
 import { ScreenLayout } from '../@/ui/screen-layout'
 import { useCtx } from '../frontend/ctx'
-import { usePreloadMedia } from '../media/media/frontend/media-preload'
 import { Media } from '../media/media/media'
 import { MediaId } from '../media/media/media-id'
 import { Feed } from './feed'
 import { FeedId } from './feed-id'
 import { FeedItem } from './feed-item'
+import { preloadMediaDetailsScreen } from '../media/media/media-details-screen/preload-media-details-screen'
 
 export const FeedScreen = () => {
   const ctx = useCtx()
@@ -121,11 +121,7 @@ const ViewFeed = (props: { feed: Feed }) => {
             ctx.feedDb.upsert({
               entities: [{ ...props.feed, activeIndex: parsed.data.feedIndex }],
             })
-            ctx.mediaDb.query({
-              where: { op: '=', column: 'id', value: parsed.data.mediaId },
-              limit: 1,
-              offset: 0,
-            })
+            preloadMediaDetailsScreen({ ctx, mediaId: parsed.data.mediaId })
           }}
         >
           {false && (
@@ -162,7 +158,7 @@ const ViewFeed = (props: { feed: Feed }) => {
 
 const SlideContent = (props: { item: Media }) => {
   const currentScreen = useCurrentScreen()
-  usePreloadMedia({ mediaId: props.item.id })
+
   return (
     <button
       className="h-full w-full cursor-pointer"

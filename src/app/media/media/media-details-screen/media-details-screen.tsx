@@ -5,21 +5,37 @@ import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaCreditsSwiper } from '../../credit/frontend/media-credit-swiper'
 import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/relationship-type-media-poster-swiper'
-import { preloadMedia } from '../frontend/media-preload'
 import { MediaId } from '../media-id'
 import { MainSection } from './main-section'
+import { preloadMediaDetailsScreen } from './preload-media-details-screen'
 import { SectionLayout } from './section-layout'
-import { useMediaDetailsQuery } from './use-media-details-query'
+import { useSubscription } from '~/@/ui/use-subscription'
+import { QueryOutput } from '~/@/db/interface/query-output/query-output'
+import { QueryInput } from '~/@/db/interface/query-input/query-input'
+import { Media } from '../media'
 
 const SWIPER_PROPS: Partial<SwiperContainerProps> = {
   slidesOffsetBefore: 24,
   slidesOffsetAfter: 24,
 }
 
-export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
-  const currentScreen = useCurrentScreen()
-  const { media } = useMediaDetailsQuery({ mediaId: props.mediaId })
+const toQuery = (input: { mediaId: MediaId }): QueryInput<Media> => {
+  return {
+    where: { op: '=', column: 'id', value: input.mediaId },
+    limit: 1,
+    offset: 0,
+  }
+}
+
+const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
   const ctx = useCtx()
+  const currentScreen = useCurrentScreen()
+
+  const queried = useSubscription(['media-query', props.mediaId], () =>
+    props.mediaId ? ctx.mediaDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null
+  )
+
+  const media = QueryOutput.first(queried)
   const from: ScreenFrom = media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }
 
   const pushMediaDetails = (input: { mediaId: MediaId }) => {
@@ -35,7 +51,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
       <MainSection media={media ?? null} />
 
       <SectionLayout title="Cast & Crew">
-        <MediaCreditsSwiper
+        <MediaCreditsSwiper.View
           mediaId={media?.id ?? null}
           swiper={{
             ...SWIPER_PROPS,
@@ -48,7 +64,7 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
       </SectionLayout>
 
       <SectionLayout title="Similar">
-        <RelationshipTypeMediaPosterSwiper
+        <RelationshipTypeMediaPosterSwiper.View
           swiper={{
             ...SWIPER_PROPS,
             slideRestorationKey: `media-details-swiper-similar-${media?.id}`,
@@ -57,13 +73,13 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
             mediaId: media?.id ?? null,
             relationshipType: 'similar',
           }}
-          onPreload={(input) => preloadMedia({ ctx, mediaId: input.mediaId })}
+          onPreload={(input) => preloadMediaDetailsScreen({ ctx, mediaId: input.mediaId })}
           onClick={pushMediaDetails}
         />
       </SectionLayout>
 
       <SectionLayout title="Recommendations">
-        <RelationshipTypeMediaPosterSwiper
+        <RelationshipTypeMediaPosterSwiper.View
           swiper={{
             ...SWIPER_PROPS,
             slideRestorationKey: `media-details-swiper-recommendations-${media?.id}`,
@@ -72,10 +88,15 @@ export const MediaDetailsScreen = (props: { mediaId: MediaId | null; from: Scree
             mediaId: media?.id ?? null,
             relationshipType: 'recommendation',
           }}
-          onPreload={(input) => preloadMedia({ ctx, mediaId: input.mediaId })}
+          onPreload={(input) => preloadMediaDetailsScreen({ ctx, mediaId: input.mediaId })}
           onClick={pushMediaDetails}
         />
       </SectionLayout>
     </ScreenLayout>
   )
+}
+
+export const MediaDetailsScreen = {
+  View,
+  toQuery,
 }

@@ -12,8 +12,6 @@ export const preloadImages = (input: { srcList: (string | undefined)[] }) => {
     if (!src) continue
     const img = new Image()
     img.src = src
-    img.onload = () => {}
-    img.onerror = () => {}
   }
 }
 

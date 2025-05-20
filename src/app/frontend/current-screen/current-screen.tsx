@@ -37,7 +37,7 @@ const CurrentScreenSwitch = (props: { screen: ICurrentScreen }) => {
       return <LoginScreen screen={props.screen.c} />
     case 'media-details':
       return (
-        <MediaDetailsScreen
+        <MediaDetailsScreen.View
           mediaId={props.screen.mediaId}
           from={props.screen.from ?? { t: 'feed' }}
         />
