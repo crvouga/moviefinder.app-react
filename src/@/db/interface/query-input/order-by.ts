@@ -50,12 +50,14 @@ const sort = <TEntity extends Record<string, unknown>>(
 
 const toSql = <TEntity extends Record<string, unknown>>(
   orderBy: OrderBy<TEntity>,
-  fieldToSqlColumn: (field: keyof TEntity) => string | number | symbol
+  fieldToSqlColumn: (field: keyof TEntity) => string | number | symbol | null
 ): string => {
   const sql = orderBy
-    .map(
-      (o) => `${quoteIfPostgresKeyword(fieldToSqlColumn(o.column))} ${o.direction.toUpperCase()}`
-    )
+    .flatMap((o): string[] => {
+      const sqlColumn = fieldToSqlColumn(o.column)
+      if (!sqlColumn) return []
+      return [`${quoteIfPostgresKeyword(sqlColumn)} ${o.direction.toUpperCase()}`]
+    })
     .join(', ')
   return sql ? `ORDER BY ${sql}` : ''
 }

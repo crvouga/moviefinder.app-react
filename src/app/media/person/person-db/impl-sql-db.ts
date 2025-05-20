@@ -6,6 +6,7 @@ import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { IPersonDb } from './interface'
+import { exhaustive } from '~/@/exhaustive-check'
 
 export type Config = {
   t: 'sql-db'
@@ -61,7 +62,7 @@ export const PersonDb = (config: Config): IPersonDb => {
         case 'profile':
           return 'profile_urls'
         default:
-          throw new Error(`Unreachable: ${key}`)
+          return exhaustive(key)
       }
     },
     rowParser: Row,
@@ -73,18 +74,6 @@ export const PersonDb = (config: Config): IPersonDb => {
         profile: ImageSet.init({
           lowestToHighestRes: row.profile_urls ?? [],
         }),
-      }
-    },
-    fieldToSqlColumn(field) {
-      switch (field) {
-        case 'id':
-          return 'id'
-        case 'name':
-          return 'name'
-        case 'popularity':
-          return 'popularity'
-        case 'profile':
-          return 'profile_urls'
       }
     },
     primaryKey: 'id',

@@ -60,15 +60,19 @@ const filter = <TEntity extends Record<string, unknown>>(
 
 export const toSql = <TEntity extends Record<string, unknown>>(
   where: Where<TEntity>,
-  columnToSqlColumn: (column: keyof TEntity) => string | number | symbol
+  columnToSqlColumn: (column: keyof TEntity) => string | number | symbol | null
 ): string => {
   switch (where.op) {
     case 'in': {
       if (where.value.length === 0) return ''
-      return `WHERE ${quoteIfPostgresKeyword(columnToSqlColumn(where.column))} IN (${where.value.map((v) => `'${v}'`).join(',')})`
+      const sqlColumn = columnToSqlColumn(where.column)
+      if (!sqlColumn) return ''
+      return `WHERE ${quoteIfPostgresKeyword(sqlColumn)} IN (${where.value.map((v) => `'${v}'`).join(',')})`
     }
     case '=': {
-      return `WHERE ${quoteIfPostgresKeyword(columnToSqlColumn(where.column))} = '${where.value}'`
+      const sqlColumn = columnToSqlColumn(where.column)
+      if (!sqlColumn) return ''
+      return `WHERE ${quoteIfPostgresKeyword(sqlColumn)} = '${where.value}'`
     }
     case 'and': {
       if (where.clauses.length === 0) return ''

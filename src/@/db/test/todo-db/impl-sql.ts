@@ -65,20 +65,6 @@ export const TodoDb = (config: Config): ITodoDb => {
           return 'updated_at_utc'
       }
     },
-    fieldToSqlColumn: (field) => {
-      switch (field) {
-        case 'id':
-          return 'id'
-        case 'title':
-          return 'title'
-        case 'completed':
-          return 'completed'
-        case 'createdAt':
-          return 'created_at_utc'
-        case 'updatedAt':
-          return 'updated_at_utc'
-      }
-    },
     rowToEntity(row) {
       return {
         id: row.id,

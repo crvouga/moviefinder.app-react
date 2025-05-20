@@ -20,19 +20,22 @@ export const MediaCreditsSwiper = (props: {
     props.mediaId
       ? ctx.creditDb.liveQuery({
           where: {
-            op: 'and',
-            clauses: [
-              {
-                op: '=',
-                column: 'mediaId',
-                value: props.mediaId,
-              },
-            ],
+            op: '=',
+            column: 'mediaId',
+            value: props.mediaId,
           },
           orderBy: [
             {
-              column: 'order',
+              column: 'computedIsDirector',
               direction: 'desc',
+            },
+            {
+              column: 'computedIsCast',
+              direction: 'desc',
+            },
+            {
+              column: 'order',
+              direction: 'asc',
             },
           ],
           limit: 10,

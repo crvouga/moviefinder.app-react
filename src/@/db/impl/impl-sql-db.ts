@@ -28,12 +28,12 @@ export type Config<
     down: string[]
     policy: IMigrationPolicy
   }
-  fieldToSqlColumn: (field: keyof TEntity) => keyof TRow
   entityKeyToSqlColumn: (key: keyof TEntity) => keyof TRow
   rowParser: z.ZodType<TRow>
   rowToEntity: (row: TRow) => TEntity
   entityToRow: (entity: TEntity) => TRow
   getRelated: (entities: TEntity[]) => Promise<TRelated>
+  computedColumnKeys?: (keyof TRow)[]
 }
 
 export const Db = <
@@ -73,11 +73,11 @@ export const Db = <
   const toSql = (queryInput: QueryInput<TEntity>) => {
     const params: SqlDbParam[] = [queryInput.limit, queryInput.offset]
     const whereClause = queryInput.where
-      ? Where.toSql(queryInput.where, config.fieldToSqlColumn)
+      ? Where.toSql(queryInput.where, config.entityKeyToSqlColumn)
       : ''
 
     const orderByClause = queryInput.orderBy
-      ? OrderBy.toSql(queryInput.orderBy, config.fieldToSqlColumn)
+      ? OrderBy.toSql(queryInput.orderBy, config.entityKeyToSqlColumn)
       : ''
 
     const sql = [
@@ -124,10 +124,11 @@ export const Db = <
       const params = input.entities.map((entity) => {
         const row = config.entityToRow(entity)
         const rowEntries = Object.entries(row)
-        const sortedRowEntries = rowEntries.sort(ascend(([key]) => key))
+        const sortedRowEntries = rowEntries.sort(ascend(([sqlColumn]) => sqlColumn))
+
         const columnValues = sortedRowEntries
-          .map(([_key, value]) => value)
-          .map((value) => SqlDbParam.to(value))
+          .filter(([sqlColumn]) => !config.computedColumnKeys?.includes(sqlColumn))
+          .map(([_sqlColumn, value]) => SqlDbParam.to(value))
 
         return columnValues
       })
@@ -137,14 +138,22 @@ export const Db = <
 
       const entity = input.entities[0]
 
-      if (!entity) {
-        return Ok({ entities: [] })
-      }
+      if (!entity) return Ok({ entities: [] })
 
       const entries = Object.entries(entity)
       const sortedEntries = entries.sort(ascend(([key]) => key))
       const entityKeys = sortedEntries.map(([key]): keyof TEntity => key)
-      const sqlColumns = entityKeys.map((key) => config.entityKeyToSqlColumn(key))
+      const sqlColumns = entityKeys.flatMap((key): (keyof TRow)[] => {
+        const sqlColumn = config.entityKeyToSqlColumn(key)
+
+        if (!sqlColumn) return []
+
+        const isComputedColumn = config.computedColumnKeys?.includes(sqlColumn)
+
+        if (isComputedColumn) return []
+
+        return [sqlColumn]
+      })
 
       const sql = `
 INSERT INTO ${config.viewName} (

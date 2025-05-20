@@ -44,7 +44,8 @@ export const MediaDb = (config: Config): IMediaDb => {
   const remoteToLocalSync = throttleByKeyDurable(
     kvDb,
     config.throttle,
-    (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => toDeterministicHash(query),
+    (query: IDb.InferQueryInput<typeof IMediaDb.parser>) =>
+      `${config.throttle._durationMilliseconds}_${toDeterministicHash(query)}`,
     async (query: IDb.InferQueryInput<typeof IMediaDb.parser>) => {
       const remoteQueried = await config.mediaDbRemote.query(query)
       const media = isOk(remoteQueried) ? remoteQueried.value.entities.items : []

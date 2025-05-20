@@ -7,6 +7,7 @@ import { ClientSessionId } from '~/app/@/client-session-id/client-session-id'
 import { IFeedDb } from './interface'
 import { Feed } from '../feed'
 import { FeedId } from '../feed-id'
+import { exhaustive } from '~/@/exhaustive-check'
 
 export type Config = {
   t: 'sql-db'
@@ -47,7 +48,7 @@ export const FeedDb = (config: Config): IFeedDb => {
         active_index: entity.activeIndex,
       }
     },
-    fieldToSqlColumn: (field) => {
+    entityKeyToSqlColumn: (field) => {
       switch (field) {
         case 'id': {
           return 'id'
@@ -59,7 +60,7 @@ export const FeedDb = (config: Config): IFeedDb => {
           return 'active_index'
         }
         default: {
-          throw new Error('Unreachable')
+          return exhaustive(field)
         }
       }
     },
@@ -78,23 +79,6 @@ export const FeedDb = (config: Config): IFeedDb => {
 
     viewName: 'feed',
     primaryKey: 'id',
-    entityKeyToSqlColumn: (key) => {
-      switch (key) {
-        case 'id': {
-          return 'id'
-        }
-        case 'activeIndex': {
-          return 'active_index'
-        }
-        case 'clientSessionId': {
-          return 'client_session_id'
-        }
-        default: {
-          throw new Error('Unreachable')
-        }
-      }
-    },
-
     migration: {
       down: [down],
       up: [up],

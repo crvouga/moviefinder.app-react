@@ -5,6 +5,7 @@ import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { MediaId } from '../../media-id'
 import { IMediaDb } from '../interface/interface'
+import { exhaustive } from '~/@/exhaustive-check'
 
 export type Config = {
   t: 'sql-db'
@@ -94,17 +95,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         case 'title':
           return 'title'
         default:
-          throw new Error(`Unreachable: ${key}`)
-      }
-    },
-    fieldToSqlColumn: (field) => {
-      switch (field) {
-        case 'id':
-          return 'id'
-        case 'popularity':
-          return 'popularity'
-        default:
-          throw new Error(`Unreachable: ${field}`)
+          return exhaustive(key)
       }
     },
     sqlDb: config.sqlDb,

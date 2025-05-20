@@ -7,6 +7,7 @@ import { isErr } from '~/@/result'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { IMediaDb } from '../../media/media-db/interface/interface'
 import { IRelationshipDb } from './interface'
+import { exhaustive } from '~/@/exhaustive-check'
 
 export type Config = {
   t: 'sql-db'
@@ -97,7 +98,7 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
         case 'order':
           return 'order'
         default:
-          throw new Error(`Unreachable: ${key}`)
+          return exhaustive(key)
       }
     },
     rowParser: Row,
@@ -108,22 +109,6 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
         to: row.to,
         type: row.type,
         order: row.order,
-      }
-    },
-    fieldToSqlColumn(field) {
-      switch (field) {
-        case 'id':
-          return 'id'
-        case 'from':
-          return 'from'
-        case 'to':
-          return 'to'
-        case 'type':
-          return 'type'
-        case 'order':
-          return 'order'
-        default:
-          throw new Error(`Unreachable: ${field}`)
       }
     },
     primaryKey: 'id',

@@ -4,12 +4,12 @@ const parser = z.string()
 
 export type CreditId = z.infer<typeof parser>
 
-const fromTmdbId = (id: number): CreditId => {
+const fromTmdbId = (id: string): CreditId => {
   return CreditId.parser.parse(`credit-tmdb-${id}`)
 }
 
-const toTmdbId = (id: CreditId): number => {
-  return parseInt(id.replace('credit-tmdb-', ''))
+const toTmdbId = (id: CreditId): string => {
+  return id.replace('credit-tmdb-', '')
 }
 
 const fromString = (id: string): CreditId => {

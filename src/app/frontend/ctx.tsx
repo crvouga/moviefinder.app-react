@@ -121,7 +121,7 @@ const init = (): Ctx => {
   feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
 
   const relatedDbs = { personDb, relationshipDb, creditDb, videoDb }
-  const throttle = TimeSpan.seconds(30)
+  const throttle = TimeSpan.seconds(0)
   const mediaDb = MediaDbFrontend({
     t: 'one-way-sync-remote-to-local',
     logger,

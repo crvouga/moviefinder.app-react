@@ -12,6 +12,7 @@ import { IPersonDb } from '../../person/person-db/interface'
 import { PersonId } from '../../person/person-id'
 import { CreditId } from '../credit-id'
 import { ICreditDb } from './interface'
+import { exhaustive } from '~/@/exhaustive-check'
 
 export type Config = {
   t: 'sql-db'
@@ -31,7 +32,9 @@ CREATE TABLE IF NOT EXISTS credit (
     job TEXT,
     character TEXT,
     "order" INTEGER,
-    type credit_type NOT NULL
+    type credit_type NOT NULL,
+    computed_is_director BOOLEAN GENERATED ALWAYS AS (COALESCE(job ILIKE 'director', false)) STORED NOT NULL,
+    computed_is_cast BOOLEAN GENERATED ALWAYS AS (type = 'cast') STORED NOT NULL
 )
 `,
 ]
@@ -46,16 +49,6 @@ DROP TYPE IF EXISTS credit_type CASCADE;
 ]
 
 const CreditTypePostgres = z.enum(['cast', 'crew'])
-
-const Row = z.object({
-  id: z.string(),
-  media_id: z.string(),
-  person_id: z.string(),
-  job: z.string().nullable(),
-  character: z.string().nullable(),
-  order: z.number().nullable(),
-  type: CreditTypePostgres,
-})
 
 export const CreditDb = (config: Config): ICreditDb => {
   return Db({
@@ -96,27 +89,17 @@ export const CreditDb = (config: Config): ICreditDb => {
       up,
       down,
     },
-    entityKeyToSqlColumn(key) {
-      switch (key) {
-        case 'id':
-          return 'id'
-        case 'mediaId':
-          return 'media_id'
-        case 'personId':
-          return 'person_id'
-        case 'job':
-          return 'job'
-        case 'character':
-          return 'character'
-        case 'order':
-          return 'order'
-        case 'type':
-          return 'type'
-        default:
-          throw new Error(`Unreachable: ${key}`)
-      }
-    },
-    rowParser: Row,
+    rowParser: z.object({
+      id: z.string(),
+      media_id: z.string(),
+      person_id: z.string(),
+      job: z.string().nullable(),
+      character: z.string().nullable(),
+      order: z.number().nullable(),
+      type: CreditTypePostgres,
+      computed_is_director: z.boolean().nullable(),
+      computed_is_cast: z.boolean().nullable(),
+    }),
     rowToEntity(row) {
       return {
         id: CreditId.fromString(row.id),
@@ -126,9 +109,12 @@ export const CreditDb = (config: Config): ICreditDb => {
         character: row.character,
         order: row.order,
         type: row.type,
+        computedIsDirector: row.computed_is_director,
+        computedIsCast: row.computed_is_cast,
       }
     },
-    fieldToSqlColumn: (field) => {
+    computedColumnKeys: ['computed_is_director', 'computed_is_cast'],
+    entityKeyToSqlColumn: (field) => {
       switch (field) {
         case 'id':
           return 'id'
@@ -144,8 +130,12 @@ export const CreditDb = (config: Config): ICreditDb => {
           return 'order'
         case 'type':
           return 'type'
+        case 'computedIsDirector':
+          return 'computed_is_director'
+        case 'computedIsCast':
+          return 'computed_is_cast'
         default:
-          throw new Error(`Unreachable: ${field}`)
+          return exhaustive(field)
       }
     },
     primaryKey: 'id',
@@ -158,6 +148,8 @@ export const CreditDb = (config: Config): ICreditDb => {
         character: entity.character,
         order: entity.order,
         type: entity.type,
+        computed_is_director: entity.computedIsDirector,
+        computed_is_cast: entity.computedIsCast,
       }
     },
   })

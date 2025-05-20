@@ -1,3 +1,3 @@
-export const exhaustive = (_value: never) => {
-  throw new Error('Exhaustive check failed')
+export const exhaustive = (value: never): never => {
+  throw new Error(`Exhaustive check failed for value: ${value}`)
 }

@@ -1,11 +1,12 @@
 import { z } from 'zod'
 import { Db } from '~/@/db/impl/impl'
+import { exhaustive } from '~/@/exhaustive-check'
 import { IKvDb } from '~/@/kv-db/interface'
 import { ILogger } from '~/@/logger'
 import { MigrationPolicy } from '~/@/migration-policy/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
-import { IVideoDb } from './interface'
 import { VideoId } from '../video-id'
+import { IVideoDb } from './interface'
 
 export type Config = {
   t: 'sql-db'
@@ -89,7 +90,7 @@ export const VideoDb = (config: Config): IVideoDb => {
         case 'publishedAt':
           return 'published_at'
         default:
-          throw new Error(`Unreachable: ${key}`)
+          return exhaustive(key)
       }
     },
     rowParser: Row,
@@ -105,32 +106,6 @@ export const VideoDb = (config: Config): IVideoDb => {
         type: row.type,
         official: row.official,
         publishedAt: row.published_at,
-      }
-    },
-    fieldToSqlColumn: (field) => {
-      switch (field) {
-        case 'id':
-          return 'id'
-        case 'iso_639_1':
-          return 'iso_639_1'
-        case 'iso_3166_1':
-          return 'iso_3166_1'
-        case 'name':
-          return 'name'
-        case 'key':
-          return 'key'
-        case 'site':
-          return 'site'
-        case 'size':
-          return 'size'
-        case 'type':
-          return 'type'
-        case 'official':
-          return 'official'
-        case 'publishedAt':
-          return 'published_at'
-        default:
-          throw new Error(`Unreachable: ${field}`)
       }
     },
     primaryKey: 'id',

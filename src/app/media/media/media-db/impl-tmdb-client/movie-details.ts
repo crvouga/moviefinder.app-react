@@ -91,32 +91,47 @@ export const queryMovieDetails = async (input: {
     }
   }
 
-  const credit: Record<CreditId, Credit> = {}
-  for (const cast of got.value.body.credits?.cast ?? []) {
-    if (!cast.id) continue
-    const creditId = CreditId.fromTmdbId(cast.id)
-    credit[creditId] = {
-      type: 'cast',
-      id: creditId,
-      character: cast.character ?? null,
-      order: cast.order ?? null,
-      job: null,
-      mediaId: MediaId.fromTmdbId(cast.id),
-      personId: PersonId.fromTmdbId(cast.id),
-    }
-  }
-  for (const crew of got.value.body.credits?.crew ?? []) {
-    if (!crew.id) continue
-    const creditId = CreditId.fromTmdbId(crew.id)
-    credit[creditId] = {
+  const crew: Record<CreditId, Credit> = {}
+  for (const [order, item] of enumerate(got.value.body.credits?.crew ?? [])) {
+    if (!item.credit_id) continue
+    const creditId = CreditId.fromTmdbId(item.credit_id)
+    if (!item.id) continue
+    const credit: Credit = Credit.compute({
       type: 'crew',
       id: creditId,
       character: null,
-      order: null,
-      job: crew.job ?? null,
+      order: order ?? null,
+      job: item.job ?? null,
       mediaId,
-      personId: PersonId.fromTmdbId(crew.id),
-    }
+      personId: PersonId.fromTmdbId(item.id),
+      computedIsDirector: null,
+      computedIsCast: null,
+    })
+    crew[creditId] = credit
+  }
+
+  const cast: Record<CreditId, Credit> = {}
+  for (const item of got.value.body.credits?.cast ?? []) {
+    if (!item.credit_id) continue
+    const creditId = CreditId.fromTmdbId(item.credit_id)
+    if (!item.id) continue
+    const credit: Credit = Credit.compute({
+      type: 'cast',
+      id: creditId,
+      character: item.character ?? null,
+      order: item.order ?? null,
+      job: null,
+      mediaId,
+      personId: PersonId.fromTmdbId(item.id),
+      computedIsDirector: null,
+      computedIsCast: null,
+    })
+    cast[creditId] = credit
+  }
+
+  const credit: Record<CreditId, Credit> = {
+    ...crew,
+    ...cast,
   }
 
   const relatedMedia: Record<MediaId, Media> = {}

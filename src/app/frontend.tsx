@@ -1,4 +1,4 @@
-import { CurrentScreen } from './frontend/current-screen'
+import { CurrentScreen } from './frontend/current-screen/current-screen'
 
 export const App = () => {
   return (
