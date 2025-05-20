@@ -82,8 +82,8 @@ export const MediaDb = (config: Config): IMediaDb => {
       remoteToLocalSync(query)
       return config.mediaDbLocal.liveQuery(query)
     },
-    query(query) {
-      remoteToLocalSync(query)
+    async query(query) {
+      await remoteToLocalSync(query)
       return config.mediaDbLocal.query(query)
     },
   }

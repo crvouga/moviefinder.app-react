@@ -16,7 +16,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
   const srcList: (string | undefined)[] = []
 
   if (media) {
-    srcList.push(ImageSet.toHighestRes(media.backdrop))
+    srcList.push(ImageSet.toMiddleRes(media.backdrop))
   }
 
   const gotCredits = await input.ctx.creditDb.query(
@@ -28,7 +28,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
   if (relatedCredits) {
     srcList.push(
       ...Object.values(relatedCredits.person).flatMap((person) =>
-        ImageSet.toHighestRes(person.profile)
+        ImageSet.toMiddleRes(person.profile)
       )
     )
   }
@@ -44,7 +44,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
 
   if (relatedSimilar) {
     srcList.push(
-      ...Object.values(relatedSimilar.media).flatMap((media) => ImageSet.toHighestRes(media.poster))
+      ...Object.values(relatedSimilar.media).flatMap((media) => ImageSet.toMiddleRes(media.poster))
     )
   }
 
@@ -60,7 +60,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
   if (relatedRecommendations) {
     srcList.push(
       ...Object.values(relatedRecommendations.media).flatMap((media) =>
-        ImageSet.toHighestRes(media.poster)
+        ImageSet.toMiddleRes(media.poster)
       )
     )
   }

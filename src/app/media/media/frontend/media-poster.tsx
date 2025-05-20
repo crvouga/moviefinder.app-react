@@ -7,7 +7,7 @@ export const MediaPoster = (props: { media?: Media; skeleton?: boolean }) => {
     <Img
       className="border-box w-full overflow-hidden rounded-lg border object-cover"
       style={{ aspectRatio: 2 / 3 }}
-      src={props.skeleton ? ' ' : ImageSet.toHighestRes(props.media?.poster || undefined)}
+      src={props.skeleton ? ' ' : ImageSet.toMiddleRes(props.media?.poster || undefined)}
       alt={props.skeleton ? ' ' : (props.media?.title ?? ' ')}
     />
   )

@@ -168,7 +168,7 @@ const SlideContent = (props: { item: Media }) => {
     >
       <Img
         className="h-full w-full object-cover"
-        src={ImageSet.toHighestRes(props.item.poster)}
+        src={ImageSet.toMiddleRes(props.item.poster)}
         alt={props.item.title ?? ''}
       />
     </button>

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from 'react'
+import { forwardRef, useState } from 'react'
 
 const isImageLoaded = (url: string | undefined): boolean => {
   if (!url) return false
@@ -13,12 +13,6 @@ export const preloadImages = (input: { srcList: (string | undefined)[] }) => {
     const img = new Image()
     img.src = src
   }
-}
-
-export const usePreloadImg = (input: { srcList: string[] }) => {
-  useEffect(() => {
-    preloadImages({ srcList: input.srcList })
-  }, [input.srcList])
 }
 
 export const Img = forwardRef<

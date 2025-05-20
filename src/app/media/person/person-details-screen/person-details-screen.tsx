@@ -32,7 +32,7 @@ export const PersonDetailsScreen = (props: { personId: PersonId | null; from: Sc
       }}
     >
       <div className="flex w-full flex-col items-center justify-start p-6">
-        <Avatar src={ImageSet.toHighestRes(person?.profile)} className="size-32" />
+        <Avatar src={ImageSet.toMiddleRes(person?.profile)} className="size-32" />
         <div className="text-2xl font-bold">{person?.name}</div>
       </div>
     </ScreenLayout>
