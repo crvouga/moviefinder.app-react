@@ -1,3 +1,4 @@
+import { AppRoot } from './frontend/app-root'
 import { CurrentScreen } from './frontend/current-screen/current-screen'
 
 export const App = () => {
@@ -5,15 +6,5 @@ export const App = () => {
     <AppRoot>
       <CurrentScreen />
     </AppRoot>
-  )
-}
-
-const AppRoot = (props: { children: React.ReactNode }) => {
-  return (
-    <div className="flex h-[100dvh] w-screen items-center justify-center bg-black text-white">
-      <div className="flex h-full max-h-[900px] w-full max-w-[600px] flex-col items-center justify-center rounded border">
-        {props.children}
-      </div>
-    </div>
   )
 }

@@ -31,17 +31,9 @@ const sort = <TEntity extends Record<string, unknown>>(
       orderBy.map((o) => {
         switch (o.direction) {
           case 'asc':
-            return ascend(
-              (entity) =>
-                // @ts-ignore
-                entity[o.column]
-            )
+            return ascend((entity) => entity[o.column])
           case 'desc':
-            return descend(
-              (entity) =>
-                // @ts-ignore
-                entity[o.column]
-            )
+            return descend((entity) => entity[o.column])
         }
       })
     )

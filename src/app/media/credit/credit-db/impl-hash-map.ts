@@ -2,6 +2,7 @@ import { Db } from '~/@/db/impl/impl'
 import { isOk } from '~/@/result'
 import { IPersonDb } from '../../person/person-db/interface'
 import { ICreditDb } from './interface'
+import { Credit } from '../credit'
 
 export type Config = {
   t: 'hash-map'
@@ -9,17 +10,19 @@ export type Config = {
 }
 
 export const CreditDb = (config: Config): ICreditDb => {
+  const entities = new Map<string, Credit>()
+
   return Db({
     t: 'hash-map',
     parser: ICreditDb.parser,
-    entities: new Map(),
+    entities,
     indexes: new Map(),
     toPrimaryKey: (entity) => entity.id,
     getRelated: async (entities) => {
       if (entities.length === 0) return { person: {} }
 
       const personQueried = await config.personDb.query({
-        limit: 1000,
+        limit: entities.length,
         offset: 0,
         where: {
           op: 'in',

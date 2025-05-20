@@ -1,25 +1,25 @@
 export type Comparator<T> = (a: T, b: T) => number
 
-type Comparable = number | string | boolean | null | undefined | Date
-
-export const ascend = <T>(keyFn: (item: T) => Comparable): Comparator<T> => {
+export const ascend = <T>(keyFn: (item: T) => unknown): Comparator<T> => {
   return (a, b) => {
     const aKey = keyFn(a)
     const bKey = keyFn(b)
     if (aKey === bKey) return 0
     if (aKey === null || aKey === undefined) return 1
     if (bKey === null || bKey === undefined) return -1
+    if (typeof aKey === 'symbol' || typeof bKey === 'symbol') return 0
     return aKey < bKey ? -1 : 1
   }
 }
 
-export const descend = <T>(keyFn: (item: T) => Comparable): Comparator<T> => {
+export const descend = <T>(keyFn: (item: T) => unknown): Comparator<T> => {
   return (a, b) => {
     const aKey = keyFn(a)
     const bKey = keyFn(b)
     if (aKey === bKey) return 0
     if (aKey === null || aKey === undefined) return -1
     if (bKey === null || bKey === undefined) return 1
+    if (typeof aKey === 'symbol' || typeof bKey === 'symbol') return 0
     return aKey < bKey ? 1 : -1
   }
 }
