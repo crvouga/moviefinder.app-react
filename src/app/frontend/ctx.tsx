@@ -77,10 +77,6 @@ const init = (): Ctx => {
 
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
-  const clientSessionIdStorage = ClientSessionIdStorage({ storage: localStorage })
-  const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
-  clientSessionIdStorage.set(clientSessionId)
-
   let mediaDbLocal: IMediaDb
   if (config.storage === 'hash-map') mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
   if (config.storage === 'sql-db')
@@ -117,7 +113,7 @@ const init = (): Ctx => {
   if (config.storage === 'hash-map') feedDb ??= FeedDb({ t: 'hash-map', logger })
   if (config.storage === 'sql-db')
     feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
-  feedDb ??= FeedDb({ t: 'kv-db', kvDb, logger })
+  feedDb ??= FeedDb({ t: 'hash-map', logger })
 
   const relatedDbs = { personDb, relationshipDb, creditDb, videoDb }
   const throttle = TimeSpan.minutes(30)
@@ -130,6 +126,10 @@ const init = (): Ctx => {
     mediaDbLocal,
     mediaDbRemote,
   })
+
+  const clientSessionIdStorage = ClientSessionIdStorage({ storage: localStorage })
+  const clientSessionId = clientSessionIdStorage.get() ?? ClientSessionId.generate()
+  clientSessionIdStorage.set(clientSessionId)
 
   return {
     kvDb,
