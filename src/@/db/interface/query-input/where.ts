@@ -81,37 +81,8 @@ export const toSql = <TEntity extends Record<string, unknown>>(
   }
 }
 
-const mapColumn = <TEntity extends Record<string, unknown>, U extends Record<string, unknown>>(
-  where: Where<TEntity>,
-  mapFn: (column: keyof TEntity) => keyof U
-): Where<U> => {
-  switch (where.op) {
-    case 'in': {
-      return {
-        op: 'in',
-        value: where.value,
-        column: mapFn(where.column),
-      }
-    }
-    case '=': {
-      return {
-        op: '=',
-        value: where.value,
-        column: mapFn(where.column),
-      }
-    }
-    case 'and': {
-      return {
-        op: 'and',
-        clauses: where.clauses.map((clause) => mapColumn(clause, mapFn)),
-      }
-    }
-  }
-}
-
 export const Where = {
   parser,
   toSql,
-  mapColumn,
   filter,
 }
