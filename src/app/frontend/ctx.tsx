@@ -47,10 +47,11 @@ type Config = {
 
 const init = (): Ctx => {
   let config: Config
-  config ??= { storage: 'hash-map' }
   config ??= { storage: 'sql-db' }
+  config ??= { storage: 'hash-map' }
 
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
+  const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 
   let logger: ILogger
   logger ??= Logger({ t: 'console', prefix: ['app'] })
@@ -63,8 +64,6 @@ const init = (): Ctx => {
   pglite ??= PgliteWorkerInstance({ t: 'in-memory' })
 
   const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
-
-  const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 
   const trpcClient = TrpcClient({ backendUrl, logger })
 
