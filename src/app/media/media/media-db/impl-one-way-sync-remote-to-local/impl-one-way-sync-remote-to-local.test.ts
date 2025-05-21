@@ -40,8 +40,8 @@ const Fixture = async () => {
   const mediaDb = MediaDbBackend({
     t: 'one-way-sync-remote-to-local',
     kvDb,
-    mediaDbLocal: local,
-    mediaDbRemote: remote,
+    remote,
+    local,
     logger: Logger({ t: 'noop' }),
     pubSub,
     throttle: TimeSpan.seconds(0),

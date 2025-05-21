@@ -28,20 +28,21 @@ import { TimeSpan } from './time-span'
  * throttledFn('b') // Logs 'Called with b' (different key)
  * ```
  */
-export const throttleByKeyDurable = <TKey, TArgs extends any[]>(
-  kvDb: IKvDb,
-  timeSpan: TimeSpan,
-  getKey: (...args: TArgs) => TKey,
+export const throttleByKeyDurable = <TArgs extends any[]>(config: {
+  kvDb: IKvDb
+  timeSpan: TimeSpan
+  getKey: (...args: TArgs) => string
   fn: (...args: TArgs) => void
-) => {
+}) => {
   return async (...args: TArgs) => {
-    const key = getKey(...args)
+    const key = config.getKey(...args)
     const now = Date.now()
-    const lastCall = unwrapOr(await kvDb.get(Codec.integer, [String(key)]), () => [0])[0] ?? 0
+    const lastCall =
+      unwrapOr(await config.kvDb.get(Codec.integer, [String(key)]), () => [0])[0] ?? 0
 
-    if (now - lastCall > TimeSpan.toMilliseconds(timeSpan)) {
-      await kvDb.set(Codec.integer, [String(key), now])
-      fn(...args)
+    if (now - lastCall > TimeSpan.toMilliseconds(config.timeSpan)) {
+      await config.kvDb.set(Codec.integer, [String(key), now])
+      config.fn(...args)
     }
   }
 }

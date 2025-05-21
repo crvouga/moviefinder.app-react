@@ -11,15 +11,19 @@ import { VideoId } from '../../../video/video-id'
 import { Media } from '../../media'
 import { MediaId } from '../../media-id'
 
+const MediaRelated = z.object({
+  person: z.record(PersonId.parser, Person.parser),
+  credit: z.record(CreditId.parser, Credit.parser),
+  relationship: z.record(RelationshipId.parser, Relationship.parser),
+  media: z.record(MediaId.parser, Media.parser),
+  video: z.record(VideoId.parser, Video.parser),
+})
+
+export type MediaRelated = z.infer<typeof MediaRelated>
+
 const parser = IDb.parser({
   Entity: Media.parser,
-  Related: z.object({
-    person: z.record(PersonId.parser, Person.parser),
-    credit: z.record(CreditId.parser, Credit.parser),
-    relationship: z.record(RelationshipId.parser, Relationship.parser),
-    media: z.record(MediaId.parser, Media.parser),
-    video: z.record(VideoId.parser, Video.parser),
-  }),
+  Related: MediaRelated,
 })
 
 export type IMediaDb = IDb.Infer<typeof parser>

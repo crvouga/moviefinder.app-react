@@ -1,6 +1,7 @@
 import { IDb } from '../interface'
 import * as ImplHashMap from './impl-hash-map'
 import * as ImplKvDb from './impl-kv-db'
+import * as ImplOneWaySyncRemoteToLocal from './impl-one-way-sync-remote-to-local/impl'
 import * as ImplSqlDb from './impl-sql-db'
 
 export type Config<
@@ -11,6 +12,7 @@ export type Config<
   | ImplSqlDb.Config<TEntity, TRelated, TRow>
   | ImplKvDb.Config<TEntity, TRelated>
   | ImplHashMap.Config<TEntity, TRelated>
+  | ImplOneWaySyncRemoteToLocal.Config<TEntity, TRelated>
 
 export const Db = <
   TEntity extends Record<string, unknown>,
@@ -26,5 +28,7 @@ export const Db = <
       return ImplKvDb.Db(config)
     case 'hash-map':
       return ImplHashMap.Db(config)
+    case 'one-way-sync-remote-to-local':
+      return ImplOneWaySyncRemoteToLocal.Db(config)
   }
 }
