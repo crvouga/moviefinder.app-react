@@ -47,8 +47,8 @@ type Config = {
 
 const init = (): Ctx => {
   let config: Config
-  config ??= { storage: 'hash-map' }
   config ??= { storage: 'sql-db' }
+  config ??= { storage: 'hash-map' }
 
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
   const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
