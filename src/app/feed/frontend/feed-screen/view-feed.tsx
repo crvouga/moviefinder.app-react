@@ -29,7 +29,10 @@ type Msg = { t: 'observed-first' } | { t: 'observed-last' }
 type State = { limit: number; offset: number }
 
 const init = (feed: Feed): State => {
-  return { limit: PAGE_SIZE + 1, offset: Math.max(0, feed.activeIndex - PAGE_SIZE) }
+  return {
+    limit: PAGE_SIZE + 1,
+    offset: Math.max(0, feed.activeIndex - PAGE_SIZE),
+  }
 }
 
 const reducer = (state: State, msg: Msg): State => {

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MediaId } from '../media/media-id'
 import { VideoId } from './video-id'
 
 const parser = z.object({
@@ -12,6 +13,8 @@ const parser = z.object({
   type: z.string().nullable(),
   official: z.boolean().nullable(),
   publishedAt: z.string().nullable(),
+  mediaId: MediaId.parser,
+  order: z.number().nullable(),
 })
 
 export type Video = z.infer<typeof parser>

@@ -1,9 +1,9 @@
 import { Clickable } from '~/@/ui/clickable'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
-import { Person } from '../../person/person'
-import { PersonId } from '../../person/person-id'
-import { Credit } from '../credit'
-import { CreditId } from '../credit-id'
+import { Person } from '../person/person'
+import { PersonId } from '../person/person-id'
+import { Credit } from './credit'
+import { CreditId } from './credit-id'
 import { CreditBlock } from './credit-block'
 
 export const CreditsSwiper = (props: {

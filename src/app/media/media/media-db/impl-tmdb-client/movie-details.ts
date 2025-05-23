@@ -7,8 +7,6 @@ import { TmdbClient } from '~/@/tmdb-client'
 import { TmdbConfiguration } from '~/@/tmdb-client/configuration/configuration'
 import { Credit } from '../../../credit/credit'
 import { CreditId } from '../../../credit/credit-id'
-import { Media } from '../../media'
-import { MediaId } from '../../media-id'
 import { Person } from '../../../person/person'
 import { PersonId } from '../../../person/person-id'
 import { Relationship } from '../../../relationship/relationship'
@@ -16,6 +14,8 @@ import { RelationshipId } from '../../../relationship/relationship-id'
 import { RelationshipType } from '../../../relationship/relationship-type'
 import { Video } from '../../../video/video'
 import { VideoId } from '../../../video/video-id'
+import { Media } from '../../media'
+import { MediaId } from '../../media-id'
 import { IMediaDb } from '../interface/interface'
 
 export const queryMovieDetails = async (input: {
@@ -196,7 +196,7 @@ export const queryMovieDetails = async (input: {
   }
 
   const video: Record<VideoId, Video> = {}
-  for (const v of got.value.body.videos?.results ?? []) {
+  for (const [order, v] of enumerate(got.value.body.videos?.results ?? [])) {
     if (!v.id) continue
     const videoId = VideoId.fromTmdbId(v.id)
     video[videoId] = {
@@ -210,6 +210,8 @@ export const queryMovieDetails = async (input: {
       iso_639_1: v.iso_639_1 ?? null,
       iso_3166_1: v.iso_3166_1 ?? null,
       size: v.size ?? null,
+      mediaId,
+      order: order,
     }
   }
 

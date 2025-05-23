@@ -1,7 +1,7 @@
 import { Clickable } from '~/@/ui/clickable'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
-import { Media } from '../media'
-import { MediaId } from '../media-id'
+import { Media } from './media'
+import { MediaId } from './media-id'
 import { MediaPoster } from './media-poster'
 
 export const MediaPosterSwiper = (props: {

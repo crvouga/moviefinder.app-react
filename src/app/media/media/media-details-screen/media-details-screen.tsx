@@ -1,19 +1,20 @@
+import { QueryInput } from '~/@/db/interface/query-input/query-input'
+import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { SwiperContainerProps } from '~/@/ui/swiper'
+import { useIsMobile } from '~/@/ui/use-is-mobile'
+import { useSubscription } from '~/@/ui/use-subscription'
 import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
-import { MediaCreditsSwiper } from '../../credit/frontend/media-credit-swiper'
-import { RelationshipTypeMediaPosterSwiper } from '../../relationship/frontend/relationship-type-media-poster-swiper'
+import { MediaCreditsSwiper } from '../../credit/media-credit-swiper'
+import { RelationshipTypeMediaPosterSwiper } from '../../relationship/relationship-type-media-poster-swiper'
+import { MediaVideoSwiper } from '../../video/media-video-swiper'
+import { Media } from '../media'
 import { MediaId } from '../media-id'
 import { MainSection } from './main-section'
 import { preloadMediaDetailsScreen } from './preload-media-details-screen'
 import { SectionLayout } from './section-layout'
-import { useSubscription } from '~/@/ui/use-subscription'
-import { QueryOutput } from '~/@/db/interface/query-output/query-output'
-import { QueryInput } from '~/@/db/interface/query-input/query-input'
-import { Media } from '../media'
-import { useIsMobile } from '~/@/ui/use-is-mobile'
 
 const toQuery = (input: { mediaId: MediaId }): QueryInput<Media> => {
   return {
@@ -52,6 +53,19 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
       scrollKey={`media-details-${props.mediaId?.toString() ?? ''}`}
     >
       <MainSection media={media ?? null} />
+
+      <SectionLayout title="Video">
+        <MediaVideoSwiper.View
+          mediaId={media?.id ?? null}
+          swiper={{
+            ...swiperProps,
+            slideRestorationKey: `media-details-swiper-video-${media?.id}`,
+          }}
+          onClick={(_payload) => {
+            debugger
+          }}
+        />
+      </SectionLayout>
 
       <SectionLayout title="Cast & Crew">
         <MediaCreditsSwiper.View

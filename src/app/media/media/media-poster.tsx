@@ -1,6 +1,6 @@
 import { ImageSet } from '~/@/image-set'
 import { Img } from '~/@/ui/img'
-import { Media } from '../media'
+import { Media } from './media'
 
 export const MediaPoster = (props: { media?: Media; skeleton?: boolean }) => {
   return (

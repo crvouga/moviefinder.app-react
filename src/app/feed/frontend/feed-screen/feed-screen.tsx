@@ -4,7 +4,7 @@ import { useSubscription } from '~/@/ui/use-subscription'
 import { ScreenLayout } from '../../../@/ui/screen-layout'
 import { useCtx } from '../../../frontend/ctx'
 import { FeedId } from '../../feed-id'
-import { ViewFeed } from './feed'
+import { ViewFeed } from './view-feed'
 import { ImgLoading } from './img-loading'
 
 export const FeedScreen = () => {
@@ -14,7 +14,11 @@ export const FeedScreen = () => {
     ctx.feedDb.liveQuery({
       limit: 1,
       offset: 0,
-      where: { op: '=', column: 'clientSessionId', value: ctx.clientSessionId },
+      where: {
+        op: '=',
+        column: 'clientSessionId',
+        value: ctx.clientSessionId,
+      },
     })
   )
 

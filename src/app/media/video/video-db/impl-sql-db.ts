@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS video (
     size INTEGER,
     type TEXT,
     official BOOLEAN,
-    published_at TIMESTAMP
+    published_at TIMESTAMP,
+    media_id TEXT NOT NULL,
+    order INTEGER
 )
 `,
 ]
@@ -37,19 +39,6 @@ const down = [
 DROP TABLE IF EXISTS video CASCADE
 `,
 ]
-
-const Row = z.object({
-  id: z.string(),
-  iso_639_1: z.string().nullable(),
-  iso_3166_1: z.string().nullable(),
-  name: z.string().nullable(),
-  key: z.string().nullable(),
-  site: z.string().nullable(),
-  size: z.number().nullable(),
-  type: z.string().nullable(),
-  official: z.boolean().nullable(),
-  published_at: z.string().nullable(),
-})
 
 export const VideoDb = (config: Config): IVideoDb => {
   return Db({
@@ -89,11 +78,28 @@ export const VideoDb = (config: Config): IVideoDb => {
           return 'official'
         case 'publishedAt':
           return 'published_at'
+        case 'mediaId':
+          return 'media_id'
+        case 'order':
+          return 'order'
         default:
           return exhaustive(key)
       }
     },
-    rowParser: Row,
+    rowParser: z.object({
+      id: z.string(),
+      iso_639_1: z.string().nullable(),
+      iso_3166_1: z.string().nullable(),
+      name: z.string().nullable(),
+      key: z.string().nullable(),
+      site: z.string().nullable(),
+      size: z.number().nullable(),
+      type: z.string().nullable(),
+      official: z.boolean().nullable(),
+      published_at: z.string().nullable(),
+      media_id: z.string(),
+      order: z.number().nullable(),
+    }),
     rowToEntity(row) {
       return {
         id: VideoId.fromString(row.id),
@@ -106,6 +112,8 @@ export const VideoDb = (config: Config): IVideoDb => {
         type: row.type,
         official: row.official,
         publishedAt: row.published_at,
+        mediaId: row.media_id,
+        order: row.order ?? 0,
       }
     },
     primaryKey: 'id',
@@ -121,6 +129,8 @@ export const VideoDb = (config: Config): IVideoDb => {
         type: entity.type,
         official: entity.official,
         published_at: entity.publishedAt,
+        media_id: entity.mediaId ?? null,
+        order: entity.order,
       }
     },
   })

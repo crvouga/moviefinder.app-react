@@ -1,8 +1,8 @@
 import { ImageSet } from '~/@/image-set'
 import { Avatar } from '~/@/ui/avatar'
 import { Typography } from '~/@/ui/typography'
-import { Person } from '../../person/person'
-import { Credit } from '../credit'
+import { Person } from '../person/person'
+import { Credit } from './credit'
 
 export const CreditBlock = (props: {
   skeleton?: boolean

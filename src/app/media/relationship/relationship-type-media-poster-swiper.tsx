@@ -3,11 +3,11 @@ import { isOk } from '~/@/result'
 import { SwiperContainerProps } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { useCtx } from '~/app/frontend/ctx'
-import { MediaPosterSwiper } from '../../media/frontend/media-poster-swiper'
-import { Media } from '../../media/media'
-import { MediaId } from '../../media/media-id'
-import { Relationship } from '../relationship'
-import { RelationshipType } from '../relationship-type'
+import { MediaPosterSwiper } from '../media/media-poster-swiper'
+import { Media } from '../media/media'
+import { MediaId } from '../media/media-id'
+import { Relationship } from './relationship'
+import { RelationshipType } from './relationship-type'
 
 const toQuery = (props: {
   mediaId: MediaId | null
