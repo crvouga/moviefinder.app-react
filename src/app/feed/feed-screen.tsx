@@ -83,12 +83,16 @@ const ViewFeed = (props: { feed: Feed }) => {
 
   const mediaQuery = useSubscription(
     ['media-query', 'offset', state.offset, 'limit', state.limit],
-    () =>
-      ctx.mediaDb.liveQuery({
+    () => {
+      return ctx.mediaDb.liveQuery({
         limit: state.limit,
         offset: state.offset,
-        orderBy: [{ column: 'popularity', direction: 'desc' }],
+        orderBy: [
+          { column: 'popularity', direction: 'desc' },
+          { column: 'id', direction: 'asc' },
+        ],
       })
+    }
   )
 
   const media = mediaQuery ?? Loading
@@ -113,15 +117,16 @@ const ViewFeed = (props: { feed: Feed }) => {
           slidesPerView={1}
           className="h-full w-full"
           direction="vertical"
-          onSlideChange={(event) => {
+          onSlideChange={async (event) => {
             const parsed = SlideData.safeParse(event.data)
 
             if (!parsed.success) return
 
-            ctx.feedDb.upsert({
+            await ctx.feedDb.upsert({
               entities: [{ ...props.feed, activeIndex: parsed.data.feedIndex }],
             })
-            preloadMediaDetailsScreen({ ctx, mediaId: parsed.data.mediaId })
+
+            await preloadMediaDetailsScreen({ ctx, mediaId: parsed.data.mediaId })
           }}
         >
           {false && (

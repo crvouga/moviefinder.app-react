@@ -18,8 +18,6 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     srcList.push(ImageSet.toMiddleRes(media.backdrop))
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-
   const gotCredits = await input.ctx.creditDb.query(
     MediaCreditsSwiper.toQuery({ mediaId: input.mediaId })
   )
