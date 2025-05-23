@@ -1,15 +1,12 @@
 import { ImageSet } from '../image-set'
 
-export const toThumbnailSrc = (input: { key: string; size: 'default' | 'medium' | 'high' }) => {
-  return `https://img.youtube.com/vi/${input.key}/${input.size}.jpg`
-}
+const YOUTUBE_THUMBNAIL_SIZES = ['default', 'mqdefault', 'hqdefault'] as const
+type ThumbnailSize = (typeof YOUTUBE_THUMBNAIL_SIZES)[number]
 
-export const toThumbnailImageSet = (input: { key: string }): ImageSet => {
-  return ImageSet.init({
-    lowestToHighestRes: [
-      toThumbnailSrc({ key: input.key, size: 'default' }),
-      toThumbnailSrc({ key: input.key, size: 'medium' }),
-      toThumbnailSrc({ key: input.key, size: 'high' }),
-    ],
+const toThumbnailSrc = (key: string, size: ThumbnailSize) =>
+  `https://img.youtube.com/vi/${key}/${size}.jpg`
+
+export const toThumbnailImageSet = (input: { key: string }): ImageSet =>
+  ImageSet.init({
+    lowestToHighestRes: YOUTUBE_THUMBNAIL_SIZES.map((size) => toThumbnailSrc(input.key, size)),
   })
-}

@@ -6,9 +6,11 @@ export type Config = ImplHashMap.Config | ImplSqlDb.Config
 
 export const VideoDb = (config: Config): IVideoDb => {
   switch (config.t) {
-    case 'hash-map':
+    case 'hash-map': {
       return ImplHashMap.VideoDb(config)
-    case 'sql-db':
+    }
+    case 'sql-db': {
       return ImplSqlDb.VideoDb(config)
+    }
   }
 }

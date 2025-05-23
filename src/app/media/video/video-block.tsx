@@ -7,23 +7,28 @@ import { Video } from './video'
 export const VideoBlock = (props: { skeleton?: boolean; video?: Video; onClick?: () => void }) => {
   const imageSet = toThumbnailImageSet({ key: props.video?.key ?? '' })
   return (
-    <div className="flex w-full flex-col items-start gap-2 overflow-hidden">
+    <div className="flex w-48 flex-col items-start gap-2 truncate">
       <Img
-        className="aspect-video w-36 rounded-lg shadow-lg"
+        className="aspect-video w-full overflow-hidden rounded-lg border shadow-lg"
         src={props.skeleton ? ' ' : ImageSet.toMiddleRes(imageSet)}
       />
-      <Typography
-        variant="label"
-        skeletonLength={9}
-        skeleton={props.skeleton}
-        text={props.video?.name ?? ''}
-      />
-      <Typography
-        variant="caption"
-        skeletonLength={4}
-        skeleton={props.skeleton}
-        text={props.video?.type ?? ''}
-      />
+      <div className="flex w-full flex-col items-start gap-1">
+        <Typography
+          variant="label"
+          className="w-full truncate text-left"
+          skeletonLength={9}
+          skeleton={props.skeleton}
+          text={props.video?.name ?? ''}
+        />
+        <Typography
+          className="truncate"
+          variant="caption"
+          color="secondary"
+          skeletonLength={4}
+          skeleton={props.skeleton}
+          text={props.video?.type ?? ''}
+        />
+      </div>
     </div>
   )
 }
