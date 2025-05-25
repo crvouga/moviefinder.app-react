@@ -10,8 +10,6 @@ export type Config = {
 export const FeedDb = (_config: Config): IFeedDb => {
   return Db({
     t: 'hash-map',
-    entities: new Map(),
-    indexes: new Map(),
     toPrimaryKey: (entity) => entity.id,
     getRelated: async () => ({}),
     parser: IFeedDb.parser,

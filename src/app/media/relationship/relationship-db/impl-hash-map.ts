@@ -12,8 +12,6 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
   return Db({
     t: 'hash-map',
     parser: IRelationshipDb.parser,
-    entities: new Map(),
-    indexes: new Map(),
     toPrimaryKey(entity) {
       return entity.id
     },

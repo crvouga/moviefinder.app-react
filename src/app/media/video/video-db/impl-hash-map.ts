@@ -9,8 +9,6 @@ export const VideoDb = (_config: Config): IVideoDb => {
   return Db({
     t: 'hash-map',
     parser: IVideoDb.parser,
-    entities: new Map(),
-    indexes: new Map(),
     toPrimaryKey: (entity) => entity.id,
     getRelated: async () => ({}),
   })

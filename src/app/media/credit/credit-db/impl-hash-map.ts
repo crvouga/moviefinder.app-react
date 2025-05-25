@@ -14,8 +14,6 @@ export const CreditDb = (config: Config): ICreditDb => {
     t: 'hash-map',
     parser: ICreditDb.parser,
     map: (entity) => Credit.compute(entity),
-    entities: new Map(),
-    indexes: new Map(),
     toPrimaryKey: (entity) => entity.id,
     getRelated: async (entities) => {
       if (entities.length === 0) return { person: {} }

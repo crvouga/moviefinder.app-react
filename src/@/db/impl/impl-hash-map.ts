@@ -1,3 +1,4 @@
+import { Paginated } from '~/@/pagination/paginated'
 import { Pagination } from '~/@/pagination/pagination'
 import { PubSub } from '~/@/pub-sub'
 import { Ok } from '~/@/result'
@@ -6,7 +7,6 @@ import { OrderBy } from '../interface/query-input/order-by'
 import { QueryInput } from '../interface/query-input/query-input'
 import { Where } from '../interface/query-input/where'
 import { QueryOutput } from '../interface/query-output/query-output'
-import { Paginated } from '~/@/pagination/paginated'
 
 export type Config<
   TEntity extends Record<string, unknown>,
@@ -14,8 +14,6 @@ export type Config<
 > = {
   t: 'hash-map'
   parser: IDb.Parser<TEntity, TRelated>
-  entities: Map<string, TEntity>
-  indexes: Map<string, Set<string>>
   toPrimaryKey: (entity: TEntity) => string
   map?: (entity: TEntity) => TEntity
   getRelated: (entities: TEntity[]) => Promise<TRelated>
@@ -31,6 +29,11 @@ export const Db = <
 ): IDb.IDb<TEntity, TRelated> => {
   const pubSubsByQueryKey = new Map<string, PubSub<QueryOutput<TEntity, TRelated>>>()
   const liveQueriesByQueryKey = new Map<string, QueryInput<TEntity>>()
+
+  // map of primary key -> entity
+  const entities = new Map<string, Record<string, unknown>>()
+  // map of entity fields -> map of field values -> set of primary keys
+  const indexes = new Map<string, Map<string, Set<string>>>()
 
   globalPubSub.subscribe(async (msg) => {
     switch (msg.t) {
@@ -50,12 +53,12 @@ export const Db = <
     queryInput: QueryInput<TEntity>
   ): Promise<QueryOutput<TEntity, TRelated>> => {
     const start = performance.now()
-    const all = Array.from(config.entities.values())
+    const all = Array.from(entities.values()) as TEntity[]
     const filtered = queryInput.where ? Where.filter(all, queryInput.where) : all
     const sorted = queryInput.orderBy ? OrderBy.sort(filtered, queryInput.orderBy) : filtered
     const paginated = Pagination.paginate(sorted, queryInput)
     const related = await config.getRelated(paginated)
-    const entities: Paginated<TEntity> = {
+    const paginatedEntities: Paginated<TEntity> = {
       items: paginated,
       total: filtered.length,
       offset: queryInput.offset,
@@ -63,7 +66,7 @@ export const Db = <
     }
     const output: QueryOutput<TEntity, TRelated> = Ok({
       related,
-      entities,
+      entities: paginatedEntities,
     })
     const end = performance.now()
     console.log(
@@ -74,6 +77,10 @@ export const Db = <
   }
 
   return {
+    // @ts-ignore
+    entities,
+    // @ts-ignore
+    indexes,
     query,
     liveQuery(queryInput) {
       const queryKey = QueryInput.toKey(queryInput)
@@ -87,7 +94,28 @@ export const Db = <
     },
     async upsert(input) {
       for (const e of input.entities) {
-        config.entities.set(config.toPrimaryKey(e), config.map ? config.map(e) : e)
+        const primaryKey = config.toPrimaryKey(e)
+        entities.set(primaryKey, config.map ? config.map(e) : e)
+
+        for (const key in e) {
+          if (!indexes.has(key)) {
+            indexes.set(key, new Map())
+          }
+
+          const valueIndexes = indexes.get(key)
+
+          const value = e[key]
+
+          if (!valueIndexes) throw new Error('valueIndexes is undefined')
+
+          const valueKey = String(value)
+
+          if (!valueIndexes.has(valueKey)) {
+            valueIndexes.set(valueKey, new Set())
+          }
+
+          valueIndexes.get(valueKey)?.add(primaryKey)
+        }
       }
       globalPubSub.publish({ t: 'publish' })
       return Ok({
