@@ -8,7 +8,7 @@ import { Ok, unwrapOr } from '~/@/result'
 import { IDb } from '../interface'
 import { QueryInput } from '../interface/query-input/query-input'
 import { QueryOutput } from '../interface/query-output/query-output'
-import { filterArray } from './impl-hash-map/filter-map'
+import { filterArray } from './impl-hash-map/filter-array'
 import { sortArray } from './impl-hash-map/sort-array'
 
 export type Config<

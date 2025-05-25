@@ -1,7 +1,7 @@
 import { Pagination } from '~/@/pagination/pagination'
 import { EntityField } from '../../interface/query-input/field'
 import { QueryInput } from '../../interface/query-input/query-input'
-import { filterMap } from './filter-array'
+import { filterMap } from './filter-map'
 import { sortArray } from './sort-array'
 
 export const queryMap = <TEntity extends Record<string, unknown>>(
