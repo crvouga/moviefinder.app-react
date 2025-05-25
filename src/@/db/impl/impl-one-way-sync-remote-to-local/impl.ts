@@ -76,7 +76,7 @@ export const Db = <
       return config.local.liveQuery(query)
     },
     async query(query) {
-      remoteToLocalSync(query)
+      await remoteToLocalSync(query)
       return config.local.query(query)
     },
   }

@@ -5,14 +5,12 @@ import { Ctx } from '~/app/frontend/ctx'
 import { MediaCreditsSwiper } from '../../credit/media-credit-swiper'
 import { RelationshipTypeMediaPosterSwiper } from '../../relationship/relationship-type-media-poster-swiper'
 import { MediaVideoSwiper } from '../../video/media-video-swiper'
+import { Video } from '../../video/video'
 import { MediaId } from '../media-id'
 import { MediaDetailsScreen } from './media-details-screen'
-import { Video } from '../../video/video'
 
 export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: MediaId }) => {
   const got = await input.ctx.mediaDb.query(MediaDetailsScreen.toQuery({ mediaId: input.mediaId }))
-
-  await new Promise((resolve) => setTimeout(resolve, 1000))
 
   const media = QueryOutput.first(got)
 
