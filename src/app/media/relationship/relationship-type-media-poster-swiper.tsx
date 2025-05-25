@@ -23,14 +23,14 @@ const toQuery = ({
       op: 'and',
       clauses: [
         {
-          column: 'type',
-          op: '=',
-          value: relationshipType,
-        },
-        {
           column: 'from',
           op: '=',
           value: mediaId,
+        },
+        {
+          column: 'type',
+          op: '=',
+          value: relationshipType,
         },
       ],
     },

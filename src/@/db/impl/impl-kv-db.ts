@@ -6,10 +6,10 @@ import { Pagination } from '~/@/pagination/pagination'
 import { PubSub } from '~/@/pub-sub'
 import { Ok, unwrapOr } from '~/@/result'
 import { IDb } from '../interface'
-import { OrderBy } from '../interface/query-input/order-by'
 import { QueryInput } from '../interface/query-input/query-input'
-import { Where } from '../interface/query-input/where'
 import { QueryOutput } from '../interface/query-output/query-output'
+import { filterArray } from './impl-hash-map/filter-map'
+import { sortArray } from './impl-hash-map/sort-array'
 
 export type Config<
   TEntity extends Record<string, unknown>,
@@ -67,8 +67,8 @@ export const Db = <
       await entitiesKv.get(Codec.fromZod(config.parser.Entity), allIds),
       () => []
     )
-    const filtered = queryInput.where ? Where.filterArray(entities, queryInput.where) : entities
-    const sorted = queryInput.orderBy ? OrderBy.sortArray(filtered, queryInput.orderBy) : filtered
+    const filtered = queryInput.where ? filterArray(entities, queryInput.where) : entities
+    const sorted = queryInput.orderBy ? sortArray(filtered, queryInput.orderBy) : filtered
     const paginated = Pagination.paginate(sorted, queryInput)
     return Ok({
       related: await config.getRelated(paginated),

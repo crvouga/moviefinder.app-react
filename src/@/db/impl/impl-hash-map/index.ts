@@ -3,12 +3,12 @@ import { Paginated } from '~/@/pagination/paginated'
 import { Pagination } from '~/@/pagination/pagination'
 import { PubSub } from '~/@/pub-sub'
 import { Ok } from '~/@/result'
-import { IDb } from '../interface'
-import { OrderBy } from '../interface/query-input/order-by'
-import { QueryInput } from '../interface/query-input/query-input'
-import { Where } from '../interface/query-input/where'
-import { QueryOutput } from '../interface/query-output/query-output'
-import { EntityField } from '../interface/query-input/field'
+import { IDb } from '../../interface'
+import { EntityField } from '../../interface/query-input/field'
+import { QueryInput } from '../../interface/query-input/query-input'
+import { QueryOutput } from '../../interface/query-output/query-output'
+import { filterMap } from './filter-array'
+import { sortArray } from './sort-array'
 
 export type Config<
   TEntity extends Record<string, unknown>,
@@ -64,11 +64,11 @@ export const Db = <
     const all = entities
 
     const filtered: Map<EntityField, TEntity> = queryInput.where
-      ? Where.filterMap(all, indexes, queryInput.where)
+      ? filterMap(all, indexes, queryInput.where, queryInput)
       : all
 
     const sorted: TEntity[] = queryInput.orderBy
-      ? OrderBy.sortMap(filtered, indexes, queryInput.orderBy)
+      ? sortArray(Array.from(filtered.values()), queryInput.orderBy)
       : Array.from(filtered.values())
 
     const paginated = Pagination.paginate(sorted, queryInput)

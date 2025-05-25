@@ -1,17 +1,17 @@
 import { z } from 'zod'
 import { DbErr } from '~/@/db/interface/error'
-import { OrderBy } from '~/@/db/interface/query-input/order-by'
-import { Where } from '~/@/db/interface/query-input/where'
 import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { isErr, mapErr, Ok, Result, unwrapOr } from '~/@/result'
 import { ascend } from '~/@/sort'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { SqlDbParam } from '~/@/sql-db/sql-db-param'
 import { toBulkInsertSql } from '~/@/sql/bulk-insert'
-import { IDb } from '../interface'
-import { QueryInput } from '../interface/query-input/query-input'
-import { QueryOutput } from '../interface/query-output/query-output'
-import { quoteIfPostgresKeyword } from '../interface/postgres-keywords'
+import { IDb } from '../../interface'
+import { QueryInput } from '../../interface/query-input/query-input'
+import { QueryOutput } from '../../interface/query-output/query-output'
+import { toOrderBySql } from './order-by-sql'
+import { quoteIfPostgresKeyword } from './postgres-keywords'
+import { toWhereSql } from './where-sql'
 
 export type Config<
   TEntity extends Record<string, unknown>,
@@ -73,11 +73,11 @@ export const Db = <
   const toSql = (queryInput: QueryInput<TEntity>) => {
     const params: SqlDbParam[] = [queryInput.limit, queryInput.offset]
     const whereClause = queryInput.where
-      ? Where.toSql(queryInput.where, config.entityKeyToSqlColumn)
+      ? toWhereSql(queryInput.where, config.entityKeyToSqlColumn)
       : ''
 
     const orderByClause = queryInput.orderBy
-      ? OrderBy.toSql(queryInput.orderBy, config.entityKeyToSqlColumn)
+      ? toOrderBySql(queryInput.orderBy, config.entityKeyToSqlColumn)
       : ''
 
     const sql = [

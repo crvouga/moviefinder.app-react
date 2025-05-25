@@ -1,7 +1,7 @@
 import { z } from 'zod'
+import { toDeterministicHash } from '~/@/deterministic-hash'
 import { OrderBy } from './order-by'
 import { Where } from './where'
-import { toDeterministicHash } from '~/@/deterministic-hash'
 
 export type QueryInput<TEntity extends Record<string, unknown>> = {
   where?: Where<TEntity>
@@ -25,20 +25,6 @@ const parser = <TEntity extends Record<string, unknown>>(
   return schema
 }
 
-const toSql = <TEntity extends Record<string, unknown>>(
-  queryInput: QueryInput<TEntity>,
-  columnToSqlColumn: (column: keyof TEntity) => string
-): string => {
-  return [
-    queryInput.where ? Where.toSql(queryInput.where, columnToSqlColumn) : '',
-    queryInput.orderBy ? OrderBy.toSql(queryInput.orderBy, columnToSqlColumn) : '',
-    queryInput.limit ? `LIMIT ${queryInput.limit}` : '',
-    queryInput.offset ? `OFFSET ${queryInput.offset}` : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
-}
-
 const toKey = <TEntity extends Record<string, unknown>>(
   queryInput: QueryInput<TEntity>
 ): string => {
@@ -54,7 +40,6 @@ const ensureKey = <TEntity extends Record<string, unknown>>(
 
 export const QueryInput = {
   parser,
-  toSql,
   toKey,
   ensureKey,
 }
