@@ -1,16 +1,14 @@
 import { ImageSet } from '~/@/image-set'
 import { Img } from '~/@/ui/img'
 import { Typography } from '~/@/ui/typography'
-import { toThumbnailImageSet } from '~/@/youtube/thumbnail'
 import { Video } from './video'
 
 export const VideoBlock = (props: { skeleton?: boolean; video?: Video; onClick?: () => void }) => {
-  const imageSet = toThumbnailImageSet({ key: props.video?.key ?? '' })
   return (
     <div className="flex w-48 flex-col items-start gap-2 truncate">
       <Img
         className="aspect-video w-full overflow-hidden rounded-lg border shadow-lg"
-        src={props.skeleton ? ' ' : ImageSet.toMiddleRes(imageSet)}
+        src={props.skeleton ? ' ' : ImageSet.toMiddleRes(Video.toImageSet(props.video))}
       />
       <div className="flex w-full flex-col items-start gap-1">
         <Typography

@@ -15,6 +15,7 @@ export type Config = OneWaySyncRemoteToLocal.Config<Media, MediaRelated> & {
     relationshipDb: IRelationshipDb
     videoDb: IVideoDb
     personDb: IPersonDb
+    mediaDb: IMediaDb
   }
 }
 
@@ -27,6 +28,7 @@ export const MediaDb = (config: Config): IMediaDb => {
         config.relatedDbs.relationshipDb.upsert({ entities: Object.values(related.relationship) }),
         config.relatedDbs.videoDb.upsert({ entities: Object.values(related.video) }),
         config.relatedDbs.personDb.upsert({ entities: Object.values(related.person) }),
+        config.relatedDbs.mediaDb.upsert({ entities: Object.values(related.media) }),
       ])
     },
   })

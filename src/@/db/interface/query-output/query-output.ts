@@ -34,9 +34,16 @@ const related = <T, U>(query: QueryOutput<T, U> | null | undefined): U | null =>
   return null
 }
 
+const entities = <T, U>(query: QueryOutput<T, U> | null | undefined): Paginated<T> | null => {
+  if (!query) return null
+  if (isOk(query)) return query.value.entities ?? null
+  return null
+}
+
 export const QueryOutput = {
   parser,
   first,
   related,
   init,
+  entities,
 }

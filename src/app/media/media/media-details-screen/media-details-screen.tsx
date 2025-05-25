@@ -61,9 +61,7 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
             ...swiperProps,
             slideRestorationKey: `media-details-swiper-video-${media?.id}`,
           }}
-          onClick={(_payload) => {
-            debugger
-          }}
+          onClick={(_payload) => {}}
         />
       </SectionLayout>
 

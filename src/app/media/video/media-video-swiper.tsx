@@ -27,9 +27,7 @@ const View = (props: {
     <VideoSwiper
       swiper={props.swiper}
       videos={queried.value.entities.items}
-      onClick={(_input) => {
-        debugger
-      }}
+      onClick={props.onClick}
     />
   )
 }

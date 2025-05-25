@@ -9,7 +9,10 @@ import { MediaId } from '../media/media-id'
 import { Relationship } from './relationship'
 import { RelationshipType } from './relationship-type'
 
-const toQuery = (props: {
+const toQuery = ({
+  mediaId,
+  relationshipType,
+}: {
   mediaId: MediaId
   relationshipType: RelationshipType
 }): QueryInput<Relationship> => {
@@ -22,12 +25,12 @@ const toQuery = (props: {
         {
           column: 'type',
           op: '=',
-          value: props.relationshipType,
+          value: relationshipType,
         },
         {
           column: 'from',
           op: '=',
-          value: props.mediaId,
+          value: mediaId,
         },
       ],
     },
@@ -84,3 +87,6 @@ export const RelationshipTypeMediaPosterSwiper = {
   View,
   toQuery,
 }
+
+// @ts-ignore
+window.RelationshipTypeMediaPosterSwiper = RelationshipTypeMediaPosterSwiper

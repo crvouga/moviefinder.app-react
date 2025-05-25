@@ -50,6 +50,7 @@ const Fixture = async () => {
       relationshipDb: RelationshipDb({ t: 'sql-db', sqlDb, kvDb, logger, mediaDb: local }),
       videoDb: VideoDb({ t: 'sql-db', sqlDb, kvDb, logger }),
       personDb,
+      mediaDb: local,
     },
   })
   return {

@@ -71,3 +71,6 @@ export const MediaCreditsSwiper = {
   View,
   toQuery,
 }
+
+// @ts-ignore
+window.MediaCreditsSwiper = MediaCreditsSwiper

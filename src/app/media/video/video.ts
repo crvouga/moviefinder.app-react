@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { MediaId } from '../media/media-id'
 import { VideoId } from './video-id'
+import { toThumbnailImageSet } from '~/@/youtube/thumbnail'
+import { ImageSet } from '~/@/image-set'
 
 const parser = z.object({
   id: VideoId.parser,
@@ -19,6 +21,14 @@ const parser = z.object({
 
 export type Video = z.infer<typeof parser>
 
+const toImageSet = (video: Video | null | undefined) => {
+  if (!video) return ImageSet.empty()
+  return toThumbnailImageSet({
+    youtubeKey: video.key ?? '',
+  })
+}
+
 export const Video = {
   parser,
+  toImageSet,
 }
