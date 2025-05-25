@@ -41,7 +41,68 @@ const parser = <TEntity extends Record<string, unknown>>(
   return schema
 }
 
-const filter = <TEntity extends Record<string, unknown>>(
+const filterMap = <TEntity extends Record<string, unknown>>(
+  entities: Map<string, TEntity>,
+  indexes: Map<string, Map<string, Set<string>>>,
+  where: Where<TEntity>
+): Map<string, TEntity> => {
+  switch (where.op) {
+    case 'in': {
+      const result = new Map<string, TEntity>()
+      const columnIndex = indexes.get(String(where.column))
+
+      if (!columnIndex) {
+        return result
+      }
+
+      const pksMatchingCriteria = new Set<string>()
+      for (const value of where.value) {
+        const pksForValue = columnIndex.get(value)
+        if (pksForValue) {
+          for (const pk of pksForValue) {
+            pksMatchingCriteria.add(pk)
+          }
+        }
+      }
+
+      for (const pk of pksMatchingCriteria) {
+        if (entities.has(pk)) {
+          const entity = entities.get(pk)
+          if (entity) {
+            result.set(pk, entity)
+          }
+        }
+      }
+      return result
+    }
+    case '=': {
+      const result = new Map<string, TEntity>()
+      const columnIndex = indexes.get(String(where.column))
+
+      if (!columnIndex) {
+        return result
+      }
+
+      const pksMatchingValue = columnIndex.get(where.value)
+      if (pksMatchingValue) {
+        for (const pk of pksMatchingValue) {
+          if (entities.has(pk)) {
+            const entity = entities.get(pk)
+            if (entity) {
+              result.set(pk, entity)
+            }
+          }
+        }
+      }
+      return result
+    }
+    case 'and': {
+      return where.clauses.reduce((accMap, clause) => filterMap(accMap, indexes, clause), entities)
+    }
+  }
+}
+
+const filterArray = <TEntity extends Record<string, unknown>>(
   entities: TEntity[],
   where: Where<TEntity>
 ): TEntity[] => {
@@ -53,7 +114,7 @@ const filter = <TEntity extends Record<string, unknown>>(
       return entities.filter((entity) => String(entity[where.column]) === where.value)
     }
     case 'and': {
-      return where.clauses.reduce((acc, clause) => filter(acc, clause), entities)
+      return where.clauses.reduce((acc, clause) => filterArray(acc, clause), entities)
     }
   }
 }
@@ -84,5 +145,6 @@ export const toSql = <TEntity extends Record<string, unknown>>(
 export const Where = {
   parser,
   toSql,
-  filter,
+  filterArray,
+  filterMap,
 }

@@ -22,7 +22,16 @@ const parser = <TEntity extends Record<string, unknown>>(
   return schema
 }
 
-const sort = <TEntity extends Record<string, unknown>>(
+const sortMap = <TEntity extends Record<string, unknown>>(
+  entities: Map<string, TEntity>,
+  _indexes: Map<string, Map<string, Set<string>>>, // indexes are not used for sorting, but kept for signature consistency if needed elsewhere
+  orderBy: OrderBy<TEntity>
+): TEntity[] => {
+  const entitiesArray = Array.from(entities.values())
+  return sortArray(entitiesArray, orderBy)
+}
+
+const sortArray = <TEntity extends Record<string, unknown>>(
   entities: TEntity[],
   orderBy: OrderBy<TEntity>
 ): TEntity[] => {
@@ -56,6 +65,7 @@ const toSql = <TEntity extends Record<string, unknown>>(
 
 export const OrderBy = {
   parser,
-  sort,
+  sortArray,
+  sortMap,
   toSql,
 }

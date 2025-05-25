@@ -67,8 +67,8 @@ export const Db = <
       await entitiesKv.get(Codec.fromZod(config.parser.Entity), allIds),
       () => []
     )
-    const filtered = queryInput.where ? Where.filter(entities, queryInput.where) : entities
-    const sorted = queryInput.orderBy ? OrderBy.sort(filtered, queryInput.orderBy) : filtered
+    const filtered = queryInput.where ? Where.filterArray(entities, queryInput.where) : entities
+    const sorted = queryInput.orderBy ? OrderBy.sortArray(filtered, queryInput.orderBy) : filtered
     const paginated = Pagination.paginate(sorted, queryInput)
     return Ok({
       related: await config.getRelated(paginated),

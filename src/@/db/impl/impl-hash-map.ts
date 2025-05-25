@@ -31,7 +31,7 @@ export const Db = <
   const liveQueriesByQueryKey = new Map<string, QueryInput<TEntity>>()
 
   // map of primary key -> entity
-  const entities = new Map<string, Record<string, unknown>>()
+  const entities = new Map<string, TEntity>()
   // map of entity fields -> map of field values -> set of primary keys
   const indexes = new Map<string, Map<string, Set<string>>>()
 
@@ -53,26 +53,36 @@ export const Db = <
     queryInput: QueryInput<TEntity>
   ): Promise<QueryOutput<TEntity, TRelated>> => {
     const start = performance.now()
-    const all = Array.from(entities.values()) as TEntity[]
-    const filtered = queryInput.where ? Where.filter(all, queryInput.where) : all
-    const sorted = queryInput.orderBy ? OrderBy.sort(filtered, queryInput.orderBy) : filtered
+    const all = entities
+
+    const filtered: Map<string, TEntity> = queryInput.where
+      ? Where.filterMap(all, indexes, queryInput.where)
+      : all
+
+    const sorted: TEntity[] = queryInput.orderBy
+      ? OrderBy.sortMap(filtered, indexes, queryInput.orderBy)
+      : Array.from(filtered.values())
+
     const paginated = Pagination.paginate(sorted, queryInput)
+
     const related = await config.getRelated(paginated)
+
     const paginatedEntities: Paginated<TEntity> = {
       items: paginated,
-      total: filtered.length,
+      total: filtered.size,
       offset: queryInput.offset,
       limit: queryInput.limit,
     }
+
     const output: QueryOutput<TEntity, TRelated> = Ok({
       related,
       entities: paginatedEntities,
     })
     const end = performance.now()
-    console.log(
-      `query took: ${(end - start).toFixed(2)} ms, scanned: ${all.length} records`,
-      queryInput
-    )
+    const duration = end - start
+    if (duration > 1) {
+      console.log(`query took: ${duration.toFixed(2)} ms, scanned: ${all.size} records`, queryInput)
+    }
     return output
   }
 
@@ -93,9 +103,12 @@ export const Db = <
       return pubSub
     },
     async upsert(input) {
-      for (const e of input.entities) {
+      for (const unmappedEntity of input.entities) {
+        const e = config.map ? config.map(unmappedEntity) : unmappedEntity
+
         const primaryKey = config.toPrimaryKey(e)
-        entities.set(primaryKey, config.map ? config.map(e) : e)
+
+        entities.set(primaryKey, e)
 
         for (const key in e) {
           if (!indexes.has(key)) {
