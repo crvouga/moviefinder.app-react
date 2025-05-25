@@ -43,10 +43,7 @@ export const Db = <
   const kvDb = KvDb({
     t: 'cached',
     source: config.kvDb,
-    cache: KvDb({
-      t: 'hash-map',
-      map: new Map(),
-    }),
+    cache: KvDb({ t: 'hash-map', map: new Map() }),
   })
 
   const remoteToLocalSync = throttleByKeyDurable<[QueryInput<TEntity>]>({
