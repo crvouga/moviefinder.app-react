@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS video (
     size INTEGER,
     type TEXT,
     official BOOLEAN,
-    published_at TIMESTAMP,
+    published_at TEXT,
     media_id TEXT NOT NULL,
-    order INTEGER
+    "order" INTEGER
 )
 `,
 ]

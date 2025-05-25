@@ -12,7 +12,7 @@ const init = (input: {
   type: RelationshipType
 }): RelationshipId => {
   return RelationshipId.parser.parse(
-    `relationship:${input.type}-from:${input.fromId}-to:${input.toId}`
+    `relationship:${input.type}&from:${input.fromId}&to:${input.toId}`
   )
 }
 

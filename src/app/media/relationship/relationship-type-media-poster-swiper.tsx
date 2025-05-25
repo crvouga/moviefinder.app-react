@@ -10,7 +10,7 @@ import { Relationship } from './relationship'
 import { RelationshipType } from './relationship-type'
 
 const toQuery = (props: {
-  mediaId: MediaId | null
+  mediaId: MediaId
   relationshipType: RelationshipType
 }): QueryInput<Relationship> => {
   return {
@@ -24,15 +24,11 @@ const toQuery = (props: {
           op: '=',
           value: props.relationshipType,
         },
-        ...(props.mediaId
-          ? [
-              {
-                column: 'from',
-                op: '=',
-                value: props.mediaId,
-              } as const,
-            ]
-          : []),
+        {
+          column: 'from',
+          op: '=',
+          value: props.mediaId,
+        },
       ],
     },
     orderBy: [
@@ -59,9 +55,10 @@ const View = (props: {
 }) => {
   const ctx = useCtx()
 
-  const queried = useSubscription(
-    ['relationship-query', props.query.relationshipType, props.query.mediaId],
-    () => (props.query.mediaId ? ctx.relationshipDb.liveQuery(toQuery(props.query)) : null)
+  const { mediaId, relationshipType } = props.query
+
+  const queried = useSubscription(['relationship-query', relationshipType, mediaId], () =>
+    mediaId ? ctx.relationshipDb.liveQuery(toQuery({ mediaId, relationshipType })) : null
   )
 
   if (!queried) return <MediaPosterSwiper swiper={props.swiper} skeleton />

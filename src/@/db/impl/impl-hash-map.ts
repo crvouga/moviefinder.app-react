@@ -37,6 +37,7 @@ export const Db = <
       existing.publish(queried)
     }
   }
+
   const query = async (
     queryInput: QueryInput<TEntity>
   ): Promise<QueryOutput<TEntity, TRelated>> => {
