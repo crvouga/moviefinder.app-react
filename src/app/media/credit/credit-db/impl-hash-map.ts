@@ -1,4 +1,5 @@
 import { Db } from '~/@/db/impl/impl'
+import { ILogger } from '~/@/logger'
 import { isOk } from '~/@/result'
 import { IPersonDb } from '../../person/person-db/interface'
 import { Credit } from '../credit'
@@ -7,6 +8,7 @@ import { ICreditDb } from './interface'
 export type Config = {
   t: 'hash-map'
   personDb: IPersonDb
+  logger: ILogger
 }
 
 export const CreditDb = (config: Config): ICreditDb => {
@@ -15,6 +17,7 @@ export const CreditDb = (config: Config): ICreditDb => {
     parser: ICreditDb.parser,
     map: (entity) => Credit.compute(entity),
     toPrimaryKey: (entity) => entity.id,
+    logger: config.logger,
     getRelated: async (entities) => {
       if (entities.length === 0) return { person: {} }
 

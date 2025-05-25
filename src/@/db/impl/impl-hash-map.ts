@@ -1,3 +1,4 @@
+import { ILogger } from '~/@/logger'
 import { Paginated } from '~/@/pagination/paginated'
 import { Pagination } from '~/@/pagination/pagination'
 import { PubSub } from '~/@/pub-sub'
@@ -7,6 +8,7 @@ import { OrderBy } from '../interface/query-input/order-by'
 import { QueryInput } from '../interface/query-input/query-input'
 import { Where } from '../interface/query-input/where'
 import { QueryOutput } from '../interface/query-output/query-output'
+import { EntityField } from '../interface/query-input/field'
 
 export type Config<
   TEntity extends Record<string, unknown>,
@@ -17,6 +19,7 @@ export type Config<
   toPrimaryKey: (entity: TEntity) => string
   map?: (entity: TEntity) => TEntity
   getRelated: (entities: TEntity[]) => Promise<TRelated>
+  logger: ILogger
 }
 
 const globalPubSub = PubSub<{ t: 'publish' }>()
@@ -35,6 +38,8 @@ export const Db = <
   // map of entity fields -> map of field values -> set of primary keys
   const indexes = new Map<string, Map<string, Set<string>>>()
 
+  const nextTick = () => new Promise((resolve) => setTimeout(resolve, 0))
+
   globalPubSub.subscribe(async (msg) => {
     switch (msg.t) {
       case 'publish': {
@@ -43,11 +48,14 @@ export const Db = <
           const existing = pubSubsByQueryKey.get(queryKey)
           if (!existing) continue
           existing.publish(queried)
+          await nextTick()
         }
         return
       }
     }
   })
+
+  const SLOW_QUERY_THRESHOLD = 1
 
   const query = async (
     queryInput: QueryInput<TEntity>
@@ -55,7 +63,7 @@ export const Db = <
     const start = performance.now()
     const all = entities
 
-    const filtered: Map<string, TEntity> = queryInput.where
+    const filtered: Map<EntityField, TEntity> = queryInput.where
       ? Where.filterMap(all, indexes, queryInput.where)
       : all
 
@@ -80,12 +88,19 @@ export const Db = <
     })
     const end = performance.now()
     const duration = end - start
-    if (duration > 1) {
-      console.log(`query took: ${duration.toFixed(2)} ms, scanned: ${all.size} records`, queryInput)
+    if (duration > SLOW_QUERY_THRESHOLD) {
+      config.logger.warn(
+        `query took: ${duration.toFixed(2)} ms, total records: ${all.size}; filtered: ${filtered.size};`,
+        queryInput
+      )
     }
     return output
   }
 
+  const enqueuePublish = async () => {
+    await nextTick()
+    globalPubSub.publish({ t: 'publish' })
+  }
   return {
     // @ts-ignore
     entities,
@@ -99,7 +114,7 @@ export const Db = <
       if (existing) return existing
       const pubSub = PubSub<QueryOutput<TEntity, TRelated>>()
       pubSubsByQueryKey.set(queryKey, pubSub)
-      globalPubSub.publish({ t: 'publish' })
+      enqueuePublish()
       return pubSub
     },
     async upsert(input) {
@@ -115,11 +130,9 @@ export const Db = <
             indexes.set(key, new Map())
           }
 
-          const valueIndexes = indexes.get(key)
+          const valueIndexes = indexes.get(key)!
 
           const value = e[key]
-
-          if (!valueIndexes) throw new Error('valueIndexes is undefined')
 
           const valueKey = String(value)
 
@@ -127,10 +140,12 @@ export const Db = <
             valueIndexes.set(valueKey, new Set())
           }
 
-          valueIndexes.get(valueKey)?.add(primaryKey)
+          const primaryKeys = valueIndexes.get(valueKey)!
+
+          primaryKeys.add(primaryKey)
         }
       }
-      globalPubSub.publish({ t: 'publish' })
+      enqueuePublish()
       return Ok({
         entities: input.entities,
       })

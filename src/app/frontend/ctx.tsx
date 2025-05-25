@@ -78,36 +78,36 @@ const init = (): Ctx => {
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
   let mediaDbLocal: IMediaDb
-  if (config.storage === 'hash-map') mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
+  if (config.storage === 'hash-map') mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map', logger })
   if (config.storage === 'sql-db')
     mediaDbLocal ??= MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy })
-  mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map' })
+  mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map', logger })
 
   let mediaDbRemote: IMediaDb
   mediaDbRemote ??= MediaDbFrontend({ t: 'trpc-client', trpcClient })
 
   let personDb: IPersonDb
-  if (config.storage === 'hash-map') personDb ??= PersonDb({ t: 'hash-map' })
+  if (config.storage === 'hash-map') personDb ??= PersonDb({ t: 'hash-map', logger })
   if (config.storage === 'sql-db') personDb ??= PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
-  personDb ??= PersonDb({ t: 'hash-map' })
+  personDb ??= PersonDb({ t: 'hash-map', logger })
 
   let relationshipDb: IRelationshipDb
   if (config.storage === 'hash-map')
-    relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
+    relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal, logger })
   if (config.storage === 'sql-db')
     relationshipDb ??= RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
-  relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal })
+  relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal, logger })
 
   let creditDb: ICreditDb
-  if (config.storage === 'hash-map') creditDb ??= CreditDb({ t: 'hash-map', personDb })
+  if (config.storage === 'hash-map') creditDb ??= CreditDb({ t: 'hash-map', personDb, logger })
   if (config.storage === 'sql-db')
     creditDb ??= CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
-  creditDb ??= CreditDb({ t: 'hash-map', personDb })
+  creditDb ??= CreditDb({ t: 'hash-map', personDb, logger })
 
   let videoDb: IVideoDb
-  if (config.storage === 'hash-map') videoDb ??= VideoDb({ t: 'hash-map' })
+  if (config.storage === 'hash-map') videoDb ??= VideoDb({ t: 'hash-map', logger })
   if (config.storage === 'sql-db') videoDb ??= VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
-  videoDb ??= VideoDb({ t: 'hash-map' })
+  videoDb ??= VideoDb({ t: 'hash-map', logger })
 
   let feedDb: IFeedDb
   if (config.storage === 'hash-map') feedDb ??= FeedDb({ t: 'hash-map', logger })

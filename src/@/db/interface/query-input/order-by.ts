@@ -3,6 +3,7 @@ import { quoteIfPostgresKeyword } from '../postgres-keywords'
 import { OrderDirection } from './order-by/direction'
 import { keyOf } from '~/@/zod/key-of'
 import { ascend, Comparator, descend } from '~/@/sort'
+import { EntityField } from './field'
 
 export type OrderBy<TEntity extends Record<string, unknown>> = {
   column: keyof TEntity
@@ -23,8 +24,8 @@ const parser = <TEntity extends Record<string, unknown>>(
 }
 
 const sortMap = <TEntity extends Record<string, unknown>>(
-  entities: Map<string, TEntity>,
-  _indexes: Map<string, Map<string, Set<string>>>, // indexes are not used for sorting, but kept for signature consistency if needed elsewhere
+  entities: Map<EntityField, TEntity>,
+  _indexes: Map<EntityField, Map<string, Set<EntityField>>>, // indexes are not used for sorting, but kept for signature consistency if needed elsewhere
   orderBy: OrderBy<TEntity>
 ): TEntity[] => {
   const entitiesArray = Array.from(entities.values())

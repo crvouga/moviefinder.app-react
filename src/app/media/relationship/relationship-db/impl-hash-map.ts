@@ -1,11 +1,13 @@
 import { Db } from '~/@/db/impl/impl'
 import { isErr } from '~/@/result'
 import { IMediaDb } from '../../media/media-db/interface/interface'
+import { ILogger } from '~/@/logger'
 import { IRelationshipDb } from './interface'
 
 export type Config = {
   t: 'hash-map'
   mediaDb: IMediaDb
+  logger: ILogger
 }
 
 export const RelationshipDb = (config: Config): IRelationshipDb => {
@@ -30,5 +32,6 @@ export const RelationshipDb = (config: Config): IRelationshipDb => {
 
       return { media: mediaMap }
     },
+    logger: config.logger,
   })
 }

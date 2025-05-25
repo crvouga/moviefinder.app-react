@@ -7,11 +7,12 @@ export type Config = {
   logger: ILogger
 }
 
-export const FeedDb = (_config: Config): IFeedDb => {
+export const FeedDb = (config: Config): IFeedDb => {
   return Db({
     t: 'hash-map',
     toPrimaryKey: (entity) => entity.id,
     getRelated: async () => ({}),
     parser: IFeedDb.parser,
+    logger: config.logger,
   })
 }

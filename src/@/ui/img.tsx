@@ -1,4 +1,5 @@
 import { forwardRef, useState } from 'react'
+import { cn } from './cn'
 
 const isImageLoaded = (url: string | undefined): boolean => {
   if (!url) return false
@@ -36,7 +37,7 @@ export const Img = forwardRef<
         src={props.src}
         aria-hidden={!loading}
         style={{ outline: 'none', border: 'none' }}
-        className={`h-full w-full bg-neutral-600 object-cover ${loading ? 'opacity-0' : ''}`}
+        className={cn('h-full w-full bg-neutral-600 object-cover', loading && 'opacity-0')}
         onLoad={() => setLoading(false)}
       />
     </div>
