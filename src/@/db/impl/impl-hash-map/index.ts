@@ -1,14 +1,11 @@
 import { ILogger } from '~/@/logger'
 import { Paginated } from '~/@/pagination/paginated'
-import { Pagination } from '~/@/pagination/pagination'
 import { PubSub } from '~/@/pub-sub'
 import { Ok } from '~/@/result'
 import { IDb } from '../../interface'
-import { EntityField } from '../../interface/query-input/field'
 import { QueryInput } from '../../interface/query-input/query-input'
 import { QueryOutput } from '../../interface/query-output/query-output'
-import { filterMap } from './filter-array'
-import { sortArray } from './sort-array'
+import { queryMap } from './query-input-map'
 
 export type Config<
   TEntity extends Record<string, unknown>,
@@ -61,23 +58,14 @@ export const Db = <
     queryInput: QueryInput<TEntity>
   ): Promise<QueryOutput<TEntity, TRelated>> => {
     const start = performance.now()
-    const all = entities
 
-    const filtered: Map<EntityField, TEntity> = queryInput.where
-      ? filterMap(all, indexes, queryInput.where, queryInput)
-      : all
+    const queried = queryMap(entities, indexes, queryInput)
 
-    const sorted: TEntity[] = queryInput.orderBy
-      ? sortArray(Array.from(filtered.values()), queryInput.orderBy)
-      : Array.from(filtered.values())
-
-    const paginated = Pagination.paginate(sorted, queryInput)
-
-    const related = await config.getRelated(paginated)
+    const related = await config.getRelated(queried)
 
     const paginatedEntities: Paginated<TEntity> = {
-      items: paginated,
-      total: filtered.size,
+      items: queried,
+      total: queried.length,
       offset: queryInput.offset,
       limit: queryInput.limit,
     }
@@ -90,7 +78,7 @@ export const Db = <
     const duration = end - start
     if (duration > SLOW_QUERY_THRESHOLD) {
       config.logger.warn(
-        `query took: ${duration.toFixed(2)} ms, total records: ${all.size}; filtered: ${filtered.size};`,
+        `query took: ${duration.toFixed(2)} ms, total records: ${entities.size}; ${queried.length} filtered`,
         queryInput
       )
     }
