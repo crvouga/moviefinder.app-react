@@ -14,7 +14,7 @@ const MAX_IMAGE = 4
 export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: MediaId }) => {
   const got = await input.ctx.mediaDb.query(MediaDetailsScreen.toQuery({ mediaId: input.mediaId }))
 
-  input.ctx.subCache.set(MediaDetailsScreen.toQueryKey({ mediaId: input.mediaId }), got)
+  input.ctx.queryCache.set(MediaDetailsScreen.toQueryKey({ mediaId: input.mediaId }), got)
 
   const media = QueryOutput.first(got)
 
@@ -28,7 +28,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     MediaCreditsSwiper.toQuery({ mediaId: input.mediaId })
   )
 
-  input.ctx.subCache.set(MediaCreditsSwiper.toQueryKey({ mediaId: input.mediaId }), gotCredits)
+  input.ctx.queryCache.set(MediaCreditsSwiper.toQueryKey({ mediaId: input.mediaId }), gotCredits)
 
   const relatedCredits = QueryOutput.related(gotCredits)
 
@@ -47,7 +47,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     })
   )
 
-  input.ctx.subCache.set(
+  input.ctx.queryCache.set(
     RelationshipTypeMediaPosterSwiper.toQueryKey({
       mediaId: input.mediaId,
       relationshipType: 'similar',
@@ -72,7 +72,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     })
   )
 
-  input.ctx.subCache.set(
+  input.ctx.queryCache.set(
     RelationshipTypeMediaPosterSwiper.toQueryKey({
       mediaId: input.mediaId,
       relationshipType: 'recommendation',
@@ -94,7 +94,7 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     MediaVideoSwiper.toQuery({ mediaId: input.mediaId })
   )
 
-  input.ctx.subCache.set(MediaVideoSwiper.toQueryKey({ mediaId: input.mediaId }), gotVideos)
+  input.ctx.queryCache.set(MediaVideoSwiper.toQueryKey({ mediaId: input.mediaId }), gotVideos)
 
   const videos = QueryOutput.entities(gotVideos)
 

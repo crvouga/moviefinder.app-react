@@ -1,7 +1,7 @@
 import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { isOk } from '~/@/result'
 import { SwiperContainerProps } from '~/@/ui/swiper'
-import { useSubscription } from '~/@/ui/use-subscription'
+import { useLiveQuery } from '~/app/@/ui/use-live-query'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaPosterSwiper } from '../media/media-poster-swiper'
 import { Media } from '../media/media'
@@ -67,10 +67,9 @@ const View = (props: {
 
   const { mediaId, relationshipType } = props.query
 
-  const queried = useSubscription({
-    subCache: ctx.subCache,
-    subKey: toQueryKey({ mediaId, relationshipType }),
-    subFn: () =>
+  const queried = useLiveQuery({
+    queryKey: toQueryKey({ mediaId, relationshipType }),
+    queryFn: () =>
       mediaId ? ctx.relationshipDb.liveQuery(toQuery({ mediaId, relationshipType })) : null,
   })
 

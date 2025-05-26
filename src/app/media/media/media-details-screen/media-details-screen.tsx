@@ -2,7 +2,7 @@ import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { SwiperContainerProps } from '~/@/ui/swiper'
 import { useIsMobile } from '~/@/ui/use-is-mobile'
-import { useSubscription } from '~/@/ui/use-subscription'
+import { useLiveQuery } from '~/app/@/ui/use-live-query'
 import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
@@ -40,10 +40,9 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
     cssMode: isMobile && false,
   }
 
-  const queried = useSubscription({
-    subCache: ctx.subCache,
-    subKey: toQueryKey({ mediaId: props.mediaId }),
-    subFn: () =>
+  const queried = useLiveQuery({
+    queryKey: toQueryKey({ mediaId: props.mediaId }),
+    queryFn: () =>
       props.mediaId ? ctx.mediaDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null,
   })
 

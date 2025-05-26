@@ -5,7 +5,7 @@ import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
 import { Swiper } from '~/@/ui/swiper'
-import { useSubscription } from '~/@/ui/use-subscription'
+import { useLiveQuery } from '~/app/@/ui/use-live-query'
 import { useCurrentScreen } from '../../../@/screen/use-current-screen'
 import { useCtx } from '../../../frontend/ctx'
 import { Media } from '../../../media/media/media'
@@ -67,10 +67,9 @@ export const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
   const [state, dispatch] = useReducer(reducer, init(props.feed))
 
-  const mediaQuery = useSubscription({
-    subCache: ctx.subCache,
-    subKey: ['media-query', 'offset', state.offset, 'limit', state.limit].join('-'),
-    subFn: () => ctx.mediaDb.liveQuery(toQuery({ offset: state.offset, limit: state.limit })),
+  const mediaQuery = useLiveQuery({
+    queryKey: ['media-query', 'offset', state.offset, 'limit', state.limit].join('-'),
+    queryFn: () => ctx.mediaDb.liveQuery(toQuery({ offset: state.offset, limit: state.limit })),
   })
 
   const media = mediaQuery ?? Loading

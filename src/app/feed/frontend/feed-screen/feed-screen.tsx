@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
-import { useSubscription } from '~/@/ui/use-subscription'
+import { useLiveQuery } from '~/app/@/ui/use-live-query'
 import { AppScreenLayout } from '../../../@/ui/app-screen-layout'
 import { useCtx } from '../../../frontend/ctx'
 import { FeedId } from '../../feed-id'
@@ -10,10 +10,9 @@ import { ImgLoading } from './img-loading'
 export const FeedScreen = () => {
   const ctx = useCtx()
 
-  const feedQuery = useSubscription({
-    subCache: ctx.subCache,
-    subKey: ['feed-query', ctx.clientSessionId].join('-'),
-    subFn: () =>
+  const feedQuery = useLiveQuery({
+    queryKey: ['feed-query', ctx.clientSessionId].join('-'),
+    queryFn: () =>
       ctx.feedDb.liveQuery({
         limit: 1,
         offset: 0,

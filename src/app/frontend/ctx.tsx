@@ -43,7 +43,7 @@ export type Ctx = {
   pglite: Promise<IPgliteInstance>
   blinkDb: Database
   pubSub: PubSub<Record<string, unknown>>
-  subCache: Map<string, Record<string, unknown>>
+  queryCache: Map<string, Record<string, unknown>>
 }
 
 type Config = {
@@ -152,7 +152,7 @@ const init = (): Ctx => {
   clientSessionIdStorage.set(clientSessionId)
 
   return {
-    subCache: new Map(),
+    queryCache: new Map(),
     pubSub: PubSub(),
     kvDb,
     mediaDb,

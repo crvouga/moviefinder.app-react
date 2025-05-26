@@ -1,6 +1,6 @@
 import { ImageSet } from '~/@/image-set'
 import { Avatar } from '~/@/ui/avatar'
-import { useSubscription } from '~/@/ui/use-subscription'
+import { useLiveQuery } from '~/app/@/ui/use-live-query'
 import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
@@ -20,10 +20,9 @@ const toQuery = (input: { personId: PersonId }): QueryInput<Person> => {
 export const PersonDetailsScreen = (props: { personId: PersonId | null; from: ScreenFrom }) => {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
-  const queried = useSubscription({
-    subCache: ctx.subCache,
-    subKey: ['person-query', ctx.clientSessionId, props.personId].join('-'),
-    subFn: () =>
+  const queried = useLiveQuery({
+    queryKey: ['person-query', ctx.clientSessionId, props.personId].join('-'),
+    queryFn: () =>
       props.personId ? ctx.personDb.liveQuery(toQuery({ personId: props.personId })) : null,
   })
 
