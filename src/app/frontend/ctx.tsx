@@ -1,3 +1,4 @@
+import { createDB, Database } from 'blinkdb'
 import { createContext, useContext } from 'react'
 import { KvDb } from '~/@/kv-db/impl'
 import { IKvDb } from '~/@/kv-db/interface'
@@ -39,15 +40,17 @@ export type Ctx = {
   creditDb: ICreditDb
   videoDb: IVideoDb
   pglite: Promise<IPgliteInstance>
+  blinkDb: Database
 }
 
 type Config = {
-  storage: 'sql-db' | 'hash-map'
+  storage: 'sql-db' | 'hash-map' | 'blink-db'
 }
 
 const init = (): Ctx => {
   let config: Config
   config ??= { storage: 'hash-map' }
+  config ??= { storage: 'blink-db' }
   config ??= { storage: 'sql-db' }
 
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
@@ -63,6 +66,9 @@ const init = (): Ctx => {
   pglite ??= PgliteInstance({ t: 'in-memory' })
   pglite ??= PgliteWorkerInstance({ t: 'in-memory' })
 
+  let blinkDb: Database
+  blinkDb ??= createDB({})
+
   const sqlDb = SqlDb({ t: 'pglite', pglite, logger })
 
   const trpcClient = TrpcClient({ backendUrl, logger })
@@ -73,7 +79,9 @@ const init = (): Ctx => {
   let kvDb: IKvDb
   if (config.storage === 'hash-map') kvDb ??= KvDb({ t: 'hash-map', map: new Map() })
   if (config.storage === 'sql-db') kvDb ??= KvDb({ t: 'sql-db', sqlDb, migrationPolicy })
-  kvDb ??= KvDb({ t: 'browser-storage', storage: localStorage })
+  // if (config.storage === 'blink-db') kvDb ??= KvDb({ t: 'blink-db', blinkDb, logger })
+  // kvDb ??= KvDb({ t: 'browser-storage', storage: localStorage })
+  kvDb ??= KvDb({ t: 'hash-map', map: new Map() })
 
   migrationPolicy = MigrationPolicy({ t: 'dangerously-wipe-on-new-schema', kvDb, logger })
 
@@ -81,6 +89,8 @@ const init = (): Ctx => {
   if (config.storage === 'hash-map') mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map', logger })
   if (config.storage === 'sql-db')
     mediaDbLocal ??= MediaDbFrontend({ t: 'sql-db', sqlDb, migrationPolicy })
+  if (config.storage === 'blink-db')
+    mediaDbLocal ??= MediaDbFrontend({ t: 'blink-db', blinkDb, logger })
   mediaDbLocal ??= MediaDbFrontend({ t: 'hash-map', logger })
 
   let mediaDbRemote: IMediaDb
@@ -89,6 +99,7 @@ const init = (): Ctx => {
   let personDb: IPersonDb
   if (config.storage === 'hash-map') personDb ??= PersonDb({ t: 'hash-map', logger })
   if (config.storage === 'sql-db') personDb ??= PersonDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  if (config.storage === 'blink-db') personDb ??= PersonDb({ t: 'blink-db', blinkDb, logger })
   personDb ??= PersonDb({ t: 'hash-map', logger })
 
   let relationshipDb: IRelationshipDb
@@ -96,23 +107,29 @@ const init = (): Ctx => {
     relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal, logger })
   if (config.storage === 'sql-db')
     relationshipDb ??= RelationshipDb({ t: 'sql-db', sqlDb, logger, kvDb, mediaDb: mediaDbLocal })
+  if (config.storage === 'blink-db')
+    relationshipDb ??= RelationshipDb({ t: 'blink-db', blinkDb, logger, mediaDb: mediaDbLocal })
   relationshipDb ??= RelationshipDb({ t: 'hash-map', mediaDb: mediaDbLocal, logger })
 
   let creditDb: ICreditDb
   if (config.storage === 'hash-map') creditDb ??= CreditDb({ t: 'hash-map', personDb, logger })
   if (config.storage === 'sql-db')
     creditDb ??= CreditDb({ t: 'sql-db', sqlDb, logger, kvDb, personDb })
+  if (config.storage === 'blink-db')
+    creditDb ??= CreditDb({ t: 'blink-db', blinkDb, logger, personDb })
   creditDb ??= CreditDb({ t: 'hash-map', personDb, logger })
 
   let videoDb: IVideoDb
   if (config.storage === 'hash-map') videoDb ??= VideoDb({ t: 'hash-map', logger })
   if (config.storage === 'sql-db') videoDb ??= VideoDb({ t: 'sql-db', sqlDb, logger, kvDb })
+  if (config.storage === 'blink-db') videoDb ??= VideoDb({ t: 'blink-db', blinkDb, logger })
   videoDb ??= VideoDb({ t: 'hash-map', logger })
 
   let feedDb: IFeedDb
   if (config.storage === 'hash-map') feedDb ??= FeedDb({ t: 'hash-map', logger })
   if (config.storage === 'sql-db')
     feedDb ??= FeedDb({ t: 'sql-db', sqlDb, logger, migrationPolicy })
+  if (config.storage === 'blink-db') feedDb ??= FeedDb({ t: 'blink-db', blinkDb, logger })
   feedDb ??= FeedDb({ t: 'hash-map', logger })
 
   const relatedDbs = { personDb, relationshipDb, creditDb, videoDb, mediaDb: mediaDbLocal }
@@ -144,6 +161,7 @@ const init = (): Ctx => {
     creditDb,
     videoDb,
     pglite,
+    blinkDb,
   }
 }
 

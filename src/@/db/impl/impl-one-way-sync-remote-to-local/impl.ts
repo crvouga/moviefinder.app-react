@@ -53,6 +53,7 @@ export const Db = <
     fn: async (query) => {
       const remoteQueried = await config.remote.query(query)
       const entities = isOk(remoteQueried) ? remoteQueried.value.entities.items : []
+
       const localUpsert = await config.local.upsert({ entities: entities })
 
       if (isOk(remoteQueried) && remoteQueried.value.related) {

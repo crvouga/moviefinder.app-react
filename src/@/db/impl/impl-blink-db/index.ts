@@ -1,27 +1,84 @@
+import {
+  Query as BlinkQuery,
+  Where as BlinkWhere,
+  count,
+  createTable,
+  Database,
+  many,
+  upsertMany,
+} from 'blinkdb'
 import { ILogger } from '~/@/logger'
-import { Paginated } from '~/@/pagination/paginated'
 import { PubSub } from '~/@/pub-sub'
 import { Ok } from '~/@/result'
 import { IDb } from '../../interface'
 import { QueryInput } from '../../interface/query-input/query-input'
+import { Where } from '../../interface/query-input/where'
 import { QueryOutput } from '../../interface/query-output/query-output'
 import { logSlowQuery } from '../shared/slow-query-logging'
-import { queryMap } from './query-input-map'
+
+const toBlinkWhere = <TEntity extends Record<string, unknown>>(
+  where: Where<TEntity>
+): BlinkWhere<TEntity> => {
+  switch (where.op) {
+    case '=': {
+      // @ts-ignore
+      const blinkWhere: BlinkWhere<TEntity> = {
+        [where.column]: {
+          eq: where.value,
+        },
+      }
+      return blinkWhere
+    }
+    case 'and': {
+      // @ts-ignore
+      const blinkWhere: BlinkWhere<TEntity> = {
+        AND: where.clauses.map(toBlinkWhere),
+      }
+      return blinkWhere
+    }
+    case 'in': {
+      // @ts-ignore
+      const blinkWhere: BlinkWhere<TEntity> = {
+        [where.column]: {
+          in: where.value,
+        },
+      }
+      return blinkWhere
+    }
+  }
+}
+
+const toBlinkQuery = <TEntity extends Record<string, unknown>>(
+  queryInput: QueryInput<TEntity>
+): BlinkQuery<TEntity, any> => {
+  return {
+    limit: {
+      skip: queryInput.offset,
+      take: queryInput.limit,
+    },
+    where: queryInput.where ? toBlinkWhere(queryInput.where) : undefined,
+  }
+}
 
 export type Config<
   TEntity extends Record<string, unknown>,
   TRelated extends Record<string, unknown>,
 > = {
-  t: 'hash-map'
+  t: 'blink-db'
+  db: Database
+  tableName: string
+  primaryKey: keyof TEntity
+  indexes: (keyof TEntity)[]
   parser: IDb.Parser<TEntity, TRelated>
-  toPrimaryKey: (entity: TEntity) => string
-  map?: (entity: TEntity) => TEntity
   getRelated: (entities: TEntity[]) => Promise<TRelated>
   logger: ILogger
+  map?: (entity: TEntity) => TEntity
 }
 
-const globalPubSub = PubSub<{ t: 'publish' }>()
+export const SLOW_QUERY_THRESHOLD = 1
+const nextTick = () => new Promise((resolve) => setTimeout(resolve, 0))
 
+const globalPubSub = PubSub<{ t: 'publish' }>()
 export const Db = <
   TEntity extends Record<string, unknown>,
   TRelated extends Record<string, unknown>,
@@ -30,13 +87,12 @@ export const Db = <
 ): IDb.IDb<TEntity, TRelated> => {
   const pubSubsByQueryKey = new Map<string, PubSub<QueryOutput<TEntity, TRelated>>>()
   const liveQueriesByQueryKey = new Map<string, QueryInput<TEntity>>()
-
-  // map of primary key -> entity
-  const entities = new Map<string, TEntity>()
-  // map of entity fields -> map of field values -> set of primary keys
-  const indexes = new Map<string, Map<string, Set<string>>>()
-
-  const nextTick = () => new Promise((resolve) => setTimeout(resolve, 0))
+  const Table = createTable<TEntity>(config.db, config.tableName)
+  const table = Table({
+    primary: config.primaryKey as any,
+    indexes: config.indexes as any,
+  })
+  const entityIds = new Set<unknown>()
 
   globalPubSub.subscribe(async (msg) => {
     switch (msg.t) {
@@ -57,28 +113,26 @@ export const Db = <
     queryInput: QueryInput<TEntity>
   ): Promise<QueryOutput<TEntity, TRelated>> => {
     const startTime = performance.now()
+    const blinkQuery = toBlinkQuery(queryInput)
 
-    const queried = queryMap(entities, indexes, queryInput)
-
-    const related = await config.getRelated(queried)
-
-    const paginatedEntities: Paginated<TEntity> = {
-      items: queried,
-      total: queried.length,
-      offset: queryInput.offset,
-      limit: queryInput.limit,
-    }
+    const [result, total] = await Promise.all([
+      many(table as any, blinkQuery),
+      count(table as any, blinkQuery),
+    ])
 
     const output: QueryOutput<TEntity, TRelated> = Ok({
-      related,
-      entities: paginatedEntities,
+      entities: {
+        items: result,
+        total,
+        offset: queryInput.offset,
+        limit: queryInput.limit,
+      },
+      related: await config.getRelated(result),
     })
-
     const endTime = performance.now()
-
     logSlowQuery({
-      entityCount: entities.size,
-      filteredCount: queried.length,
+      entityCount: entityIds.size,
+      filteredCount: result.length,
       logger: config.logger,
       query: queryInput,
       startTime,
@@ -91,11 +145,8 @@ export const Db = <
     await nextTick()
     globalPubSub.publish({ t: 'publish' })
   }
+
   return {
-    // @ts-ignore
-    entities,
-    // @ts-ignore
-    indexes,
     query,
     liveQuery(queryInput) {
       const queryKey = QueryInput.toKey(queryInput)
@@ -108,32 +159,13 @@ export const Db = <
       return pubSub
     },
     async upsert(input) {
-      for (const unmappedEntity of input.entities) {
-        const e = config.map ? config.map(unmappedEntity) : unmappedEntity
-
-        const primaryKey = config.toPrimaryKey(e)
-
-        entities.set(primaryKey, e)
-
-        for (const key in e) {
-          if (!indexes.has(key)) {
-            indexes.set(key, new Map())
-          }
-
-          const valueIndexes = indexes.get(key)!
-
-          const value = e[key]
-
-          const valueKey = String(value)
-
-          if (!valueIndexes.has(valueKey)) {
-            valueIndexes.set(valueKey, new Set())
-          }
-
-          const primaryKeys = valueIndexes.get(valueKey)!
-
-          primaryKeys.add(primaryKey)
-        }
+      await upsertMany(
+        // @ts-ignore
+        table,
+        input.entities
+      )
+      for (const entity of input.entities) {
+        entityIds.add(entity[config.primaryKey])
       }
       enqueuePublish()
       return Ok({

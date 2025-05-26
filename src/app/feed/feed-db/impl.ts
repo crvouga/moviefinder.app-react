@@ -1,9 +1,10 @@
+import * as ImplBlinkDb from './impl-blink-db'
 import * as ImplHashMap from './impl-hash-map'
 import * as ImplKvDb from './impl-kv-db'
 import * as ImplSqlDb from './impl-sql-db'
 import { IFeedDb } from './interface'
 
-export type Config = ImplSqlDb.Config | ImplHashMap.Config | ImplKvDb.Config
+export type Config = ImplSqlDb.Config | ImplHashMap.Config | ImplKvDb.Config | ImplBlinkDb.Config
 
 export const FeedDb = (config: Config): IFeedDb => {
   const logger = config.logger.prefix(['feed-db'])
@@ -14,5 +15,7 @@ export const FeedDb = (config: Config): IFeedDb => {
       return ImplHashMap.FeedDb({ ...config, logger })
     case 'kv-db':
       return ImplKvDb.FeedDb({ ...config, logger })
+    case 'blink-db':
+      return ImplBlinkDb.FeedDb({ ...config, logger })
   }
 }
