@@ -1,22 +1,8 @@
 import { z } from 'zod'
 import { unwrap } from '~/@/result'
-import { Ctx } from './ctx'
-
-type Command = {
-  description: string
-  match: RegExp
-  handler: (strings: TemplateStringsArray, ...values: any[]) => Promise<void>
-}
-
-const SQL_SUMMARY = `
-SELECT
-    relname AS table_name,    
-    pg_size_pretty(pg_total_relation_size(relid)) AS total_size
-FROM
-    pg_stat_user_tables
-ORDER BY
-    pg_total_relation_size(relid) DESC;
-`
+import { Ctx } from '../ctx'
+import { PsqlSummary } from './summary'
+import { Command } from './types'
 
 const SQL_TABLE_INFO = `
 SELECT 
@@ -43,7 +29,7 @@ GROUP BY t.tablename
 export const Psql = (config: { ctx: Ctx }) => {
   const commands: Command[] = []
 
-  if (false)
+  if (true)
     commands.push({
       description: 'List all tables',
       match: /dt/,
@@ -57,7 +43,7 @@ export const Psql = (config: { ctx: Ctx }) => {
       },
     })
 
-  if (false)
+  if (true)
     commands.push({
       description: 'Describe a table',
       match: /d\s+\w+/,
@@ -79,7 +65,7 @@ export const Psql = (config: { ctx: Ctx }) => {
       },
     })
 
-  if (false)
+  if (true)
     commands.push({
       description: 'help',
       match: /^(help|h)$/,
@@ -88,36 +74,25 @@ export const Psql = (config: { ctx: Ctx }) => {
       },
     })
 
-  if (false)
+  if (true) PsqlSummary.register({ commands, ctx: config.ctx })
+
+  if (true)
     commands.push({
-      description: 'Summarize the database',
-      match: /summary/,
-      handler: async (_strings: TemplateStringsArray, ..._values: any[]) => {
-        const result = await config.ctx.sqlDb.query({
-          sql: SQL_SUMMARY,
-          parser: z.unknown(),
-        })
+      description: 'Execute a raw SQL query',
+      match: /.*/,
+      handler: async (strings: TemplateStringsArray, ...values: any[]) => {
+        const sql = strings.reduce((acc, str, i) => acc + str + (values[i] ?? ''), '')
+
+        const result = await config.ctx.sqlDb.query({ parser: z.unknown(), sql })
         const { rows } = unwrap(result)
+        if (rows.length === 0) {
+          console.log('No rows returned')
+          return
+        }
+        // console.clear()
         console.table(rows)
       },
     })
-
-  commands.push({
-    description: 'Execute a raw SQL query',
-    match: /.*/,
-    handler: async (strings: TemplateStringsArray, ...values: any[]) => {
-      const sql = strings.reduce((acc, str, i) => acc + str + (values[i] ?? ''), '')
-
-      const result = await config.ctx.sqlDb.query({ parser: z.unknown(), sql })
-      const { rows } = unwrap(result)
-      if (rows.length === 0) {
-        console.log('No rows returned')
-        return
-      }
-      // console.clear()
-      console.table(rows)
-    },
-  })
 
   return {
     psql: async (strings: TemplateStringsArray, ...values: any[]) => {

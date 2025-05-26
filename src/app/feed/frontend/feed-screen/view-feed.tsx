@@ -20,7 +20,7 @@ const PAGE_SIZE = 5
 
 const SlideData = z.object({
   feedIndex: z.number().int().min(0),
-  mediaId: MediaId.parser,
+  mediaId: MediaId.parser.nullable(),
   slideIndex: z.number().int().min(0),
 })
 type SlideData = z.infer<typeof SlideData>
@@ -76,15 +76,23 @@ export const ViewFeed = (props: { feed: Feed }) => {
 
   const media = mediaQuery ?? Loading
 
-  if (media.t === 'error') return <ImgLoading />
-  if (media.t === 'loading') return <ImgLoading />
-  if (media.value.entities.items.length === 0) return <ImgLoading />
+  const imageLoading = <ImgLoading key="image-loading" />
+
+  if (media.t === 'error') return imageLoading
+  if (media.t === 'loading') return imageLoading
+  if (media.value.entities.items.length === 0) return imageLoading
 
   const slideItems = FeedItem.fromPaginatedMedia(media.value.entities)
 
   const initialSlideIndex = slideItems.findIndex(
     (item) => item.feedIndex === props.feed.activeIndex
   )
+
+  const lastSlideData: SlideData = {
+    slideIndex: slideItems.length,
+    feedIndex: props.feed.activeIndex,
+    mediaId: null,
+  }
 
   return (
     <Swiper.Container
@@ -99,7 +107,9 @@ export const ViewFeed = (props: { feed: Feed }) => {
           entities: [{ ...props.feed, activeIndex: parsed.feedIndex }],
         })
 
-        await MediaDetailsScreen.preload({ ctx, mediaId: parsed.mediaId })
+        if (parsed.mediaId) {
+          await MediaDetailsScreen.preload({ ctx, mediaId: parsed.mediaId })
+        }
       }}
     >
       {slideItems.map((item, slideIndex) => {
@@ -115,7 +125,7 @@ export const ViewFeed = (props: { feed: Feed }) => {
         )
       })}
 
-      <Swiper.Slide>
+      <Swiper.Slide data={lastSlideData}>
         <WrapIntersectionObserver
           onVisible={() => {
             dispatch({ t: 'observed-last' })
