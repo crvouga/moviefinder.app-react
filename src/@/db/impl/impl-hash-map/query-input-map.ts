@@ -12,7 +12,7 @@ export const queryMap = <TEntity extends Record<string, unknown>>(
   const all = entities
 
   const filtered: Map<EntityField, TEntity> = queryInput.where
-    ? filterMap(all, indexes, queryInput.where, queryInput)
+    ? filterMap(all, indexes, queryInput.where)
     : all
 
   const sorted: TEntity[] = queryInput.orderBy

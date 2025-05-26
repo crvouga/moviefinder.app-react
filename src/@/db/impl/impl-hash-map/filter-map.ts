@@ -1,12 +1,10 @@
-import { Pagination } from '~/@/pagination/pagination'
 import { EntityField } from '../../interface/query-input/field'
 import { Where } from '../../interface/query-input/where'
 
 export const filterMap = <TEntity extends Record<string, unknown>>(
   entities: Map<EntityField, TEntity>,
   indexes: Map<EntityField, Map<string, Set<EntityField>>>,
-  where: Where<TEntity>,
-  pagination: Pagination
+  where: Where<TEntity>
 ): Map<EntityField, TEntity> => {
   switch (where.op) {
     case 'in': {
@@ -51,7 +49,7 @@ export const filterMap = <TEntity extends Record<string, unknown>>(
     case 'and': {
       let accMap = entities
       for (const clause of where.clauses) {
-        accMap = filterMap(accMap, indexes, clause, pagination)
+        accMap = filterMap(accMap, indexes, clause)
       }
       return accMap
     }
