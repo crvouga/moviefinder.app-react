@@ -12,7 +12,8 @@ export const useLiveQuery = <T extends Record<string, unknown>>(input: {
     return null
   }
 
-  const [value, setValue] = useState<T | null>(init)
+  const init_ = init()
+  const [value, setValue] = useState<T | null>(init_)
 
   useLayoutEffect(() => {
     const init_ = init()
