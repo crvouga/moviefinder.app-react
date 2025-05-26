@@ -22,7 +22,7 @@ export const AppVideoPlayer = () => {
 
   return (
     <div className="absolute top-0 right-0 left-0 z-30">
-      <div className="overflow-bidden aspect-video w-full bg-black">
+      <div className="overflow-bidden aspect-video w-full bg-black" key={state.video.key}>
         {state.video.key ? <YoutubeVideoPlayer youtubeVideoKey={state.video.key} /> : null}
       </div>
 
