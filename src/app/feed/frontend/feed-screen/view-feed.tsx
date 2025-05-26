@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react'
+import { useReducer } from 'react'
 import { z } from 'zod'
 import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { ImageSet } from '~/@/image-set'
@@ -76,12 +76,8 @@ export const ViewFeed = (props: { feed: Feed }) => {
 
   const media = mediaQuery ?? Loading
 
-  useEffect(() => {}, [])
-
   if (media.t === 'error') return <ImgLoading />
-
   if (media.t === 'loading') return <ImgLoading />
-
   if (media.value.entities.items.length === 0) return <ImgLoading />
 
   const slideItems = FeedItem.fromPaginatedMedia(media.value.entities)
