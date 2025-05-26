@@ -1,13 +1,12 @@
 import { Clickable } from '~/@/ui/clickable'
 import { Swiper, SwiperContainerProps } from '~/@/ui/swiper'
 import { Video } from './video'
-import { VideoId } from './video-id'
 import { VideoBlock } from './video-block'
 
 export const VideoSwiper = (props: {
   swiper?: Partial<SwiperContainerProps>
   videos?: Video[]
-  onClick?: (input: { videoId: VideoId }) => void
+  onClick?: (input: { video: Video }) => void
   skeleton?: boolean
 }) => {
   return (
@@ -33,7 +32,7 @@ export const VideoSwiper = (props: {
             <Swiper.Slide key={video.id} className="w-fit">
               <Clickable
                 onClick={() => {
-                  props.onClick?.({ videoId: video.id })
+                  props.onClick?.({ video })
                 }}
               >
                 <VideoBlock video={video} />

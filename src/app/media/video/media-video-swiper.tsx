@@ -5,13 +5,12 @@ import { useSubscription } from '~/@/ui/use-subscription'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../media/media-id'
 import { Video } from './video'
-import { VideoId } from './video-id'
 import { VideoSwiper } from './video-swiper'
 
 const View = (props: {
   swiper?: Partial<SwiperContainerProps>
   mediaId: MediaId | null
-  onClick: (input: { videoId: VideoId }) => void
+  onClick: (input: { video: Video }) => void
 }) => {
   const ctx = useCtx()
 

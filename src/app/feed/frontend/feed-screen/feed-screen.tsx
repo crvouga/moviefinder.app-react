@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { QueryOutput } from '~/@/db/interface/query-output/query-output'
 import { useSubscription } from '~/@/ui/use-subscription'
-import { ScreenLayout } from '../../../@/ui/screen-layout'
+import { AppScreenLayout } from '../../../@/ui/app-screen-layout'
 import { useCtx } from '../../../frontend/ctx'
 import { FeedId } from '../../feed-id'
 import { ViewFeed } from './view-feed'
@@ -39,8 +39,8 @@ export const FeedScreen = () => {
   }, [ctx, feedQuery, feed])
 
   return (
-    <ScreenLayout scrollKey="feed" topBar={{ title: 'Feed' }} includeAppBottomButtons>
+    <AppScreenLayout scrollKey="feed" topBar={{ title: 'Feed' }} includeAppBottomButtons>
       {feed ? <ViewFeed feed={feed} /> : <ImgLoading />}
-    </ScreenLayout>
+    </AppScreenLayout>
   )
 }

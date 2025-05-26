@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 export type Sub<T> = {
   subscribe: (callback: (value: T) => void) => () => void
   next: (filter: (value: T) => boolean) => Promise<T>
@@ -59,4 +61,10 @@ export const PubSub = <T>(): PubSub<T> => {
       return subscribers.size
     },
   }
+}
+
+export const useSub = <T>(pubSub: PubSub<T>, callback: (value: T) => void) => {
+  useEffect(() => {
+    return pubSub.subscribe(callback)
+  }, [pubSub, callback])
 }

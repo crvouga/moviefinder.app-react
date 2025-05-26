@@ -3,9 +3,10 @@ import { TimeSpan } from '~/@/time-span'
 import { BottomButton, BottomButtons } from '~/@/ui/bottom-buttons'
 import { TopBar } from '~/@/ui/top-bar'
 import { useScrollRestoration } from '~/@/ui/use-scroll-restoration'
+import { AppVideoPlayer } from '~/app/@/ui/app-video-player'
 import { useAppBottomButtons } from './app-bottom-buttons'
 
-export const ScreenLayout = (props: {
+export const AppScreenLayout = (props: {
   topBar: {
     title: string
     onBack?: () => void
@@ -32,12 +33,15 @@ export const ScreenLayout = (props: {
         onMore={props.topBar.onMore}
       />
 
-      <div
-        ref={scrollableRef}
-        className="flex w-full flex-1 flex-col items-center justify-start overflow-x-hidden overflow-y-auto"
-        key={props.scrollKey}
-      >
-        {props.children}
+      <div className="relative flex w-full flex-1 overflow-hidden">
+        <div
+          ref={scrollableRef}
+          className="flex w-full flex-1 flex-col items-center justify-start overflow-x-hidden overflow-y-auto"
+          key={props.scrollKey}
+        >
+          {props.children}
+        </div>
+        <AppVideoPlayer />
       </div>
 
       {props.actions && props.actions.length > 0 && <BottomButtons buttons={props.actions} />}

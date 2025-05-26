@@ -1,12 +1,12 @@
 import { IconCommandLineSolid } from '~/@/ui/icon'
 import { List } from '~/@/ui/list'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
-import { ScreenLayout } from '~/app/@/ui/screen-layout'
+import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
 
 export const MoreIndexScreen = () => {
   const currentScreen = useCurrentScreen()
   return (
-    <ScreenLayout
+    <AppScreenLayout
       scrollKey="user-more"
       topBar={{
         title: 'More',
@@ -28,6 +28,6 @@ export const MoreIndexScreen = () => {
           },
         ]}
       />
-    </ScreenLayout>
+    </AppScreenLayout>
   )
 }

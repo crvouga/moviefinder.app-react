@@ -8,6 +8,7 @@ import { IMigrationPolicy } from '~/@/migration-policy/interface'
 import { PgliteInstance } from '~/@/pglite/pglite-instance'
 import { PgliteWorkerInstance } from '~/@/pglite/pglite-worker-instance/pglite-worker-instance'
 import { IPgliteInstance } from '~/@/pglite/types'
+import { PubSub } from '~/@/pub-sub'
 import { SqlDb } from '~/@/sql-db/impl'
 import { ISqlDb } from '~/@/sql-db/interface'
 import { TimeSpan } from '~/@/time-span'
@@ -41,6 +42,7 @@ export type Ctx = {
   videoDb: IVideoDb
   pglite: Promise<IPgliteInstance>
   blinkDb: Database
+  pubSub: PubSub<Record<string, unknown>>
 }
 
 type Config = {
@@ -162,6 +164,7 @@ const init = (): Ctx => {
     videoDb,
     pglite,
     blinkDb,
+    pubSub: PubSub(),
   }
 }
 

@@ -5,7 +5,8 @@ import { useIsMobile } from '~/@/ui/use-is-mobile'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
-import { ScreenLayout } from '~/app/@/ui/screen-layout'
+import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
+import { useAppVideoPlayer } from '~/app/@/ui/app-video-player'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaCreditsSwiper } from '../../credit/media-credit-swiper'
 import { RelationshipTypeMediaPosterSwiper } from '../../relationship/relationship-type-media-poster-swiper'
@@ -46,8 +47,10 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
     currentScreen.push({ t: 'media-details', mediaId: input.mediaId, from })
   }
 
+  const videoPlayer = useAppVideoPlayer()
+
   return (
-    <ScreenLayout
+    <AppScreenLayout
       includeGutter
       topBar={{ onBack: () => currentScreen.push(props.from), title: media?.title ?? ' ' }}
       scrollKey={`media-details-${props.mediaId?.toString() ?? ''}`}
@@ -61,7 +64,9 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
             ...swiperProps,
             slideRestorationKey: `media-details-swiper-video-${media?.id}`,
           }}
-          onClick={(_payload) => {}}
+          onClick={(payload) => {
+            videoPlayer.toggle(payload.video)
+          }}
         />
       </SectionLayout>
 
@@ -92,7 +97,6 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
           onClick={pushMediaDetails}
         />
       </SectionLayout>
-
       <SectionLayout title="Recommendations">
         <RelationshipTypeMediaPosterSwiper.View
           swiper={{
@@ -107,7 +111,7 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
           onClick={pushMediaDetails}
         />
       </SectionLayout>
-    </ScreenLayout>
+    </AppScreenLayout>
   )
 }
 

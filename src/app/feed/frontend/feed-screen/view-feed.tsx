@@ -1,10 +1,9 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 import { z } from 'zod'
 import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
-import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { Swiper } from '~/@/ui/swiper'
 import { useSubscription } from '~/@/ui/use-subscription'
 import { useCurrentScreen } from '../../../@/screen/use-current-screen'
@@ -75,15 +74,19 @@ export const ViewFeed = (props: { feed: Feed }) => {
 
   const media = mediaQuery ?? Loading
 
+  useEffect(() => {}, [])
+
   if (media.t === 'error') return <ImgLoading />
 
   if (media.t === 'loading') return <ImgLoading />
 
   if (media.value.entities.items.length === 0) return <ImgLoading />
 
-  const feedItems = FeedItem.fromPaginatedMedia(media.value.entities)
+  const slideItems = FeedItem.fromPaginatedMedia(media.value.entities)
 
-  const initialSlideIndex = feedItems.findIndex((item) => item.feedIndex === props.feed.activeIndex)
+  const initialSlideIndex = slideItems.findIndex(
+    (item) => item.feedIndex === props.feed.activeIndex
+  )
 
   return (
     <Swiper.Container
@@ -99,17 +102,21 @@ export const ViewFeed = (props: { feed: Feed }) => {
         })
 
         await preloadMediaDetailsScreen({ ctx, mediaId: parsed.mediaId })
+
+        const isLast = parsed.slideIndex >= slideItems.length - 1
+
+        if (isLast) {
+          dispatch({ t: 'observed-last' })
+        }
+
+        const isFirst = parsed.slideIndex === 0
+
+        if (isFirst) {
+          dispatch({ t: 'observed-first' })
+        }
       }}
     >
-      {false && (
-        <Swiper.Slide>
-          <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-first' })}>
-            <ImgLoading />
-          </WrapIntersectionObserver>
-        </Swiper.Slide>
-      )}
-
-      {feedItems.map((item, slideIndex) => {
+      {slideItems.map((item, slideIndex) => {
         const data: SlideData = {
           slideIndex: slideIndex,
           feedIndex: item.feedIndex,
@@ -121,12 +128,6 @@ export const ViewFeed = (props: { feed: Feed }) => {
           </Swiper.Slide>
         )
       })}
-
-      <Swiper.Slide>
-        <WrapIntersectionObserver onVisible={() => dispatch({ t: 'observed-last' })}>
-          <ImgLoading />
-        </WrapIntersectionObserver>
-      </Swiper.Slide>
     </Swiper.Container>
   )
 }

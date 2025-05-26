@@ -18,10 +18,6 @@ export const CurrentScreen = () => {
 
   return (
     <>
-      <ConditionalHide name="feed" show={currentScreen.value.t === 'feed'}>
-        <FeedScreen />
-      </ConditionalHide>
-
       <CurrentScreenSwitch screen={currentScreen.value} />
     </>
   )
@@ -30,7 +26,7 @@ export const CurrentScreen = () => {
 const CurrentScreenSwitch = (props: { screen: ICurrentScreen }) => {
   switch (props.screen.t) {
     case 'feed':
-      return null
+      return <FeedScreen />
     case 'user':
       return <UserScreen screen={props.screen.c} />
     case 'login':
@@ -52,7 +48,11 @@ const CurrentScreenSwitch = (props: { screen: ICurrentScreen }) => {
   }
 }
 
-const ConditionalHide = (props: { children: React.ReactNode; name: string; show: boolean }) => {
+export const ConditionalHide = (props: {
+  children: React.ReactNode
+  name: string
+  show: boolean
+}) => {
   return (
     <div
       data-screen={props.name}

@@ -1,11 +1,11 @@
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
-import { ScreenLayout } from '~/app/@/ui/screen-layout'
+import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
 import { LoginCta } from './login-cta'
 
 export const AccountScreen = () => {
   const currentScreen = useCurrentScreen()
   return (
-    <ScreenLayout
+    <AppScreenLayout
       scrollKey="account"
       topBar={{
         title: 'Account',
@@ -16,6 +16,6 @@ export const AccountScreen = () => {
       includeAppBottomButtons
     >
       <LoginCta />
-    </ScreenLayout>
+    </AppScreenLayout>
   )
 }

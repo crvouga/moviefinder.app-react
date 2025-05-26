@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { MediaId } from '../media/media-id'
 import { VideoId } from './video-id'
-import { toThumbnailImageSet } from '~/@/youtube/thumbnail'
+import { toThumbnailImageSet } from '~/@/youtube/youtube-thumbnail'
 import { ImageSet } from '~/@/image-set'
 
 const parser = z.object({

@@ -4,7 +4,7 @@ import { Button } from '~/@/ui/button'
 import { Form } from '~/@/ui/form'
 import { TextField } from '~/@/ui/text-field'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
-import { ScreenLayout } from '~/app/@/ui/screen-layout'
+import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
 
 type State = {
   code: string
@@ -30,7 +30,7 @@ export const VerifyCodeScreen = ({ phoneNumber }: { phoneNumber: string }) => {
   }
 
   return (
-    <ScreenLayout
+    <AppScreenLayout
       scrollKey="verify-code"
       topBar={{
         title: 'Verify Code',
@@ -63,6 +63,6 @@ export const VerifyCodeScreen = ({ phoneNumber }: { phoneNumber: string }) => {
           </>
         )}
       />
-    </ScreenLayout>
+    </AppScreenLayout>
   )
 }
