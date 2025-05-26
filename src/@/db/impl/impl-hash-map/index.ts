@@ -6,6 +6,7 @@ import { IDb } from '../../interface'
 import { QueryInput } from '../../interface/query-input/query-input'
 import { QueryOutput } from '../../interface/query-output/query-output'
 import { logSlowQuery } from '../shared/slow-query-logging'
+import { Indexes } from './indexes'
 import { queryMap } from './query-input-map'
 
 export type Config<
@@ -30,11 +31,8 @@ export const Db = <
 ): IDb.IDb<TEntity, TRelated> => {
   const pubSubsByQueryKey = new Map<string, PubSub<QueryOutput<TEntity, TRelated>>>()
   const liveQueriesByQueryKey = new Map<string, QueryInput<TEntity>>()
-
-  // map of primary key -> entity
   const entities = new Map<string, TEntity>()
-  // map of entity fields -> map of field values -> set of primary keys
-  const indexes = new Map<string, Map<string, Set<string>>>()
+  const indexes: Indexes = new Map()
 
   const nextTick = () => new Promise((resolve) => setTimeout(resolve, 0))
 
@@ -110,30 +108,9 @@ export const Db = <
     async upsert(input) {
       for (const unmappedEntity of input.entities) {
         const e = config.map ? config.map(unmappedEntity) : unmappedEntity
-
         const primaryKey = config.toPrimaryKey(e)
-
         entities.set(primaryKey, e)
-
-        for (const key in e) {
-          if (!indexes.has(key)) {
-            indexes.set(key, new Map())
-          }
-
-          const valueIndexes = indexes.get(key)!
-
-          const value = e[key]
-
-          const valueKey = String(value)
-
-          if (!valueIndexes.has(valueKey)) {
-            valueIndexes.set(valueKey, new Set())
-          }
-
-          const primaryKeys = valueIndexes.get(valueKey)!
-
-          primaryKeys.add(primaryKey)
-        }
+        Indexes.populate(indexes, e, primaryKey)
       }
       enqueuePublish()
       return Ok({

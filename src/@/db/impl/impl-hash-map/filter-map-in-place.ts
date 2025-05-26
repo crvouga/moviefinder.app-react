@@ -1,9 +1,10 @@
 import { EntityField } from '../../interface/query-input/field'
 import { Where } from '../../interface/query-input/where'
+import { Indexes } from './indexes'
 
 export const filterMapInPlace = <TEntity extends Record<string, unknown>>(
   entities: Map<EntityField, TEntity>,
-  indexes: Map<EntityField, Map<string, Set<EntityField>>>,
+  indexes: Indexes,
   where: Where<TEntity>
 ): void => {
   switch (where.op) {
