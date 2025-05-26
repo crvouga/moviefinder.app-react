@@ -1,7 +1,7 @@
 import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { isOk } from '~/@/result'
 import { SwiperContainerProps } from '~/@/ui/swiper'
-import { useLiveQuery } from '~/app/@/ui/use-live-query'
+import { useLiveQuery } from '~/@/ui/use-live-query'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { useCtx } from '~/app/frontend/ctx'
 import { MediaId } from '../media/media-id'
@@ -49,6 +49,7 @@ const View = (props: {
   const currentScreen = useCurrentScreen()
 
   const queried = useLiveQuery({
+    queryCache: ctx.queryCache,
     queryKey: toQueryKey({ mediaId: props.mediaId }),
     queryFn: () =>
       props.mediaId ? ctx.creditDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null,

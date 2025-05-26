@@ -1,13 +1,13 @@
+import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { ImageSet } from '~/@/image-set'
 import { Avatar } from '~/@/ui/avatar'
-import { useLiveQuery } from '~/app/@/ui/use-live-query'
+import { useLiveQuery } from '~/@/ui/use-live-query'
 import { ScreenFrom } from '~/app/@/screen/current-screen-types'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
-import { PersonId } from '../person-id'
-import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { Person } from '../person'
+import { PersonId } from '../person-id'
 
 const toQuery = (input: { personId: PersonId }): QueryInput<Person> => {
   return QueryInput.init<Person>({
@@ -21,6 +21,7 @@ export const PersonDetailsScreen = (props: { personId: PersonId | null; from: Sc
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
   const queried = useLiveQuery({
+    queryCache: ctx.queryCache,
     queryKey: ['person-query', ctx.clientSessionId, props.personId].join('-'),
     queryFn: () =>
       props.personId ? ctx.personDb.liveQuery(toQuery({ personId: props.personId })) : null,

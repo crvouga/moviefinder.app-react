@@ -1,15 +1,13 @@
 import { useLayoutEffect, useState } from 'react'
-import { useCtx } from '~/app/frontend/ctx'
-import { Sub } from '../../../@/pub-sub'
+import { Sub } from '../pub-sub'
 
 export const useLiveQuery = <T extends Record<string, unknown>>(input: {
+  queryCache: Map<string, Record<string, unknown>>
   queryKey: string
   queryFn: () => Sub<T> | null
 }): T | null => {
-  const ctx = useCtx()
-
   const init = (): T | null => {
-    const cached = ctx.queryCache.get(input.queryKey)
+    const cached = input.queryCache.get(input.queryKey)
     if (cached) return cached as T
     return null
   }
@@ -21,7 +19,7 @@ export const useLiveQuery = <T extends Record<string, unknown>>(input: {
     setValue(init_)
     return input.queryFn()?.subscribe((value) => {
       setValue(value)
-      ctx.queryCache.set(input.queryKey, value)
+      input.queryCache.set(input.queryKey, value)
     })
   }, [input.queryKey])
 

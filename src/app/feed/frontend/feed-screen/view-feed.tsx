@@ -4,17 +4,17 @@ import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
+import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 import { Swiper } from '~/@/ui/swiper'
-import { useLiveQuery } from '~/app/@/ui/use-live-query'
+import { useLiveQuery } from '~/@/ui/use-live-query'
 import { useCurrentScreen } from '../../../@/screen/use-current-screen'
 import { useCtx } from '../../../frontend/ctx'
 import { Media } from '../../../media/media/media'
-import { preloadMediaDetailsScreen } from '../../../media/media/media-details-screen/preload-media-details-screen'
+import { MediaDetailsScreen } from '../../../media/media/media-details-screen/media-details-screen'
 import { MediaId } from '../../../media/media/media-id'
 import { Feed } from '../../feed'
 import { FeedItem } from '../../feed-item'
 import { ImgLoading } from './img-loading'
-import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 
 const PAGE_SIZE = 5
 
@@ -69,6 +69,7 @@ export const ViewFeed = (props: { feed: Feed }) => {
   const [state, dispatch] = useReducer(reducer, init(props.feed))
 
   const mediaQuery = useLiveQuery({
+    queryCache: ctx.queryCache,
     queryKey: ['media-query', 'offset', state.offset, 'limit', state.limit].join('-'),
     queryFn: () => ctx.mediaDb.liveQuery(toQuery({ offset: state.offset, limit: state.limit })),
   })
@@ -102,7 +103,7 @@ export const ViewFeed = (props: { feed: Feed }) => {
           entities: [{ ...props.feed, activeIndex: parsed.feedIndex }],
         })
 
-        await preloadMediaDetailsScreen({ ctx, mediaId: parsed.mediaId })
+        await MediaDetailsScreen.preload({ ctx, mediaId: parsed.mediaId })
       }}
     >
       {slideItems.map((item, slideIndex) => {

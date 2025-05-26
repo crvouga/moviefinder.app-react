@@ -1,11 +1,11 @@
 import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { isOk } from '~/@/result'
 import { SwiperContainerProps } from '~/@/ui/swiper'
-import { useLiveQuery } from '~/app/@/ui/use-live-query'
+import { useLiveQuery } from '~/@/ui/use-live-query'
 import { useCtx } from '~/app/frontend/ctx'
-import { MediaPosterSwiper } from '../media/media-poster-swiper'
 import { Media } from '../media/media'
 import { MediaId } from '../media/media-id'
+import { MediaPosterSwiper } from '../media/media-poster-swiper'
 import { Relationship } from './relationship'
 import { RelationshipType } from './relationship-type'
 
@@ -68,6 +68,7 @@ const View = (props: {
   const { mediaId, relationshipType } = props.query
 
   const queried = useLiveQuery({
+    queryCache: ctx.queryCache,
     queryKey: toQueryKey({ mediaId, relationshipType }),
     queryFn: () =>
       mediaId ? ctx.relationshipDb.liveQuery(toQuery({ mediaId, relationshipType })) : null,
