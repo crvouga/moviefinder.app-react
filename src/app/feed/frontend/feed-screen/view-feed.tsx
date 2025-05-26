@@ -1,5 +1,6 @@
 import { useReducer } from 'react'
 import { z } from 'zod'
+import { QueryInput } from '~/@/db/interface/query-input/query-input'
 import { ImageSet } from '~/@/image-set'
 import { Loading } from '~/@/result'
 import { Img } from '~/@/ui/img'
@@ -52,22 +53,24 @@ const reducer = (state: State, msg: Msg): State => {
   }
 }
 
+const toQuery = (input: { offset: number; limit: number }): QueryInput<Media> => {
+  return QueryInput.init<Media>({
+    limit: input.limit,
+    offset: input.offset,
+    orderBy: [
+      { column: 'popularity', direction: 'desc' },
+      { column: 'id', direction: 'asc' },
+    ],
+  })
+}
+
 export const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
   const [state, dispatch] = useReducer(reducer, init(props.feed))
 
   const mediaQuery = useSubscription(
     ['media-query', 'offset', state.offset, 'limit', state.limit],
-    () => {
-      return ctx.mediaDb.liveQuery({
-        limit: state.limit,
-        offset: state.offset,
-        orderBy: [
-          { column: 'popularity', direction: 'desc' },
-          { column: 'id', direction: 'asc' },
-        ],
-      })
-    }
+    () => ctx.mediaDb.liveQuery(toQuery({ offset: state.offset, limit: state.limit }))
   )
 
   const media = mediaQuery ?? Loading

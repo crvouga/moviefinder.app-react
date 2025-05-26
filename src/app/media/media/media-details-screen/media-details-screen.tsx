@@ -17,11 +17,11 @@ import { preloadMediaDetailsScreen } from './preload-media-details-screen'
 import { SectionLayout } from './section-layout'
 
 const toQuery = (input: { mediaId: MediaId }): QueryInput<Media> => {
-  return {
+  return QueryInput.init<Media>({
     where: { op: '=', column: 'id', value: input.mediaId },
     limit: 1,
     offset: 0,
-  }
+  })
 }
 
 const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {

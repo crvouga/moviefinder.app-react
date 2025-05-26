@@ -16,7 +16,7 @@ const toQuery = ({
   mediaId: MediaId
   relationshipType: RelationshipType
 }): QueryInput<Relationship> => {
-  return {
+  return QueryInput.init<Relationship>({
     limit: 10,
     offset: 0,
     where: {
@@ -44,7 +44,7 @@ const toQuery = ({
         direction: 'asc',
       },
     ],
-  }
+  })
 }
 
 const View = (props: {

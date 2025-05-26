@@ -1,6 +1,6 @@
 import { ILogger } from '~/@/logger'
 
-export const SLOW_QUERY_THRESHOLD = 1
+export const SLOW_QUERY_THRESHOLD = 16
 
 export const logSlowQuery = (input: {
   entityCount: number

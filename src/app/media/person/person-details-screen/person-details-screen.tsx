@@ -6,18 +6,22 @@ import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { ScreenLayout } from '~/app/@/ui/screen-layout'
 import { useCtx } from '~/app/frontend/ctx'
 import { PersonId } from '../person-id'
+import { QueryInput } from '~/@/db/interface/query-input/query-input'
+import { Person } from '../person'
+
+const toQuery = (input: { personId: PersonId }): QueryInput<Person> => {
+  return QueryInput.init<Person>({
+    where: { op: '=', column: 'id', value: input.personId },
+    limit: 1,
+    offset: 0,
+  })
+}
 
 export const PersonDetailsScreen = (props: { personId: PersonId | null; from: ScreenFrom }) => {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
   const queried = useSubscription(['person-query', ctx.clientSessionId, props.personId], () =>
-    props.personId
-      ? ctx.personDb.liveQuery({
-          where: { op: '=', column: 'id', value: props.personId },
-          limit: 1,
-          offset: 0,
-        })
-      : null
+    props.personId ? ctx.personDb.liveQuery(toQuery({ personId: props.personId })) : null
   )
 
   const person = queried?.t === 'ok' ? queried.value.entities.items[0] : null

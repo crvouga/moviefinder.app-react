@@ -33,7 +33,7 @@ const View = (props: {
 }
 
 const toQuery = (input: { mediaId: MediaId }): QueryInput<Video> => {
-  return {
+  return QueryInput.init<Video>({
     where: {
       op: '=',
       column: 'mediaId',
@@ -47,7 +47,7 @@ const toQuery = (input: { mediaId: MediaId }): QueryInput<Video> => {
     ],
     limit: 10,
     offset: 0,
-  }
+  })
 }
 
 export const MediaVideoSwiper = {

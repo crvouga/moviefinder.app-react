@@ -11,7 +11,7 @@ import { CreditId } from './credit-id'
 import { CreditsSwiper } from './credit-swiper'
 
 const toQuery = (input: { mediaId: MediaId }): QueryInput<Credit> => {
-  return {
+  return QueryInput.init<Credit>({
     where: {
       op: '=',
       column: 'mediaId',
@@ -33,7 +33,7 @@ const toQuery = (input: { mediaId: MediaId }): QueryInput<Credit> => {
     ],
     limit: 10,
     offset: 0,
-  }
+  })
 }
 
 const View = (props: {

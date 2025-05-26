@@ -8,7 +8,7 @@ export type QueryInput<TEntity extends Record<string, unknown>> = {
   orderBy?: OrderBy<TEntity>
   limit: number
   offset: number
-  key?: string
+  _key?: string
 }
 
 const parser = <TEntity extends Record<string, unknown>>(
@@ -28,18 +28,26 @@ const parser = <TEntity extends Record<string, unknown>>(
 const toKey = <TEntity extends Record<string, unknown>>(
   queryInput: QueryInput<TEntity>
 ): string => {
+  if (queryInput._key) return queryInput._key
   return toDeterministicHash(queryInput)
 }
 
 const ensureKey = <TEntity extends Record<string, unknown>>(
   queryInput: QueryInput<TEntity>
 ): QueryInput<TEntity> => {
-  if (queryInput.key) return queryInput
-  return { ...queryInput, key: toKey(queryInput) }
+  if (queryInput._key) return queryInput
+  return { ...queryInput, _key: toKey(queryInput) }
+}
+
+const init = <TEntity extends Record<string, unknown>>(
+  queryInput: QueryInput<TEntity>
+): QueryInput<TEntity> => {
+  return ensureKey(queryInput)
 }
 
 export const QueryInput = {
   parser,
   toKey,
   ensureKey,
+  init,
 }
