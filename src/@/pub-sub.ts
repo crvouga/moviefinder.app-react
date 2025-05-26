@@ -3,6 +3,7 @@ export type Sub<T> = {
   next: (filter: (value: T) => boolean) => Promise<T>
   map: <U>(mapper: (value: T) => U) => Sub<U>
   mapAsync: <U>(mapper: (value: T) => Promise<U>) => Sub<U>
+  subscriberCount: () => number
 }
 
 export type Pub<T> = {
@@ -53,6 +54,9 @@ export const PubSub = <T>(): PubSub<T> => {
       })
 
       return pubSub
+    },
+    subscriberCount() {
+      return subscribers.size
     },
   }
 }

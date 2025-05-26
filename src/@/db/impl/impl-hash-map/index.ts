@@ -102,8 +102,21 @@ export const Db = <
       if (existing) return existing
       const pubSub = PubSub<QueryOutput<TEntity, TRelated>>()
       pubSubsByQueryKey.set(queryKey, pubSub)
+      console.log('pubSubsByQueryKey.size', pubSubsByQueryKey.size)
       enqueuePublish()
-      return pubSub
+      return {
+        ...pubSub,
+        subscribe(callback) {
+          const unsub = pubSub.subscribe(callback)
+          return () => {
+            unsub()
+            if (pubSub.subscriberCount() === 0) {
+              pubSubsByQueryKey.delete(queryKey)
+              liveQueriesByQueryKey.delete(queryKey)
+            }
+          }
+        },
+      }
     },
     async upsert(input) {
       for (const unmappedEntity of input.entities) {
