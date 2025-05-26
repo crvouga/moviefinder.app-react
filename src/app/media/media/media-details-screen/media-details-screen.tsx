@@ -25,6 +25,10 @@ const toQuery = (input: { mediaId: MediaId }): QueryInput<Media> => {
   })
 }
 
+const toQueryKey = (input: { mediaId: MediaId | null }) => {
+  return ['media-query', input.mediaId].join('-')
+}
+
 const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
@@ -36,15 +40,29 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
     cssMode: isMobile && false,
   }
 
-  const queried = useSubscription(['media-query', props.mediaId], () =>
-    props.mediaId ? ctx.mediaDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null
-  )
+  const queried = useSubscription({
+    subCache: ctx.subCache,
+    subKey: toQueryKey({ mediaId: props.mediaId }),
+    subFn: () =>
+      props.mediaId ? ctx.mediaDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null,
+  })
 
   const media = QueryOutput.first(queried)
-  const from: ScreenFrom = media ? { t: 'media-details', mediaId: media.id } : { t: 'feed' }
+  const from: ScreenFrom = media
+    ? {
+        t: 'media-details',
+        mediaId: media.id,
+      }
+    : {
+        t: 'feed',
+      }
 
   const pushMediaDetails = (input: { mediaId: MediaId }) => {
-    currentScreen.push({ t: 'media-details', mediaId: input.mediaId, from })
+    currentScreen.push({
+      t: 'media-details',
+      mediaId: input.mediaId,
+      from,
+    })
   }
 
   const videoPlayer = useAppVideoPlayer()
@@ -118,4 +136,5 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
 export const MediaDetailsScreen = {
   View,
   toQuery,
+  toQueryKey,
 }

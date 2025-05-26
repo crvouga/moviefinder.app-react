@@ -47,6 +47,13 @@ const toQuery = ({
   })
 }
 
+const toQueryKey = (input: {
+  mediaId: MediaId | null
+  relationshipType: RelationshipType
+}): string => {
+  return ['relationship-query', input.relationshipType, input.mediaId].join('-')
+}
+
 const View = (props: {
   swiper?: Partial<SwiperContainerProps>
   query: {
@@ -60,9 +67,12 @@ const View = (props: {
 
   const { mediaId, relationshipType } = props.query
 
-  const queried = useSubscription(['relationship-query', relationshipType, mediaId], () =>
-    mediaId ? ctx.relationshipDb.liveQuery(toQuery({ mediaId, relationshipType })) : null
-  )
+  const queried = useSubscription({
+    subCache: ctx.subCache,
+    subKey: toQueryKey({ mediaId, relationshipType }),
+    subFn: () =>
+      mediaId ? ctx.relationshipDb.liveQuery(toQuery({ mediaId, relationshipType })) : null,
+  })
 
   if (!queried) return <MediaPosterSwiper swiper={props.swiper} skeleton />
 
@@ -86,6 +96,7 @@ const View = (props: {
 export const RelationshipTypeMediaPosterSwiper = {
   View,
   toQuery,
+  toQueryKey,
 }
 
 // @ts-ignore

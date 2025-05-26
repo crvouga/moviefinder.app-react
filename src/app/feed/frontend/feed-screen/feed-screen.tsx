@@ -10,17 +10,20 @@ import { ImgLoading } from './img-loading'
 export const FeedScreen = () => {
   const ctx = useCtx()
 
-  const feedQuery = useSubscription(['feed-query', ctx.clientSessionId], () =>
-    ctx.feedDb.liveQuery({
-      limit: 1,
-      offset: 0,
-      where: {
-        op: '=',
-        column: 'clientSessionId',
-        value: ctx.clientSessionId,
-      },
-    })
-  )
+  const feedQuery = useSubscription({
+    subCache: ctx.subCache,
+    subKey: ['feed-query', ctx.clientSessionId].join('-'),
+    subFn: () =>
+      ctx.feedDb.liveQuery({
+        limit: 1,
+        offset: 0,
+        where: {
+          op: '=',
+          column: 'clientSessionId',
+          value: ctx.clientSessionId,
+        },
+      }),
+  })
 
   const feed = QueryOutput.first(feedQuery)
 

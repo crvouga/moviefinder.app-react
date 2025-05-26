@@ -1,16 +1,13 @@
 import { useLayoutEffect, useState } from 'react'
 import { Sub } from '../pub-sub'
 
-const valueCache = new Map<string, Record<string, unknown>>()
-
-export const useSubscription = <T extends Record<string, unknown>>(
-  key: (string | number | symbol | undefined | null | boolean)[],
-  createSub: () => Sub<T> | null
-): T | null => {
-  const keyString = key.join('-')
-
+export const useSubscription = <T extends Record<string, unknown>>(input: {
+  subCache: Map<string, Record<string, unknown>>
+  subKey: string
+  subFn: () => Sub<T> | null
+}): T | null => {
   const init = (): T | null => {
-    const cached = valueCache.get(keyString)
+    const cached = input.subCache.get(input.subKey)
     if (cached) return cached as T
     return null
   }
@@ -18,12 +15,13 @@ export const useSubscription = <T extends Record<string, unknown>>(
   const [value, setValue] = useState<T | null>(init)
 
   useLayoutEffect(() => {
-    setValue(init)
-    return createSub()?.subscribe((value) => {
+    const init_ = init()
+    setValue(init_)
+    return input.subFn()?.subscribe((value) => {
       setValue(value)
-      valueCache.set(keyString, value)
+      input.subCache.set(input.subKey, value)
     })
-  }, [keyString])
+  }, [input.subKey])
 
   return value
 }

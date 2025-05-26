@@ -20,9 +20,12 @@ const toQuery = (input: { personId: PersonId }): QueryInput<Person> => {
 export const PersonDetailsScreen = (props: { personId: PersonId | null; from: ScreenFrom }) => {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
-  const queried = useSubscription(['person-query', ctx.clientSessionId, props.personId], () =>
-    props.personId ? ctx.personDb.liveQuery(toQuery({ personId: props.personId })) : null
-  )
+  const queried = useSubscription({
+    subCache: ctx.subCache,
+    subKey: ['person-query', ctx.clientSessionId, props.personId].join('-'),
+    subFn: () =>
+      props.personId ? ctx.personDb.liveQuery(toQuery({ personId: props.personId })) : null,
+  })
 
   const person = queried?.t === 'ok' ? queried.value.entities.items[0] : null
 

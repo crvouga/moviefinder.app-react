@@ -14,9 +14,12 @@ const View = (props: {
 }) => {
   const ctx = useCtx()
 
-  const queried = useSubscription(['video-query', props.mediaId], () =>
-    props.mediaId ? ctx.videoDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null
-  )
+  const queried = useSubscription({
+    subCache: ctx.subCache,
+    subKey: toQueryKey({ mediaId: props.mediaId }),
+    subFn: () =>
+      props.mediaId ? ctx.videoDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null,
+  })
 
   if (!queried) return <VideoSwiper swiper={props.swiper} skeleton />
 
@@ -49,7 +52,12 @@ const toQuery = (input: { mediaId: MediaId }): QueryInput<Video> => {
   })
 }
 
+const toQueryKey = (input: { mediaId: MediaId | null }): string => {
+  return ['video-query', input.mediaId].join('-')
+}
+
 export const MediaVideoSwiper = {
   View,
   toQuery,
+  toQueryKey,
 }

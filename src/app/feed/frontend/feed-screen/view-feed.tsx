@@ -67,10 +67,11 @@ export const ViewFeed = (props: { feed: Feed }) => {
   const ctx = useCtx()
   const [state, dispatch] = useReducer(reducer, init(props.feed))
 
-  const mediaQuery = useSubscription(
-    ['media-query', 'offset', state.offset, 'limit', state.limit],
-    () => ctx.mediaDb.liveQuery(toQuery({ offset: state.offset, limit: state.limit }))
-  )
+  const mediaQuery = useSubscription({
+    subCache: ctx.subCache,
+    subKey: ['media-query', 'offset', state.offset, 'limit', state.limit].join('-'),
+    subFn: () => ctx.mediaDb.liveQuery(toQuery({ offset: state.offset, limit: state.limit })),
+  })
 
   const media = mediaQuery ?? Loading
 

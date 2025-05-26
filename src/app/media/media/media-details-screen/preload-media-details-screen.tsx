@@ -9,8 +9,12 @@ import { Video } from '../../video/video'
 import { MediaId } from '../media-id'
 import { MediaDetailsScreen } from './media-details-screen'
 
+const MAX_IMAGE = 4
+
 export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: MediaId }) => {
   const got = await input.ctx.mediaDb.query(MediaDetailsScreen.toQuery({ mediaId: input.mediaId }))
+
+  input.ctx.subCache.set(MediaDetailsScreen.toQueryKey({ mediaId: input.mediaId }), got)
 
   const media = QueryOutput.first(got)
 
@@ -24,13 +28,15 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     MediaCreditsSwiper.toQuery({ mediaId: input.mediaId })
   )
 
+  input.ctx.subCache.set(MediaCreditsSwiper.toQueryKey({ mediaId: input.mediaId }), gotCredits)
+
   const relatedCredits = QueryOutput.related(gotCredits)
 
   if (relatedCredits) {
     srcList.push(
-      ...Object.values(relatedCredits.person).flatMap((person) =>
-        ImageSet.toMiddleRes(person.profile)
-      )
+      ...Object.values(relatedCredits.person)
+        .slice(0, MAX_IMAGE)
+        .flatMap((person) => ImageSet.toMiddleRes(person.profile))
     )
   }
 
@@ -41,11 +47,21 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     })
   )
 
+  input.ctx.subCache.set(
+    RelationshipTypeMediaPosterSwiper.toQueryKey({
+      mediaId: input.mediaId,
+      relationshipType: 'similar',
+    }),
+    gotSimilar
+  )
+
   const relatedSimilar = QueryOutput.related(gotSimilar)
 
   if (relatedSimilar) {
     srcList.push(
-      ...Object.values(relatedSimilar.media).flatMap((media) => ImageSet.toMiddleRes(media.poster))
+      ...Object.values(relatedSimilar.media)
+        .slice(0, MAX_IMAGE)
+        .flatMap((media) => ImageSet.toMiddleRes(media.poster))
     )
   }
 
@@ -56,13 +72,21 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     })
   )
 
+  input.ctx.subCache.set(
+    RelationshipTypeMediaPosterSwiper.toQueryKey({
+      mediaId: input.mediaId,
+      relationshipType: 'recommendation',
+    }),
+    gotRecommendations
+  )
+
   const relatedRecommendations = QueryOutput.related(gotRecommendations)
 
   if (relatedRecommendations) {
     srcList.push(
-      ...Object.values(relatedRecommendations.media).flatMap((media) =>
-        ImageSet.toMiddleRes(media.poster)
-      )
+      ...Object.values(relatedRecommendations.media)
+        .slice(0, MAX_IMAGE)
+        .flatMap((media) => ImageSet.toMiddleRes(media.poster))
     )
   }
 
@@ -70,10 +94,16 @@ export const preloadMediaDetailsScreen = async (input: { ctx: Ctx; mediaId: Medi
     MediaVideoSwiper.toQuery({ mediaId: input.mediaId })
   )
 
+  input.ctx.subCache.set(MediaVideoSwiper.toQueryKey({ mediaId: input.mediaId }), gotVideos)
+
   const videos = QueryOutput.entities(gotVideos)
 
   if (videos) {
-    srcList.push(...videos.items.flatMap((video) => ImageSet.toMiddleRes(Video.toImageSet(video))))
+    srcList.push(
+      ...videos.items
+        .slice(0, MAX_IMAGE)
+        .flatMap((video) => ImageSet.toMiddleRes(Video.toImageSet(video)))
+    )
   }
 
   preloadImages({ srcList })

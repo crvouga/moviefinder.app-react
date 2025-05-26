@@ -36,6 +36,10 @@ const toQuery = (input: { mediaId: MediaId }): QueryInput<Credit> => {
   })
 }
 
+const toQueryKey = (input: { mediaId: MediaId | null }): string => {
+  return ['credit-query', input.mediaId].join('-')
+}
+
 const View = (props: {
   swiper?: Partial<SwiperContainerProps>
   mediaId: MediaId | null
@@ -44,9 +48,12 @@ const View = (props: {
   const ctx = useCtx()
   const currentScreen = useCurrentScreen()
 
-  const queried = useSubscription(['credit-query', props.mediaId], () =>
-    props.mediaId ? ctx.creditDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null
-  )
+  const queried = useSubscription({
+    subCache: ctx.subCache,
+    subKey: toQueryKey({ mediaId: props.mediaId }),
+    subFn: () =>
+      props.mediaId ? ctx.creditDb.liveQuery(toQuery({ mediaId: props.mediaId })) : null,
+  })
 
   if (!queried) return <CreditsSwiper swiper={props.swiper} skeleton />
 
@@ -70,6 +77,7 @@ const View = (props: {
 export const MediaCreditsSwiper = {
   View,
   toQuery,
+  toQueryKey,
 }
 
 // @ts-ignore
