@@ -14,6 +14,7 @@ import { MediaId } from '../../../media/media/media-id'
 import { Feed } from '../../feed'
 import { FeedItem } from '../../feed-item'
 import { ImgLoading } from './img-loading'
+import { WrapIntersectionObserver } from '~/@/ui/intersection-observer'
 
 const PAGE_SIZE = 5
 
@@ -102,18 +103,6 @@ export const ViewFeed = (props: { feed: Feed }) => {
         })
 
         await preloadMediaDetailsScreen({ ctx, mediaId: parsed.mediaId })
-
-        const isLast = parsed.slideIndex >= slideItems.length - 1
-
-        if (isLast) {
-          dispatch({ t: 'observed-last' })
-        }
-
-        const isFirst = parsed.slideIndex === 0
-
-        if (isFirst) {
-          dispatch({ t: 'observed-first' })
-        }
       }}
     >
       {slideItems.map((item, slideIndex) => {
@@ -128,6 +117,16 @@ export const ViewFeed = (props: { feed: Feed }) => {
           </Swiper.Slide>
         )
       })}
+
+      <Swiper.Slide>
+        <WrapIntersectionObserver
+          onVisible={() => {
+            dispatch({ t: 'observed-last' })
+          }}
+        >
+          <ImgLoading />
+        </WrapIntersectionObserver>
+      </Swiper.Slide>
     </Swiper.Container>
   )
 }

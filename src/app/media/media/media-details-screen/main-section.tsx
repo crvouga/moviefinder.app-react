@@ -6,7 +6,7 @@ import { Media } from '../media'
 
 export const MainSection = (props: { media: Media | null }) => {
   return (
-    <section className="flex w-full flex-col items-center justify-start">
+    <section className="flex w-full flex-col items-center justify-start pb-12">
       <Img
         className="aspect-video w-full object-cover"
         src={ImageSet.toMiddleRes(props.media?.backdrop)}
