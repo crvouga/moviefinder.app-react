@@ -102,7 +102,6 @@ export const Db = <
       if (existing) return existing
       const pubSub = PubSub<QueryOutput<TEntity, TRelated>>()
       pubSubsByQueryKey.set(queryKey, pubSub)
-      console.log('pubSubsByQueryKey.size', pubSubsByQueryKey.size)
       enqueuePublish()
       return {
         ...pubSub,
