@@ -67,7 +67,7 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
     })
   }
 
-  const videoPlayer = useAppVideoPlayer()
+  const appVideoPlayer = useAppVideoPlayer()
 
   return (
     <AppScreenLayout
@@ -85,7 +85,7 @@ const View = (props: { mediaId: MediaId | null; from: ScreenFrom }) => {
             slideRestorationKey: `media-details-swiper-video-${media?.id}`,
           }}
           onClick={(payload) => {
-            videoPlayer.toggle(payload.video)
+            appVideoPlayer.toggle(payload.video)
           }}
         />
       </SectionLayout>
