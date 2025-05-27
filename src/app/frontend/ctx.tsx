@@ -52,8 +52,8 @@ type Config = {
 
 const init = (): Ctx => {
   let config: Config
-  config ??= { storage: 'sql-db' }
   config ??= { storage: 'hash-map' }
+  config ??= { storage: 'sql-db' }
   config ??= { storage: 'blink-db' }
 
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
