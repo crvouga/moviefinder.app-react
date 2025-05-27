@@ -84,13 +84,12 @@ export const ViewFeed = (props: { feed: Feed }) => {
 
   const slideItems = FeedItem.fromPaginatedMedia(media.value.entities)
 
-  const initialSlideIndex = slideItems.findIndex(
-    (item) => item.feedIndex === props.feed.activeIndex
-  )
+  const initialSlideIndex =
+    slideItems.findIndex((item) => item.feedIndex === props.feed.activeIndex) + 1
 
   const lastSlideData: SlideData = {
     slideIndex: slideItems.length,
-    feedIndex: props.feed.activeIndex,
+    feedIndex: (slideItems[slideItems.length - 1]?.feedIndex ?? 0) + 1,
     mediaId: null,
   }
 

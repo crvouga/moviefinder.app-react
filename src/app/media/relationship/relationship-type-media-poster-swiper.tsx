@@ -80,7 +80,8 @@ const View = (props: {
 
   const media: Media[] = queried.value.entities.items.flatMap((item) => {
     const media = queried.value.related.media[item.to]
-    return media ? [media] : []
+    if (!media) return []
+    return [media]
   })
 
   return (
