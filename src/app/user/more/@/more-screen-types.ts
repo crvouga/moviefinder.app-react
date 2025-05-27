@@ -7,6 +7,9 @@ const parser = z.discriminatedUnion('t', [
   z.object({
     t: z.literal('pglite-repl'),
   }),
+  z.object({
+    t: z.literal('wipe-local-data'),
+  }),
 ])
 
 export type IMoreScreen = z.infer<typeof parser>

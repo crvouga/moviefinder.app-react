@@ -1,4 +1,4 @@
-import { IconCommandLineSolid } from '~/@/ui/icon'
+import { IconCommandLineSolid, IconTrashSolid } from '~/@/ui/icon'
 import { List } from '~/@/ui/list'
 import { useCurrentScreen } from '~/app/@/screen/use-current-screen'
 import { AppScreenLayout } from '~/app/@/ui/app-screen-layout'
@@ -23,6 +23,14 @@ export const MoreIndexScreen = () => {
             text: 'PGLite REPL',
             onClick: () => {
               currentScreen.push({ t: 'user', c: { t: 'more', c: { t: 'pglite-repl' } } })
+            },
+            link: true,
+          },
+          {
+            renderStartIcon: (props) => <IconTrashSolid {...props} />,
+            text: 'Wipe Local Data',
+            onClick: () => {
+              currentScreen.push({ t: 'user', c: { t: 'more', c: { t: 'wipe-local-data' } } })
             },
             link: true,
           },

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { IMoreScreen } from '../more/@/more-screen-types'
 
 const parser = z.discriminatedUnion('t', [
   z.object({
@@ -6,14 +7,7 @@ const parser = z.discriminatedUnion('t', [
   }),
   z.object({
     t: z.literal('more'),
-    c: z.discriminatedUnion('t', [
-      z.object({
-        t: z.literal('index'),
-      }),
-      z.object({
-        t: z.literal('pglite-repl'),
-      }),
-    ]),
+    c: IMoreScreen.parser,
   }),
 ])
 
