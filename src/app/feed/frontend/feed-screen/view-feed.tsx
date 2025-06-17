@@ -57,10 +57,7 @@ const toQuery = (input: { offset: number; limit: number }): QueryInput<Media> =>
   return QueryInput.init<Media>({
     limit: input.limit,
     offset: input.offset,
-    orderBy: [
-      { column: 'popularity', direction: 'desc' },
-      { column: 'id', direction: 'asc' },
-    ],
+    orderBy: [{ column: 'popularity', direction: 'desc' }],
   })
 }
 
