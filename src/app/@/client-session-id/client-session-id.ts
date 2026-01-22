@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { Codec } from '~/@/codec'
+import { randomUUID } from '~/@/uuid'
 
 const parser = z.string()
 
 export type ClientSessionId = z.infer<typeof parser>
 
 export const generate = (): ClientSessionId => {
-  return parser.parse(`client-session:${crypto.randomUUID()}`)
+  return parser.parse(`client-session:${randomUUID()}`)
 }
 
 const codec: Codec<ClientSessionId> = {
