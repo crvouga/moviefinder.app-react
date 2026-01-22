@@ -15,7 +15,8 @@ COPY package.json bun.lock ./
 
 # Install Bun for dependency installation (baseline build)
 # We use Bun to install because it's faster and handles bun.lock
-ARG BUN_VERSION=1.1.38
+# Using newer version with better WASM support
+ARG BUN_VERSION=1.2.21
 RUN curl -fsSL https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64-baseline.zip -o bun.zip && \
     unzip -q bun.zip && \
     install -m 755 bun-linux-x64-baseline/bun /usr/local/bin/bun && \
@@ -42,7 +43,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bun baseline build for runtime (no AVX required)
-ARG BUN_VERSION=1.1.38
+# Using newer version with better WASM support
+ARG BUN_VERSION=1.2.21
 RUN curl -fsSL https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64-baseline.zip -o bun.zip && \
     unzip -q bun.zip && \
     install -m 755 bun-linux-x64-baseline/bun /usr/local/bin/bun && \
