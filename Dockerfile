@@ -54,6 +54,9 @@ WORKDIR /app
 COPY --from=builder /app/package.json /app/bun.lock ./
 COPY --from=builder /app/node_modules ./node_modules
 
+# Copy tsconfig.json for path alias resolution
+COPY --from=builder /app/tsconfig.json ./
+
 # Copy built files and source
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src ./src
