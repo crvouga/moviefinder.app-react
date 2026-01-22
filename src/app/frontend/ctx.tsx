@@ -57,6 +57,8 @@ const init = (): Ctx => {
   config ??= { storage: 'blink-db' }
 
   const isProd = import.meta.env.VITE_NODE_ENV === 'production'
+  // Default to empty string (same origin) if not set - works when frontend is served by backend
+  // In dev mode with separate servers, set VITE_BACKEND_URL=http://localhost:3000
   const backendUrl = import.meta.env.VITE_BACKEND_URL ?? ''
 
   let logger: ILogger

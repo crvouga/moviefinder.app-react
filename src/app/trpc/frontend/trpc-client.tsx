@@ -6,9 +6,11 @@ import { AppRouter } from '../backend/app-router'
 
 export const TrpcClient = (config: { backendUrl: string; logger: ILogger }) => {
   const logger = config.logger.prefix(['trpc-client'])
-  const url = `${config.backendUrl}${ENDPOINT}`
+  // If backendUrl is empty, use same origin (relative URL)
+  // Otherwise, construct the full URL
+  const url = config.backendUrl ? `${config.backendUrl}${ENDPOINT}` : ENDPOINT
 
-  logger.info('initializing trpc client', { url })
+  logger.info('initializing trpc client', { url, backendUrl: config.backendUrl || '(same origin)' })
 
   return createTRPCClient<AppRouter>({
     links: [
