@@ -25,6 +25,8 @@ const main = async (): Promise<Result<null, Error>> => {
   }
 
   const server = Bun.serve({
+    port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
+    hostname: '0.0.0.0',
     async fetch(req) {
       const requestId = RequestId.generate()
       const logger = ctx.logger.prefix([requestId])
