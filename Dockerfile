@@ -1,5 +1,22 @@
-# Use Bun as base image
-FROM oven/bun:1 AS base
+# Use Debian as base image for better CPU compatibility
+FROM --platform=linux/amd64 debian:bookworm-slim AS base
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Bun baseline build (no AVX required)
+# Using a specific version for stability - update as needed
+ARG BUN_VERSION=1.3.6
+ARG TARGETPLATFORM
+RUN curl -fsSL https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64-baseline.zip -o bun.zip && \
+    unzip -q bun.zip && \
+    mv bun-linux-x64-baseline/bun /usr/local/bin/bun && \
+    chmod +x /usr/local/bin/bun && \
+    rm -rf bun.zip bun-linux-x64-baseline
 
 # Set working directory
 WORKDIR /app

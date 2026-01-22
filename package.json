@@ -11,7 +11,7 @@
     "kp": "bun x kill-port 3000",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "bun install && bun run build && bun start",
-    "docker": "docker build --no-cache -t moviefinder-app-react . && docker run -p 3000:3000 moviefinder-app-react",
+    "docker": "docker build --platform linux/amd64 --no-cache -t moviefinder-app-react . && docker run --platform linux/amd64 -p 3000:3000 moviefinder-app-react",
     "start": "bun --hot ./src/backend.ts",
     "tc": "tsc --watch --noEmit",
     "viz-bundle": "bun x vite-bundle-visualizer"
