@@ -10,8 +10,13 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME: crvouga/moviefinder-app-react
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-push:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions:
       contents: read
